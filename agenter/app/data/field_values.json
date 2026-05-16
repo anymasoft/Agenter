@@ -1,0 +1,766 @@
+{
+  "FIELD_VALUES": {
+    "UseStandardCommands": [
+      "true",
+      "false"
+    ],
+    "CheckUnique": [
+      "true",
+      "false"
+    ],
+    "Autonumbering": [
+      "true",
+      "false"
+    ],
+    "MultiLine": [
+      "true",
+      "false"
+    ],
+    "FillFromFillingValue": [
+      "true",
+      "false"
+    ],
+    "ExtendedEdit": [
+      "true",
+      "false"
+    ],
+    "PasswordMode": [
+      "true",
+      "false"
+    ],
+    "MarkNegatives": [
+      "true",
+      "false"
+    ],
+    "Hierarchical": [
+      "true",
+      "false"
+    ],
+    "HierarchyType": [
+      "HierarchyFoldersAndItems",
+      "HierarchyOfItems"
+    ],
+    "FoldersOnTop": [
+      "true",
+      "false"
+    ],
+    "UseInputByString": [
+      "true",
+      "false"
+    ],
+    "RegisterRecords": [
+      "true",
+      "false"
+    ],
+    "Posting": [
+      "Allow",
+      "Deny"
+    ],
+    "RealTimePosting": [
+      "Allow",
+      "Deny"
+    ],
+    "SequenceFilling": [
+      "AutoFillOff",
+      "AutoFillOn",
+      "AutoFillOnWrite"
+    ],
+    "RegisterRecordsWritingOnPost": [
+      "WriteSelected",
+      "WriteModified"
+    ],
+    "PostInPrivilegedMode": [
+      "true",
+      "false"
+    ],
+    "UnpostInPrivilegedMode": [
+      "true",
+      "false"
+    ],
+    "IncludeHelpInContents": [
+      "true",
+      "false"
+    ],
+    "BasedOn": [
+      "true",
+      "false"
+    ],
+    "DataLockControlMode": [
+      "Managed",
+      "Automatic",
+      "AutomaticAndManaged"
+    ],
+    "DataSeparation": [
+      "DontUse",
+      "Separate"
+    ],
+    "SeparatedDataUse": [
+      "Independently",
+      "IndependentlyAndSimultaneously"
+    ],
+    "Indexing": [
+      "DontIndex",
+      "Index",
+      "IndexWithAdditionalOrder"
+    ],
+    "FullTextSearch": [
+      "Use",
+      "DontUse"
+    ],
+    "ObjectPresentation": [
+      ""
+    ],
+    "ExtendedObjectPresentation": [
+      ""
+    ],
+    "ListPresentation": [
+      ""
+    ],
+    "ExtendedListPresentation": [
+      ""
+    ],
+    "Explanation": [
+      ""
+    ],
+    "CreateOnInput": [
+      "Auto",
+      "Use",
+      "DontUse"
+    ],
+    "AuxiliaryObjectForm": [
+      ""
+    ],
+    "AuxiliaryListForm": [
+      ""
+    ],
+    "AuxiliaryChoiceForm": [
+      ""
+    ],
+    "DefaultObjectForm": [
+      ""
+    ],
+    "DefaultListForm": [
+      ""
+    ],
+    "DefaultChoiceForm": [
+      ""
+    ],
+    "ChoiceHistoryOnInput": [
+      "Auto",
+      "Use",
+      "DontUse"
+    ],
+    "NumberType": [
+      "String",
+      "Number"
+    ],
+    "NumberAllowedLength": [
+      "Variable",
+      "Fixed"
+    ],
+    "NumberPeriodicity": [
+      "Nonperiodical",
+      "Year",
+      "Quarter",
+      "Month",
+      "Day"
+    ],
+    "FillChecking": [
+      "DontCheck",
+      "ShowError",
+      "ShowWarning"
+    ],
+    "DataHistory": [
+      "Use",
+      "DontUse"
+    ],
+    "QuickChoice": [
+      "Auto",
+      "Use",
+      "DontUse"
+    ],
+    "SearchStringModeOnInputByString": [
+      "Begin",
+      "AnyPart"
+    ],
+    "ChoiceDataGetModeOnInputByString": [
+      "Background",
+      "Directly",
+      "OnDemand"
+    ],
+    "FullTextSearchOnInputByString": [
+      "Use",
+      "DontUse"
+    ],
+    "DefaultForm": [
+      ""
+    ],
+    "AuxiliaryForm": [
+      ""
+    ],
+    "CodeLength": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11",
+      "12",
+      "15",
+      "20",
+      "25",
+      "50"
+    ],
+    "CodeAllowedLength": [
+      "Variable",
+      "Fixed"
+    ],
+    "CodeSeries": [
+      "WholeCatalog",
+      "WithinOwnerSubordination",
+      "WithinOwnerHierarchy",
+      "WholeCharacteristicKind"
+    ],
+    "SubordinationUse": [
+      "ToItems",
+      "ToFolders",
+      "ToFoldersAndItems"
+    ],
+    "DescriptionLength": [
+      "10",
+      "25",
+      "50",
+      "100",
+      "150",
+      "200",
+      "250",
+      "300",
+      "500"
+    ],
+    "Periodicity": [
+      "Nonperiodical",
+      "Second",
+      "Day",
+      "Month",
+      "Quarter",
+      "Year"
+    ],
+    "WriteMode": [
+      "RecorderSubordinate",
+      "Independent"
+    ],
+    "MainFilterOnTheFly": [
+      "true",
+      "false"
+    ],
+    "DefaultRecordForm": [
+      ""
+    ],
+    "StandardRecordForm": [
+      ""
+    ],
+    "StandardListForm": [
+      ""
+    ],
+    "RecordFormUsePurpose": [
+      "PlatformApplication",
+      "MobilePlatformApplication"
+    ],
+    "ListFormUsePurpose": [
+      "PlatformApplication",
+      "MobilePlatformApplication"
+    ],
+    "EnableTotalsSliceLast": [
+      "true",
+      "false"
+    ],
+    "EnableTotalsSliceFirst": [
+      "true",
+      "false"
+    ],
+    "InformationRegisterPeriodicity": [
+      "Nonperiodical",
+      "Second",
+      "Day",
+      "Month",
+      "Quarter",
+      "Year",
+      "RecorderPosition"
+    ],
+    "RegisterType": [
+      "Turnovers",
+      "Balances"
+    ],
+    "MainAttribute": [
+      "true",
+      "false"
+    ],
+    "Use": [
+      "Always",
+      "Auto",
+      "DontUse"
+    ],
+    "Balance": [
+      "true",
+      "false"
+    ],
+    "Type": [
+      "Both",
+      "Debit",
+      "Credit"
+    ],
+    "CorrespondentType": [
+      "ChartOfAccounts",
+      "ExtDimension"
+    ],
+    "Correspondence": [
+      "true",
+      "false"
+    ],
+    "ChartOfCalculationTypes": [
+      ""
+    ],
+    "ActionPeriod": [
+      "true",
+      "false"
+    ],
+    "ActionPeriodUse": [
+      "true",
+      "false"
+    ],
+    "Schedule": [
+      ""
+    ],
+    "ScheduleValue": [
+      ""
+    ],
+    "ScheduleDate": [
+      ""
+    ],
+    "BasePeriod": [
+      "true",
+      "false"
+    ],
+    "BaseCalculationTypes": [
+      ""
+    ],
+    "ActionPeriodRoundUp": [
+      "true",
+      "false"
+    ],
+    "Predefined": [
+      "true",
+      "false"
+    ],
+    "PredefinedDataUpdate": [
+      "Auto",
+      "DontAutoUpdate",
+      "AutoUpdateUseDefaultLanguage"
+    ],
+    "EditType": [
+      "InDialog",
+      "BothWays"
+    ],
+    "DefaultPresentation": [
+      "AsDescription",
+      "AsCode"
+    ],
+    "StandardTabularSections": [
+      ""
+    ],
+    "SearchOnInput": [
+      "Auto",
+      "Use",
+      "DontUse"
+    ],
+    "FullTextSearchUsing": [
+      "Allow",
+      "Use",
+      "DontUse"
+    ],
+    "Characteristics": [
+      ""
+    ],
+    "DataLockFields": [
+      ""
+    ],
+    "CommandParameterType": [
+      ""
+    ],
+    "ParameterUseMode": [
+      "Single",
+      "Multiple"
+    ],
+    "ModifiesData": [
+      "true",
+      "false"
+    ],
+    "FormUsePurpose": [
+      "PlatformApplication",
+      "MobilePlatformApplication",
+      "MobileClient"
+    ],
+    "ApplicationUsePurpose": [
+      "PlatformApplication",
+      "MobilePlatformApplication",
+      "MobileClient"
+    ]
+  },
+  "FIELD_LABELS": {
+    "Name": "Имя",
+    "Synonym": "Синоним",
+    "Comment": "Комментарий",
+    "UseStandardCommands": "Использовать стандартные команды",
+    "Posting": "Проведение",
+    "RealTimePosting": "Проведение в реальном времени",
+    "RegisterRecords": "Записи регистров",
+    "BasedOn": "Основание",
+    "InputByString": "Ввод по строке",
+    "CreateOnInput": "Создание при вводе",
+    "DefaultObjectForm": "Форма объекта по умолчанию",
+    "DefaultListForm": "Форма списка по умолчанию",
+    "DefaultChoiceForm": "Форма выбора по умолчанию",
+    "FullTextSearch": "Полнотекстовый поиск",
+    "DataHistory": "История данных",
+    "ObjectPresentation": "Представление объекта",
+    "ListPresentation": "Представление списка",
+    "IncludeHelpInContents": "Включать справку в содержание",
+    "PostInPrivilegedMode": "Проведение в привилегированном режиме",
+    "UnpostInPrivilegedMode": "Отмена проведения в привилегированном режиме",
+    "WriteRegisterRecordsOnPosting": "Запись регистров при проведении",
+    "HierarchyType": "Тип иерархии",
+    "SubordinationUse": "Подчинение",
+    "RegisterRecordsDeletion": "Удаление записей регистров",
+    "RegisterRecordsWritingOnPost": "Запись регистров при проведении",
+    "SequenceFilling": "Заполнение последовательности",
+    "NumberType": "Тип номера",
+    "NumberAllowedLength": "Тип длины номера",
+    "NumberPeriodicity": "Периодичность номера",
+    "SearchStringModeOnInputByString": "Режим поиска по строке",
+    "FullTextSearchOnInputByString": "Полнотекстовый поиск при вводе по строке",
+    "ChoiceDataGetModeOnInputByString": "Режим получения данных при вводе по строке",
+    "DataLockControlMode": "Режим управления блокировкой данных",
+    "FillChecking": "Проверка заполнения",
+    "ChoiceFoldersAndItems": "Выбор папок и элементов",
+    "Indexing": "Индексирование",
+    "PasswordMode": "Режим пароля",
+    "MarkNegatives": "Отмечать отрицательные",
+    "MultiLine": "Многострочный",
+    "ExtendedEdit": "Расширенное редактирование",
+    "FillFromFillingValue": "Заполнять из значения заполнения",
+    "CheckUnique": "Проверять уникальность",
+    "Autonumbering": "Автонумерация",
+    "UpdateDataHistoryImmediatelyAfterWrite": "Обновлять историю данных сразу после записи",
+    "ExecuteAfterWriteDataHistoryVersionProcessing": "Выполнять обработку версии истории данных после записи",
+    "DefaultForm": "Форма по умолчанию",
+    "AuxiliaryForm": "Вспомогательная форма",
+    "DefaultRecordForm": "Форма записи по умолчанию",
+    "AuxiliaryRecordForm": "Вспомогательная форма записи",
+    "AuxiliaryListForm": "Вспомогательная форма списка",
+    "AuxiliaryChoiceForm": "Вспомогательная форма выбора",
+    "EditType": "Тип редактирования",
+    "InformationRegisterPeriodicity": "Периодичность регистра сведений",
+    "WriteMode": "Режим записи",
+    "MainFilterOnPeriod": "Основной фильтр по периоду",
+    "EnableTotalsSliceFirst": "Включить срез итогов сначала",
+    "EnableTotalsSliceLast": "Включить срез итогов в конце",
+    "EnableTotalsSplitting": "Включить разбиение итогов",
+    "RecordPresentation": "Представление записи",
+    "ExtendedRecordPresentation": "Расширенное представление записи",
+    "ExtendedListPresentation": "Расширенное представление списка",
+    "ExtendedObjectPresentation": "Расширенное представление объекта",
+    "Explanation": "Пояснение",
+    "ExtendedPresentation": "Расширенное представление",
+    "RegisterType": "Тип регистра",
+    "ChartOfAccounts": "План счетов",
+    "Correspondence": "Корреспонденция",
+    "PeriodAdjustmentLength": "Длина уточнения периода",
+    "Master": "Ведущий",
+    "MainFilter": "Основной фильтр",
+    "Periodicity": "Периодичность",
+    "ActionPeriod": "Период действия",
+    "BasePeriod": "Базовый период",
+    "Schedule": "График",
+    "ScheduleValue": "Значение графика",
+    "ScheduleDate": "Дата графика",
+    "ChartOfCalculationTypes": "План видов расчета",
+    "Hierarchical": "Иерархический",
+    "FoldersOnTop": "Папки сверху",
+    "CodeLength": "Длина кода",
+    "CodeAllowedLength": "Тип длины кода",
+    "CodeSeries": "Серия кода",
+    "DescriptionLength": "Длина описания",
+    "DefaultPresentation": "Представление по умолчанию",
+    "QuickChoice": "Быстрый выбор",
+    "ChoiceMode": "Режим выбора",
+    "ChoiceHistoryOnInput": "История выбора при вводе",
+    "DefaultFolderForm": "Форма папки по умолчанию",
+    "DefaultFolderChoiceForm": "Форма выбора папки по умолчанию",
+    "AuxiliaryFolderForm": "Вспомогательная форма папки",
+    "AuxiliaryFolderChoiceForm": "Вспомогательная форма выбора папки",
+    "DataLockFields": "Поля блокировки данных",
+    "PredefinedDataUpdate": "Обновление предопределенных данных",
+    "Characteristics": "Характеристики",
+    "StandardAttributes": "Стандартные реквизиты",
+    "Posted": "Проведен",
+    "PredefinedDataName": "Имя предопределенных данных",
+    "Order": "Порядок",
+    "OffBalance": "Забалансовый",
+    "Ref": "Ссылка",
+    "DeletionMark": "Пометка удаления",
+    "CodeMask": "Маска кода",
+    "ExtDimensionTypes": "Виды субконто",
+    "MaxExtDimensionCount": "Максимальное количество субконто",
+    "AutoOrderByCode": "Автопорядок по коду",
+    "OrderLength": "Длина порядка",
+    "Date": "Дата",
+    "Number": "Номер",
+    "Owner": "Владелец",
+    "Parent": "Родитель",
+    "Code": "Код",
+    "Level": "Уровень",
+    "IsFolder": "Это папка",
+    "DataVersion": "Версия данных",
+    "LockedByDBMS": "Заблокировано СУБД",
+    "ReadOnly": "Только чтение",
+    "TypeReductionMode": "Режим приведения типа",
+    "StandardTabularSections": "Стандартные табличные части",
+    "DependenceOnCalculationTypes": "Зависимость от базы",
+    "BaseCalculationTypes": "Базовые планы видов расчета",
+    "ActionPeriodUse": "Использует период действия",
+    "ActionPeriodIsBase": "Базовый период действия",
+    "Type": "Тип",
+    "CharacteristicExtValues": "Внешние значения характеристик",
+    "NumberLength": "Длина номера",
+    "TaskNumberAutoPrefix": "Автопрефикс номера задачи",
+    "Addressing": "Адресация",
+    "MainAddressingAttribute": "Основной атрибут адресации",
+    "CurrentPerformer": "Текущий исполнитель",
+    "Task": "Задача",
+    "CreateTaskInPrivilegedMode": "Создание задачи в привилегированном режиме",
+    "DistributedInfoBase": "Распределенная информационная база",
+    "IncludeConfigurationExtensions": "Включать расширения конфигурации",
+    "AutoRecord": "Авторегистрация",
+    "RegisteredDocuments": "Зарегистрированные документы",
+    "Namespace": "Пространство имен",
+    "XDTOPackages": "Пакеты XDTO",
+    "DescriptorFileName": "Имя файла дескриптора",
+    "ReuseSessions": "Переиспользование сеансов",
+    "SessionMaxAge": "Максимальный возраст сеанса",
+    "RootURL": "Корневой URL",
+    "IncludeInCommandInterface": "Включать в интерфейс команд",
+    "UseOneCommand": "Использовать одну команду",
+    "Picture": "Картинка",
+    "Content": "Содержимое",
+    "MethodName": "Имя метода",
+    "Description": "Описание",
+    "Key": "Ключ",
+    "Use": "Использование",
+    "Predefined": "Предопределенное",
+    "RestartCountOnFailure": "Количество перезапусков при ошибке",
+    "RestartIntervalOnFailure": "Интервал перезапуска при ошибке",
+    "Group": "Группа",
+    "Representation": "Представление",
+    "ToolTip": "Подсказка",
+    "Shortcut": "Сочетание клавиш",
+    "CommandParameterType": "Тип параметра команды",
+    "ParameterUseMode": "Режим использования параметра",
+    "ModifiesData": "Изменяет данные",
+    "OnMainServerUnavalableBehavior": "Поведение при недоступности главного сервера",
+    "TemplateType": "Тип макета",
+    "AvailabilityForChoice": "Доступность для выбора",
+    "AvailabilityForAppearance": "Доступность для отображения",
+    "LocationURL": "URL расположения",
+    "DefaultSaveForm": "Форма сохранения по умолчанию",
+    "DefaultLoadForm": "Форма загрузки по умолчанию",
+    "AuxiliarySaveForm": "Вспомогательная форма сохранения",
+    "AuxiliaryLoadForm": "Вспомогательная форма загрузки",
+    "FormType": "Тип формы",
+    "UsePurposes": "Назначения использования",
+    "Global": "Глобальный",
+    "ClientManagedApplication": "Клиентское управляемое приложение",
+    "Server": "Серверный",
+    "ExternalConnection": "Внешнее соединение",
+    "ClientOrdinaryApplication": "Клиентское обычное приложение",
+    "ServerCall": "Серверный вызов",
+    "Privileged": "Привилегированный",
+    "ReturnValuesReuse": "Переиспользование возвращаемых значений",
+    "Format": "Формат",
+    "EditFormat": "Формат редактирования",
+    "MinValue": "Минимальное значение",
+    "MaxValue": "Максимальное значение",
+    "ChoiceParameterLinks": "Связи параметров выбора",
+    "ChoiceParameters": "Параметры выбора",
+    "ChoiceForm": "Форма выбора",
+    "LinkByType": "Связь по типу",
+    "MainDataCompositionSchema": "Основная схема композиции данных",
+    "DefaultSettingsForm": "Форма настроек по умолчанию",
+    "AuxiliarySettingsForm": "Вспомогательная форма настроек",
+    "DefaultVariantForm": "Форма варианта по умолчанию",
+    "VariantsStorage": "Хранилище вариантов",
+    "SettingsStorage": "Хранилище настроек",
+    "AccumulationRegister": "Регистр накопления",
+    "AuthenticationSeparation": "Разделение аутентификации",
+    "AutoUse": "Автоиспользование",
+    "AuxiliaryObjectForm": "Вспомогательная форма объекта",
+    "BusinessProcess": "Бизнес-процесс",
+    "CalculationRegister": "Регистр расчета",
+    "Category": "Категория",
+    "ChartOfCharacteristicTypes": "План видов характеристик",
+    "CodeType": "Тип кода",
+    "CommandGroup": "Группа команд",
+    "CommonAttribute": "Общий реквизит",
+    "CommonCommand": "Общая команда",
+    "CommonForm": "Общая форма",
+    "CommonModule": "Общий модуль",
+    "CommonPicture": "Общая картинка",
+    "CommonTemplate": "Общий макет",
+    "ConditionalSeparation": "Условное разделение",
+    "ConfigurationExtensionsSeparation": "Разделение расширений конфигурации",
+    "Constant": "Константа",
+    "DataProcessor": "Обработка",
+    "DataSeparation": "Разделение данных",
+    "DataSeparationUse": "Использование разделения данных",
+    "DataSeparationValue": "Значение разделения данных",
+    "DefinedType": "Определяемый тип",
+    "DocumentJournal": "Журнал документов",
+    "DocumentNumerator": "Нумератор документов",
+    "Event": "Событие",
+    "EventSubscription": "Подписка на событие",
+    "ExchangePlan": "План обмена",
+    "FillValue": "Значение заполнения",
+    "FilterCriterion": "Критерий отбора",
+    "FunctionalOption": "Функциональная опция",
+    "FunctionalOptionsParameter": "Параметр функциональных опций",
+    "HTTPService": "HTTP-сервис",
+    "Handler": "Обработчик",
+    "InformationRegister": "Регистр сведений",
+    "Location": "Расположение",
+    "Mask": "Маска",
+    "PrivilegedGetMode": "Режим получения в привилегированном режиме",
+    "Report": "Отчет",
+    "Role": "Роль",
+    "ScheduledJob": "Регламентное задание",
+    "SeparatedDataUse": "Использование разделенных данных",
+    "SessionParameter": "Параметр сеанса",
+    "Source": "Источник",
+    "StyleItem": "Элемент стиля",
+    "Subsystem": "Подсистема",
+    "UsersSeparation": "Разделение пользователей",
+    "Value": "Значение",
+    "WSReference": "WS-ссылка",
+    "WebService": "Веб-сервис"
+  },
+  "ENUM_VALUE_LABELS": {
+    "DontDepend": "Не зависит",
+    "OnActionPeriod": "Зависит по периоду действия",
+    "OnRegistrationPeriod": "Зависит по периоду регистрации",
+    "Turnovers": "Обороты",
+    "Balances": "Остатки",
+    "BalancesAndTurnovers": "Остатки и обороты",
+    "DontCheck": "Не проверять",
+    "ShowError": "Показать ошибку",
+    "ShowWarning": "Показать предупреждение",
+    "Auto": "Автоматически",
+    "Use": "Использовать",
+    "DontUse": "Не использовать",
+    "Create": "Создавать",
+    "DontCreate": "Не создавать",
+    "TransformValues": "Преобразовывать значения",
+    "DontTransform": "Не преобразовывать",
+    "Allow": "Разрешить",
+    "Deny": "Запретить",
+    "AutoFillOff": "Автозаполнение выключено",
+    "AutoFillOn": "Автозаполнение включено",
+    "AutoFillOnWrite": "Автозаполнение при записи",
+    "WriteSelected": "Записывать выбранные",
+    "WriteModified": "Записывать измененные",
+    "Managed": "Управляемый",
+    "Automatic": "Автоматический",
+    "AutomaticAndManaged": "Автоматический и управляемый",
+    "HierarchyFoldersAndItems": "Папки и элементы",
+    "HierarchyOfItems": "Элементы",
+    "String": "Строка",
+    "Number": "Число",
+    "Variable": "Переменная",
+    "Fixed": "Фиксированная",
+    "Nonperiodical": "Непериодический",
+    "Year": "Год",
+    "Quarter": "Квартал",
+    "Month": "Месяц",
+    "Day": "День",
+    "Second": "Секунда",
+    "RecorderPosition": "Позиция регистратора",
+    "WholeCatalog": "Весь справочник",
+    "WithinOwnerSubordination": "В пределах подчиненности владельца",
+    "WithinOwnerHierarchy": "В пределах иерархии владельца",
+    "WholeCharacteristicKind": "Весь вид характеристики",
+    "Begin": "С начала",
+    "AnyPart": "С любой части",
+    "Substring": "Подстрока",
+    "Anywhere": "Везде",
+    "Background": "В фоне",
+    "Directly": "Напрямую",
+    "OnDemand": "По требованию",
+    "ToItems": "Элементам",
+    "ToFolders": "Папкам",
+    "ToFoldersAndItems": "Папкам и элементам",
+    "RecorderSubordinate": "Подчиненный регистратору",
+    "Independent": "Независимый",
+    "Both": "Оба",
+    "Debit": "Дебет",
+    "Credit": "Кредит",
+    "ChartOfAccounts": "План счетов",
+    "ExtDimension": "Внешнее измерение",
+    "DontAutoUpdate": "Не обновлять автоматически",
+    "AutoUpdateUseDefaultLanguage": "Автообновление с языком по умолчанию",
+    "InDialog": "В диалоге",
+    "BothWays": "Оба способа",
+    "AsDescription": "Как описание",
+    "AsCode": "Как код",
+    "Always": "Всегда",
+    "DontIndex": "Не индексировать",
+    "Index": "Индексировать",
+    "IndexWithAdditionalOrder": "Индексировать с дополнительным порядком",
+    "Items": "Элементы",
+    "FoldersAndItems": "Папки и элементы",
+    "PlatformApplication": "Приложение платформы",
+    "MobilePlatformApplication": "Мобильное приложение платформы",
+    "MobileClient": "Мобильный клиент",
+    "Single": "Одиночный",
+    "Multiple": "Множественный",
+    "Any": "Любой",
+    "Nonnegative": "Неотрицательный",
+    "Date": "Дата",
+    "Time": "Время",
+    "DateTime": "Дата и время",
+    "Separate": "Раздельно",
+    "Independently": "Независимо",
+    "IndependentlyAndSimultaneously": "Независимо и одновременно",
+    "BusinessProcessNumber": "Номер бизнес-процесса",
+    "Picture": "Картинка",
+    "PictureAndText": "Картинка и текст",
+    "FormCommandBar": "Панель команд формы",
+    "FormNavigationPanel": "Панель навигации формы",
+    "ActionsPanel": "Панель действий",
+    "NavigationPanel": "Панель навигации",
+    "BinaryData": "Двоичные данные",
+    "SpreadsheetDocument": "Табличный документ",
+    "TextDocument": "Текстовый документ",
+    "DataCompositionSchema": "Схема компоновки данных"
+  },
+  "INFORMATION_REGISTER_PERIODICITY_LABELS": {
+    "Nonperiodical": "Непериодический",
+    "Second": "В пределах секунды",
+    "Day": "В пределах дня",
+    "Month": "В пределах месяца",
+    "Quarter": "В пределах квартала",
+    "Year": "В пределах года",
+    "RecorderPosition": "Позиция регистратора"
+  }
+}

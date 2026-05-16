@@ -1,0 +1,5466 @@
+{
+  "roots": [
+    "AccountingFlag",
+    "AccountingRegister",
+    "AccumulationRegister",
+    "ActionPeriod",
+    "ActionPeriodUse",
+    "AdditionalFullTextSearchDictionaries",
+    "Addressing",
+    "AddressingAttribute",
+    "AddressingDimension",
+    "AllowedIncomingShareRequestTypes",
+    "Attribute",
+    "AuthenticationSeparation",
+    "AutoOrderByCode",
+    "AutoUse",
+    "Autonumbering",
+    "AuxiliaryChoiceForm",
+    "AuxiliaryFolderChoiceForm",
+    "AuxiliaryFolderForm",
+    "AuxiliaryForm",
+    "AuxiliaryListForm",
+    "AuxiliaryLoadForm",
+    "AuxiliaryObjectForm",
+    "AuxiliaryRecordForm",
+    "AuxiliarySaveForm",
+    "AuxiliarySettingsForm",
+    "AvailabilityForAppearance",
+    "AvailabilityForChoice",
+    "Balance",
+    "BaseCalculationTypes",
+    "BaseDimension",
+    "BasePeriod",
+    "BasedOn",
+    "BriefInformation",
+    "BusinessProcess",
+    "CalculationRegister",
+    "Catalog",
+    "Category",
+    "CharacteristicExtValues",
+    "Characteristics",
+    "ChartOfAccounts",
+    "ChartOfCalculationTypes",
+    "ChartOfCharacteristicTypes",
+    "CheckUnique",
+    "ChildObjects",
+    "ChoiceDataGetModeOnInputByString",
+    "ChoiceFoldersAndItems",
+    "ChoiceForm",
+    "ChoiceHistoryOnInput",
+    "ChoiceMode",
+    "ChoiceParameterLinks",
+    "ChoiceParameters",
+    "ClientManagedApplication",
+    "ClientOrdinaryApplication",
+    "CodeAllowedLength",
+    "CodeLength",
+    "CodeMask",
+    "CodeSeries",
+    "CodeType",
+    "Column",
+    "Command",
+    "CommandGroup",
+    "CommandParameterType",
+    "Comment",
+    "CommonAttribute",
+    "CommonCommand",
+    "CommonForm",
+    "CommonModule",
+    "CommonPicture",
+    "CommonSettingsStorage",
+    "CommonTemplate",
+    "CompatibilityMode",
+    "ConditionalSeparation",
+    "Configuration",
+    "ConfigurationExtensionCompatibilityMode",
+    "ConfigurationExtensionsSeparation",
+    "ConfigurationInformationAddress",
+    "Constant",
+    "Content",
+    "Copyright",
+    "Correspondence",
+    "CreateOnInput",
+    "CreateTaskInPrivilegedMode",
+    "CurrentPerformer",
+    "DataHistory",
+    "DataLockControlMode",
+    "DataLockFields",
+    "DataProcessor",
+    "DataSeparation",
+    "DataSeparationUse",
+    "DataSeparationValue",
+    "DatabaseTablespacesUseMode",
+    "DefaultChoiceForm",
+    "DefaultCollaborationSystemUsersChoiceForm",
+    "DefaultConstantsForm",
+    "DefaultDataHistoryChangeHistoryForm",
+    "DefaultDataHistoryVersionDataForm",
+    "DefaultDataHistoryVersionDifferencesForm",
+    "DefaultDynamicListSettingsForm",
+    "DefaultFolderChoiceForm",
+    "DefaultFolderForm",
+    "DefaultForm",
+    "DefaultInterface",
+    "DefaultLanguage",
+    "DefaultListForm",
+    "DefaultLoadForm",
+    "DefaultObjectForm",
+    "DefaultPresentation",
+    "DefaultRecordForm",
+    "DefaultReportAppearanceTemplate",
+    "DefaultReportForm",
+    "DefaultReportSettingsForm",
+    "DefaultReportVariantForm",
+    "DefaultRoles",
+    "DefaultRunMode",
+    "DefaultSaveForm",
+    "DefaultSearchForm",
+    "DefaultSettingsForm",
+    "DefaultStyle",
+    "DefaultVariantForm",
+    "DefinedType",
+    "DenyIncompleteValues",
+    "DependenceOnCalculationTypes",
+    "Description",
+    "DescriptionLength",
+    "DescriptorFileName",
+    "DetailedInformation",
+    "Dimension",
+    "DistributedInfoBase",
+    "Document",
+    "DocumentJournal",
+    "DocumentMap",
+    "DocumentNumerator",
+    "Documents",
+    "DynamicListsUserSettingsStorage",
+    "EditFormat",
+    "EditType",
+    "EnableTotalsSliceFirst",
+    "EnableTotalsSliceLast",
+    "EnableTotalsSplitting",
+    "Enum",
+    "EnumValue",
+    "Event",
+    "EventSubscription",
+    "ExchangePlan",
+    "ExecuteAfterWriteDataHistoryVersionProcessing",
+    "Explanation",
+    "ExtDimensionAccountingFlag",
+    "ExtDimensionTypes",
+    "ExtendedEdit",
+    "ExtendedListPresentation",
+    "ExtendedObjectPresentation",
+    "ExtendedPresentation",
+    "ExtendedRecordPresentation",
+    "ExternalConnection",
+    "ExternalIntegrationServiceAddress",
+    "ExternalIntegrationServiceChannelName",
+    "FillChecking",
+    "FillFromFillingValue",
+    "FillValue",
+    "FilterCriterion",
+    "FoldersOnTop",
+    "Form",
+    "FormDataSettingsStorage",
+    "FormType",
+    "Format",
+    "FullTextSearch",
+    "FullTextSearchOnInputByString",
+    "FunctionalOption",
+    "FunctionalOptionsParameter",
+    "Global",
+    "Group",
+    "HTTPMethod",
+    "HTTPService",
+    "Handler",
+    "Hierarchical",
+    "HierarchyType",
+    "IncludeConfigurationExtensions",
+    "IncludeHelpInContents",
+    "IncludeInCommandInterface",
+    "Indexing",
+    "InformationRegister",
+    "InformationRegisterPeriodicity",
+    "InputByString",
+    "IntegrationService",
+    "IntegrationServiceChannel",
+    "Interface",
+    "InterfaceCompatibilityMode",
+    "InternalInfo",
+    "Key",
+    "Language",
+    "LanguageCode",
+    "LevelCount",
+    "LimitLevelCount",
+    "LineNumberLength",
+    "LinkByType",
+    "ListPresentation",
+    "Location",
+    "LocationURL",
+    "MainAddressingAttribute",
+    "MainClientApplicationWindowMode",
+    "MainDataCompositionSchema",
+    "MainFilter",
+    "MainFilterOnPeriod",
+    "MarkNegatives",
+    "Mask",
+    "Master",
+    "MaxExtDimensionCount",
+    "MaxValue",
+    "MessageDirection",
+    "MetaDataObject",
+    "Method",
+    "MethodName",
+    "MinValue",
+    "MobileApplicationURLs",
+    "ModalityUseMode",
+    "ModifiesData",
+    "MoveBoundaryOnPosting",
+    "MultiLine",
+    "Name",
+    "NamePrefix",
+    "Namespace",
+    "Nillable",
+    "NumberAllowedLength",
+    "NumberLength",
+    "NumberPeriodicity",
+    "NumberType",
+    "Numerator",
+    "ObjectAutonumerationMode",
+    "ObjectPresentation",
+    "OnMainServerUnavalableBehavior",
+    "Operation",
+    "OrderLength",
+    "Owners",
+    "Parameter",
+    "ParameterUseMode",
+    "PasswordMode",
+    "PeriodAdjustmentLength",
+    "Periodicity",
+    "Picture",
+    "PostInPrivilegedMode",
+    "Posting",
+    "Predefined",
+    "PredefinedDataUpdate",
+    "Privileged",
+    "PrivilegedGetMode",
+    "ProcedureName",
+    "Properties",
+    "QuickChoice",
+    "RealTimePosting",
+    "ReceiveMessageProcessing",
+    "RecordPresentation",
+    "References",
+    "RegisterRecords",
+    "RegisterRecordsDeletion",
+    "RegisterRecordsMap",
+    "RegisterRecordsWritingOnPost",
+    "RegisterType",
+    "RegisteredDocuments",
+    "Report",
+    "ReportsUserSettingsStorage",
+    "ReportsVariantsStorage",
+    "Representation",
+    "RequiredMobileApplicationPermissions",
+    "Resource",
+    "RestartCountOnFailure",
+    "RestartIntervalOnFailure",
+    "ReturnValuesReuse",
+    "ReuseSessions",
+    "Role",
+    "RootURL",
+    "Schedule",
+    "ScheduleDate",
+    "ScheduleLink",
+    "ScheduleValue",
+    "ScheduledJob",
+    "ScriptVariant",
+    "SearchStringModeOnInputByString",
+    "SeparatedDataUse",
+    "Sequence",
+    "SequenceFilling",
+    "Server",
+    "ServerCall",
+    "SessionMaxAge",
+    "SessionParameter",
+    "SettingsStorage",
+    "Shortcut",
+    "Source",
+    "StandaloneConfigurationRestrictionRoles",
+    "StandardAttributes",
+    "StandardTabularSections",
+    "StyleItem",
+    "SubordinationUse",
+    "Subsystem",
+    "Switchable",
+    "SynchronousPlatformExtensionAndAddInCallUseMode",
+    "Synonym",
+    "TabularSection",
+    "Task",
+    "TaskNumberAutoPrefix",
+    "Template",
+    "TemplateType",
+    "ToolTip",
+    "Transactioned",
+    "TransferDirection",
+    "Type",
+    "TypeReductionMode",
+    "URLExternalDataStorage",
+    "URLTemplate",
+    "UnpostInPrivilegedMode",
+    "UpdateCatalogAddress",
+    "UpdateDataHistoryImmediatelyAfterWrite",
+    "Use",
+    "UseInTotals",
+    "UseManagedFormInOrdinaryApplication",
+    "UseOneCommand",
+    "UseOrdinaryFormInManagedApplication",
+    "UsePurposes",
+    "UseStandardCommands",
+    "UsedMobileApplicationFunctionalities",
+    "UsersSeparation",
+    "Value",
+    "VariantsStorage",
+    "Vendor",
+    "VendorInformationAddress",
+    "Version",
+    "WSReference",
+    "WebService",
+    "WriteMode",
+    "XDTOPackage",
+    "XDTOPackages",
+    "XDTOReturningValueType",
+    "XDTOValueType"
+  ],
+  "elements": {
+    "AccountingFlag": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 0
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "AccountingRegister": {
+      "children": [
+        "InternalInfo",
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "InternalInfo": 0,
+        "Properties": 0,
+        "ChildObjects": 0
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "AccumulationRegister": {
+      "children": [
+        "InternalInfo",
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "InternalInfo": 0,
+        "Properties": 0,
+        "ChildObjects": 0
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "ActionPeriod": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "ActionPeriodUse": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "AdditionalFullTextSearchDictionaries": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "Addressing": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "AddressingAttribute": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 1
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "required"
+        }
+      ]
+    },
+    "AddressingDimension": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "AllowedIncomingShareRequestTypes": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "Attribute": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 1
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "required"
+        }
+      ]
+    },
+    "AuthenticationSeparation": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "AutoOrderByCode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "AutoUse": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Autonumbering": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "AuxiliaryChoiceForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "AuxiliaryFolderChoiceForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "AuxiliaryFolderForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "AuxiliaryForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "AuxiliaryListForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "AuxiliaryLoadForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "AuxiliaryObjectForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "AuxiliaryRecordForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "AuxiliarySaveForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "AuxiliarySettingsForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "AvailabilityForAppearance": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "AvailabilityForChoice": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "Balance": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "BaseCalculationTypes": {
+      "children": [
+        "Item"
+      ],
+      "childMin": {
+        "Item": 0
+      },
+      "childMax": {
+        "Item": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "BaseDimension": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "BasePeriod": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "BasedOn": {
+      "children": [
+        "Item"
+      ],
+      "childMin": {
+        "Item": 0
+      },
+      "childMax": {
+        "Item": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "BriefInformation": {
+      "children": [
+        "item"
+      ],
+      "childMin": {
+        "item": 1
+      },
+      "childMax": {
+        "item": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "BusinessProcess": {
+      "children": [
+        "InternalInfo",
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "InternalInfo": 0,
+        "Properties": 0,
+        "ChildObjects": 0
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "CalculationRegister": {
+      "children": [
+        "InternalInfo",
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "InternalInfo": 0,
+        "Properties": 0,
+        "ChildObjects": 0
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "Catalog": {
+      "children": [
+        "InternalInfo",
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "InternalInfo": 0,
+        "Properties": 0,
+        "ChildObjects": 0
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "Category": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "CharacteristicExtValues": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Characteristics": {
+      "children": [
+        "Characteristic"
+      ],
+      "childMin": {
+        "Characteristic": 0
+      },
+      "childMax": {
+        "Characteristic": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "ChartOfAccounts": {
+      "children": [
+        "InternalInfo",
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "InternalInfo": 0,
+        "Properties": 0,
+        "ChildObjects": 0
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "ChartOfCalculationTypes": {
+      "children": [
+        "InternalInfo",
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "InternalInfo": 0,
+        "Properties": 0,
+        "ChildObjects": 0
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "ChartOfCharacteristicTypes": {
+      "children": [
+        "InternalInfo",
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "InternalInfo": 0,
+        "Properties": 0,
+        "ChildObjects": 0
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "CheckUnique": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "ChildObjects": {
+      "children": [
+        "AccountingRegister",
+        "AccumulationRegister",
+        "AddressingAttribute",
+        "Attribute",
+        "BusinessProcess",
+        "CalculationRegister",
+        "Catalog",
+        "ChartOfAccounts",
+        "ChartOfCalculationTypes",
+        "ChartOfCharacteristicTypes",
+        "Column",
+        "Command",
+        "CommandGroup",
+        "CommonAttribute",
+        "CommonCommand",
+        "CommonForm",
+        "CommonModule",
+        "CommonPicture",
+        "CommonTemplate",
+        "Constant",
+        "DataProcessor",
+        "DefinedType",
+        "Dimension",
+        "Document",
+        "DocumentJournal",
+        "DocumentNumerator",
+        "Enum",
+        "EnumValue",
+        "EventSubscription",
+        "ExchangePlan",
+        "FilterCriterion",
+        "Form",
+        "FunctionalOption",
+        "FunctionalOptionsParameter",
+        "HTTPService",
+        "InformationRegister",
+        "IntegrationService",
+        "IntegrationServiceChannel",
+        "Interface",
+        "Language",
+        "Method",
+        "Operation",
+        "Parameter",
+        "Report",
+        "Resource",
+        "Role",
+        "ScheduledJob",
+        "SessionParameter",
+        "SettingsStorage",
+        "StyleItem",
+        "Subsystem",
+        "TabularSection",
+        "Task",
+        "Template",
+        "URLTemplate",
+        "WebService",
+        "WSReference",
+        "XDTOPackage"
+      ],
+      "childMin": {
+        "AccountingRegister": 0,
+        "AccumulationRegister": 0,
+        "AddressingAttribute": 0,
+        "Attribute": 0,
+        "BusinessProcess": 0,
+        "CalculationRegister": 0,
+        "Catalog": 0,
+        "ChartOfAccounts": 0,
+        "ChartOfCalculationTypes": 0,
+        "ChartOfCharacteristicTypes": 0,
+        "Column": 0,
+        "Command": 0,
+        "CommandGroup": 0,
+        "CommonAttribute": 0,
+        "CommonCommand": 0,
+        "CommonForm": 0,
+        "CommonModule": 0,
+        "CommonPicture": 0,
+        "CommonTemplate": 0,
+        "Constant": 0,
+        "DataProcessor": 0,
+        "DefinedType": 0,
+        "Dimension": 0,
+        "Document": 0,
+        "DocumentJournal": 0,
+        "DocumentNumerator": 0,
+        "Enum": 0,
+        "EnumValue": 0,
+        "EventSubscription": 0,
+        "ExchangePlan": 0,
+        "FilterCriterion": 0,
+        "Form": 0,
+        "FunctionalOption": 0,
+        "FunctionalOptionsParameter": 0,
+        "HTTPService": 0,
+        "InformationRegister": 0,
+        "IntegrationService": 0,
+        "IntegrationServiceChannel": 0,
+        "Interface": 0,
+        "Language": 0,
+        "Method": 0,
+        "Operation": 0,
+        "Parameter": 0,
+        "Report": 0,
+        "Resource": 0,
+        "Role": 0,
+        "ScheduledJob": 0,
+        "SessionParameter": 0,
+        "SettingsStorage": 0,
+        "StyleItem": 0,
+        "Subsystem": 0,
+        "TabularSection": 0,
+        "Task": 0,
+        "Template": 0,
+        "URLTemplate": 0,
+        "WebService": 0,
+        "WSReference": 0,
+        "XDTOPackage": 0
+      },
+      "childMax": {
+        "AccountingRegister": -1,
+        "AccumulationRegister": -1,
+        "AddressingAttribute": -1,
+        "Attribute": -1,
+        "BusinessProcess": -1,
+        "CalculationRegister": -1,
+        "Catalog": -1,
+        "ChartOfAccounts": -1,
+        "ChartOfCalculationTypes": -1,
+        "ChartOfCharacteristicTypes": -1,
+        "Column": -1,
+        "Command": -1,
+        "CommandGroup": -1,
+        "CommonAttribute": -1,
+        "CommonCommand": -1,
+        "CommonForm": -1,
+        "CommonModule": -1,
+        "CommonPicture": -1,
+        "CommonTemplate": -1,
+        "Constant": -1,
+        "DataProcessor": -1,
+        "DefinedType": -1,
+        "Dimension": -1,
+        "Document": -1,
+        "DocumentJournal": -1,
+        "DocumentNumerator": 1,
+        "Enum": -1,
+        "EnumValue": -1,
+        "EventSubscription": -1,
+        "ExchangePlan": -1,
+        "FilterCriterion": -1,
+        "Form": -1,
+        "FunctionalOption": -1,
+        "FunctionalOptionsParameter": -1,
+        "HTTPService": -1,
+        "InformationRegister": -1,
+        "IntegrationService": 1,
+        "IntegrationServiceChannel": -1,
+        "Interface": -1,
+        "Language": 1,
+        "Method": -1,
+        "Operation": -1,
+        "Parameter": -1,
+        "Report": -1,
+        "Resource": -1,
+        "Role": -1,
+        "ScheduledJob": -1,
+        "SessionParameter": -1,
+        "SettingsStorage": -1,
+        "StyleItem": -1,
+        "Subsystem": -1,
+        "TabularSection": -1,
+        "Task": -1,
+        "Template": -1,
+        "URLTemplate": -1,
+        "WebService": -1,
+        "WSReference": 1,
+        "XDTOPackage": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "ChoiceDataGetModeOnInputByString": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "ChoiceFoldersAndItems": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "ChoiceForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "ChoiceHistoryOnInput": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "ChoiceMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "ChoiceParameterLinks": {
+      "children": [
+        "Link"
+      ],
+      "childMin": {
+        "Link": 0
+      },
+      "childMax": {
+        "Link": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "ChoiceParameters": {
+      "children": [
+        "item"
+      ],
+      "childMin": {
+        "item": 0
+      },
+      "childMax": {
+        "item": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "ClientManagedApplication": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "ClientOrdinaryApplication": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "CodeAllowedLength": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "CodeLength": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "CodeMask": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "CodeSeries": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "CodeType": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Column": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 1
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "required"
+        }
+      ]
+    },
+    "Command": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 1
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "required"
+        }
+      ]
+    },
+    "CommandGroup": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 0
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "CommandParameterType": {
+      "children": [
+        "Type",
+        "TypeSet"
+      ],
+      "childMin": {
+        "Type": 0,
+        "TypeSet": 0
+      },
+      "childMax": {
+        "Type": -1,
+        "TypeSet": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "Comment": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "CommonAttribute": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 0
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "CommonCommand": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 0
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "CommonForm": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 0
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "CommonModule": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 0
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "CommonPicture": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 0
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "CommonSettingsStorage": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "CommonTemplate": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 0
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "CompatibilityMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "ConditionalSeparation": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Configuration": {
+      "children": [
+        "InternalInfo",
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "InternalInfo": 1,
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "required"
+        }
+      ]
+    },
+    "ConfigurationExtensionCompatibilityMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "ConfigurationExtensionsSeparation": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "ConfigurationInformationAddress": {
+      "children": [
+        "item"
+      ],
+      "childMin": {
+        "item": 1
+      },
+      "childMax": {
+        "item": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "Constant": {
+      "children": [
+        "InternalInfo",
+        "Properties"
+      ],
+      "childMin": {
+        "InternalInfo": 0,
+        "Properties": 0
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "Content": {
+      "children": [
+        "Object",
+        "Item"
+      ],
+      "childMin": {
+        "Object": 0,
+        "Item": 0
+      },
+      "childMax": {
+        "Object": -1,
+        "Item": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "Copyright": {
+      "children": [
+        "item"
+      ],
+      "childMin": {
+        "item": 1
+      },
+      "childMax": {
+        "item": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "Correspondence": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "CreateOnInput": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "CreateTaskInPrivilegedMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "CurrentPerformer": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DataHistory": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DataLockControlMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DataLockFields": {
+      "children": [
+        "Field"
+      ],
+      "childMin": {
+        "Field": 0
+      },
+      "childMax": {
+        "Field": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "DataProcessor": {
+      "children": [
+        "InternalInfo",
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "InternalInfo": 0,
+        "Properties": 0,
+        "ChildObjects": 0
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "DataSeparation": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DataSeparationUse": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DataSeparationValue": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DatabaseTablespacesUseMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DefaultChoiceForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DefaultCollaborationSystemUsersChoiceForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "DefaultConstantsForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "DefaultDataHistoryChangeHistoryForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "DefaultDataHistoryVersionDataForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "DefaultDataHistoryVersionDifferencesForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "DefaultDynamicListSettingsForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "DefaultFolderChoiceForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DefaultFolderForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DefaultForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DefaultInterface": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "DefaultLanguage": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DefaultListForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DefaultLoadForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DefaultObjectForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DefaultPresentation": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DefaultRecordForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DefaultReportAppearanceTemplate": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "DefaultReportForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DefaultReportSettingsForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DefaultReportVariantForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DefaultRoles": {
+      "children": [
+        "Item"
+      ],
+      "childMin": {
+        "Item": 3
+      },
+      "childMax": {
+        "Item": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "DefaultRunMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DefaultSaveForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DefaultSearchForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "DefaultSettingsForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DefaultStyle": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "DefaultVariantForm": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DefinedType": {
+      "children": [
+        "InternalInfo",
+        "Properties"
+      ],
+      "childMin": {
+        "InternalInfo": 0,
+        "Properties": 0
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "DenyIncompleteValues": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "DependenceOnCalculationTypes": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Description": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DescriptionLength": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "DescriptorFileName": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "DetailedInformation": {
+      "children": [
+        "item"
+      ],
+      "childMin": {
+        "item": 1
+      },
+      "childMax": {
+        "item": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "Dimension": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 1
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "required"
+        }
+      ]
+    },
+    "DistributedInfoBase": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "Document": {
+      "children": [
+        "InternalInfo",
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "InternalInfo": 0,
+        "Properties": 0,
+        "ChildObjects": 0
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "DocumentJournal": {
+      "children": [
+        "InternalInfo",
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "InternalInfo": 0,
+        "Properties": 0,
+        "ChildObjects": 0
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "DocumentMap": {
+      "children": [
+        "Item"
+      ],
+      "childMin": {
+        "Item": 0
+      },
+      "childMax": {
+        "Item": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "DocumentNumerator": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 0
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "Documents": {
+      "children": [
+        "Item"
+      ],
+      "childMin": {
+        "Item": 27
+      },
+      "childMax": {
+        "Item": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "DynamicListsUserSettingsStorage": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "EditFormat": {
+      "children": [
+        "item"
+      ],
+      "childMin": {
+        "item": 0
+      },
+      "childMax": {
+        "item": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "EditType": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "EnableTotalsSliceFirst": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "EnableTotalsSliceLast": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "EnableTotalsSplitting": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "Enum": {
+      "children": [
+        "InternalInfo",
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "InternalInfo": 0,
+        "Properties": 0,
+        "ChildObjects": 0
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "EnumValue": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 1
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "required"
+        }
+      ]
+    },
+    "Event": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "EventSubscription": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 0
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "ExchangePlan": {
+      "children": [
+        "InternalInfo",
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "InternalInfo": 0,
+        "Properties": 0,
+        "ChildObjects": 0
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "ExecuteAfterWriteDataHistoryVersionProcessing": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "Explanation": {
+      "children": [
+        "item"
+      ],
+      "childMin": {
+        "item": 0
+      },
+      "childMax": {
+        "item": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "ExtDimensionAccountingFlag": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 0
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "ExtDimensionTypes": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "ExtendedEdit": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "ExtendedListPresentation": {
+      "children": [
+        "item"
+      ],
+      "childMin": {
+        "item": 0
+      },
+      "childMax": {
+        "item": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "ExtendedObjectPresentation": {
+      "children": [
+        "item"
+      ],
+      "childMin": {
+        "item": 0
+      },
+      "childMax": {
+        "item": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "ExtendedPresentation": {
+      "children": [
+        "item"
+      ],
+      "childMin": {
+        "item": 0
+      },
+      "childMax": {
+        "item": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "ExtendedRecordPresentation": {
+      "children": [
+        "item"
+      ],
+      "childMin": {
+        "item": 0
+      },
+      "childMax": {
+        "item": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "ExternalConnection": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "ExternalIntegrationServiceAddress": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "ExternalIntegrationServiceChannelName": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "FillChecking": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "FillFromFillingValue": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "FillValue": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:anyType"
+    },
+    "FilterCriterion": {
+      "children": [
+        "InternalInfo",
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "InternalInfo": 0,
+        "Properties": 0,
+        "ChildObjects": 0
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "FoldersOnTop": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "Form": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 0
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "FormDataSettingsStorage": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "FormType": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Format": {
+      "children": [
+        "item"
+      ],
+      "childMin": {
+        "item": 0
+      },
+      "childMax": {
+        "item": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "FullTextSearch": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "FullTextSearchOnInputByString": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "FunctionalOption": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 0
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "FunctionalOptionsParameter": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 0
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "Global": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "Group": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "HTTPMethod": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "HTTPService": {
+      "children": [
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "Properties": 0,
+        "ChildObjects": 0
+      },
+      "childMax": {
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "Handler": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Hierarchical": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "HierarchyType": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "IncludeConfigurationExtensions": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "IncludeHelpInContents": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "IncludeInCommandInterface": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "Indexing": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "InformationRegister": {
+      "children": [
+        "InternalInfo",
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "InternalInfo": 0,
+        "Properties": 0,
+        "ChildObjects": 0
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "InformationRegisterPeriodicity": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "InputByString": {
+      "children": [
+        "Field"
+      ],
+      "childMin": {
+        "Field": 0
+      },
+      "childMax": {
+        "Field": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "IntegrationService": {
+      "children": [
+        "InternalInfo",
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "InternalInfo": 0,
+        "Properties": 0,
+        "ChildObjects": 0
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "IntegrationServiceChannel": {
+      "children": [
+        "InternalInfo",
+        "Properties"
+      ],
+      "childMin": {
+        "InternalInfo": 1,
+        "Properties": 1
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "required"
+        }
+      ]
+    },
+    "Interface": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 0
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "InterfaceCompatibilityMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "InternalInfo": {
+      "children": [
+        "GeneratedType",
+        "ContainedObject",
+        "ThisNode"
+      ],
+      "childMin": {
+        "GeneratedType": 0,
+        "ContainedObject": 0,
+        "ThisNode": 0
+      },
+      "childMax": {
+        "GeneratedType": -1,
+        "ContainedObject": -1,
+        "ThisNode": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "Key": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Language": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 0
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "LanguageCode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "LevelCount": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "LimitLevelCount": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "LineNumberLength": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "LinkByType": {
+      "children": [
+        "DataPath",
+        "LinkItem"
+      ],
+      "childMin": {
+        "DataPath": 0,
+        "LinkItem": 0
+      },
+      "childMax": {
+        "DataPath": 1,
+        "LinkItem": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "ListPresentation": {
+      "children": [
+        "item"
+      ],
+      "childMin": {
+        "item": 0
+      },
+      "childMax": {
+        "item": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "Location": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "LocationURL": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "MainAddressingAttribute": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "MainClientApplicationWindowMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "MainDataCompositionSchema": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "MainFilter": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "MainFilterOnPeriod": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "MarkNegatives": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "Mask": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Master": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "MaxExtDimensionCount": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "MaxValue": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:anyType"
+    },
+    "MessageDirection": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "MetaDataObject": {
+      "children": [
+        "Form",
+        "AccumulationRegister",
+        "AccountingRegister",
+        "BusinessProcess",
+        "Template",
+        "CalculationRegister",
+        "Catalog",
+        "ChartOfCalculationTypes",
+        "ChartOfCharacteristicTypes",
+        "ChartOfAccounts",
+        "CommandGroup",
+        "CommonAttribute",
+        "CommonCommand",
+        "CommonForm",
+        "CommonModule",
+        "CommonPicture",
+        "CommonTemplate",
+        "Configuration",
+        "Constant",
+        "DataProcessor",
+        "DefinedType",
+        "DocumentJournal",
+        "DocumentNumerator",
+        "Document",
+        "Enum",
+        "EventSubscription",
+        "ExchangePlan",
+        "FilterCriterion",
+        "FunctionalOption",
+        "FunctionalOptionsParameter",
+        "HTTPService",
+        "InformationRegister",
+        "IntegrationService",
+        "Interface",
+        "Language",
+        "Report",
+        "Role",
+        "ScheduledJob",
+        "SessionParameter",
+        "SettingsStorage",
+        "StyleItem",
+        "Subsystem",
+        "Task",
+        "WebService",
+        "WSReference",
+        "XDTOPackage"
+      ],
+      "childMin": {
+        "Form": 0,
+        "AccumulationRegister": 0,
+        "AccountingRegister": 0,
+        "BusinessProcess": 0,
+        "Template": 0,
+        "CalculationRegister": 0,
+        "Catalog": 0,
+        "ChartOfCalculationTypes": 0,
+        "ChartOfCharacteristicTypes": 0,
+        "ChartOfAccounts": 0,
+        "CommandGroup": 0,
+        "CommonAttribute": 0,
+        "CommonCommand": 0,
+        "CommonForm": 0,
+        "CommonModule": 0,
+        "CommonPicture": 0,
+        "CommonTemplate": 0,
+        "Configuration": 0,
+        "Constant": 0,
+        "DataProcessor": 0,
+        "DefinedType": 0,
+        "DocumentJournal": 0,
+        "DocumentNumerator": 0,
+        "Document": 0,
+        "Enum": 0,
+        "EventSubscription": 0,
+        "ExchangePlan": 0,
+        "FilterCriterion": 0,
+        "FunctionalOption": 0,
+        "FunctionalOptionsParameter": 0,
+        "HTTPService": 0,
+        "InformationRegister": 0,
+        "IntegrationService": 0,
+        "Interface": 0,
+        "Language": 0,
+        "Report": 0,
+        "Role": 0,
+        "ScheduledJob": 0,
+        "SessionParameter": 0,
+        "SettingsStorage": 0,
+        "StyleItem": 0,
+        "Subsystem": 0,
+        "Task": 0,
+        "WebService": 0,
+        "WSReference": 0,
+        "XDTOPackage": 0
+      },
+      "childMax": {
+        "Form": 1,
+        "AccumulationRegister": 1,
+        "AccountingRegister": 1,
+        "BusinessProcess": 1,
+        "Template": 1,
+        "CalculationRegister": 1,
+        "Catalog": 1,
+        "ChartOfCalculationTypes": 1,
+        "ChartOfCharacteristicTypes": 1,
+        "ChartOfAccounts": 1,
+        "CommandGroup": 1,
+        "CommonAttribute": 1,
+        "CommonCommand": 1,
+        "CommonForm": 1,
+        "CommonModule": 1,
+        "CommonPicture": 1,
+        "CommonTemplate": 1,
+        "Configuration": 1,
+        "Constant": 1,
+        "DataProcessor": 1,
+        "DefinedType": 1,
+        "DocumentJournal": 1,
+        "DocumentNumerator": 1,
+        "Document": 1,
+        "Enum": 1,
+        "EventSubscription": 1,
+        "ExchangePlan": 1,
+        "FilterCriterion": 1,
+        "FunctionalOption": 1,
+        "FunctionalOptionsParameter": 1,
+        "HTTPService": 1,
+        "InformationRegister": 1,
+        "IntegrationService": 1,
+        "Interface": 1,
+        "Language": 1,
+        "Report": 1,
+        "Role": 1,
+        "ScheduledJob": 1,
+        "SessionParameter": 1,
+        "SettingsStorage": 1,
+        "StyleItem": 1,
+        "Subsystem": 1,
+        "Task": 1,
+        "WebService": 1,
+        "WSReference": 1,
+        "XDTOPackage": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "version",
+          "type": "xs:decimal",
+          "use": "required"
+        }
+      ]
+    },
+    "Method": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 1
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "required"
+        }
+      ]
+    },
+    "MethodName": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "MinValue": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:anyType"
+    },
+    "MobileApplicationURLs": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "ModalityUseMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "ModifiesData": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "MoveBoundaryOnPosting": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "MultiLine": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "Name": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "NamePrefix": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "Namespace": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Nillable": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "NumberAllowedLength": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "NumberLength": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "NumberPeriodicity": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "NumberType": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Numerator": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "ObjectAutonumerationMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "ObjectPresentation": {
+      "children": [
+        "item"
+      ],
+      "childMin": {
+        "item": 0
+      },
+      "childMax": {
+        "item": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "OnMainServerUnavalableBehavior": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Operation": {
+      "children": [
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "childMax": {
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "required"
+        }
+      ]
+    },
+    "OrderLength": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "Owners": {
+      "children": [
+        "Item"
+      ],
+      "childMin": {
+        "Item": 0
+      },
+      "childMax": {
+        "Item": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "Parameter": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 1
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "required"
+        }
+      ]
+    },
+    "ParameterUseMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "PasswordMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "PeriodAdjustmentLength": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "Periodicity": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Picture": {
+      "children": [
+        "Ref",
+        "LoadTransparent",
+        "TransparentPixel"
+      ],
+      "childMin": {
+        "Ref": 0,
+        "LoadTransparent": 0,
+        "TransparentPixel": 0
+      },
+      "childMax": {
+        "Ref": 1,
+        "LoadTransparent": 1,
+        "TransparentPixel": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "PostInPrivilegedMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "Posting": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Predefined": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "PredefinedDataUpdate": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Privileged": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "PrivilegedGetMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "ProcedureName": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Properties": {
+      "children": [
+        "Name",
+        "Synonym",
+        "Comment",
+        "Type",
+        "PasswordMode",
+        "Format",
+        "EditFormat",
+        "ToolTip",
+        "MarkNegatives",
+        "Mask",
+        "MultiLine",
+        "ExtendedEdit",
+        "MinValue",
+        "MaxValue",
+        "FillChecking",
+        "ChoiceFoldersAndItems",
+        "ChoiceParameterLinks",
+        "ChoiceParameters",
+        "QuickChoice",
+        "CreateOnInput",
+        "ChoiceForm",
+        "LinkByType",
+        "ChoiceHistoryOnInput",
+        "Indexing",
+        "FullTextSearch",
+        "DataHistory",
+        "UseStandardCommands",
+        "DefaultListForm",
+        "AuxiliaryListForm",
+        "RegisterType",
+        "IncludeHelpInContents",
+        "DataLockControlMode",
+        "EnableTotalsSplitting",
+        "ListPresentation",
+        "ExtendedListPresentation",
+        "Explanation",
+        "DenyIncompleteValues",
+        "UseInTotals",
+        "StandardAttributes",
+        "FormType",
+        "UsePurposes",
+        "EditType",
+        "InputByString",
+        "SearchStringModeOnInputByString",
+        "ChoiceDataGetModeOnInputByString",
+        "FullTextSearchOnInputByString",
+        "DefaultObjectForm",
+        "DefaultChoiceForm",
+        "AuxiliaryObjectForm",
+        "AuxiliaryChoiceForm",
+        "NumberType",
+        "NumberLength",
+        "NumberAllowedLength",
+        "CheckUnique",
+        "Characteristics",
+        "Autonumbering",
+        "BasedOn",
+        "NumberPeriodicity",
+        "Task",
+        "CreateTaskInPrivilegedMode",
+        "DataLockFields",
+        "ObjectPresentation",
+        "ExtendedObjectPresentation",
+        "UpdateDataHistoryImmediatelyAfterWrite",
+        "ExecuteAfterWriteDataHistoryVersionProcessing",
+        "FillFromFillingValue",
+        "FillValue",
+        "TemplateType",
+        "LineNumberLength",
+        "Periodicity",
+        "ActionPeriod",
+        "BasePeriod",
+        "Schedule",
+        "ScheduleValue",
+        "ScheduleDate",
+        "ChartOfCalculationTypes",
+        "ScheduleLink",
+        "BaseDimension",
+        "Hierarchical",
+        "HierarchyType",
+        "LimitLevelCount",
+        "LevelCount",
+        "FoldersOnTop",
+        "Owners",
+        "SubordinationUse",
+        "CodeLength",
+        "DescriptionLength",
+        "CodeType",
+        "CodeAllowedLength",
+        "CodeSeries",
+        "DefaultPresentation",
+        "PredefinedDataUpdate",
+        "ChoiceMode",
+        "DefaultFolderForm",
+        "DefaultFolderChoiceForm",
+        "AuxiliaryFolderForm",
+        "AuxiliaryFolderChoiceForm",
+        "Use",
+        "Group",
+        "CommandParameterType",
+        "ParameterUseMode",
+        "ModifiesData",
+        "Representation",
+        "Picture",
+        "Shortcut",
+        "OnMainServerUnavalableBehavior",
+        "DependenceOnCalculationTypes",
+        "BaseCalculationTypes",
+        "ActionPeriodUse",
+        "StandardTabularSections",
+        "CharacteristicExtValues",
+        "Category",
+        "Content",
+        "AutoUse",
+        "DataSeparation",
+        "SeparatedDataUse",
+        "DataSeparationValue",
+        "DataSeparationUse",
+        "ConditionalSeparation",
+        "UsersSeparation",
+        "AuthenticationSeparation",
+        "ConfigurationExtensionsSeparation",
+        "ExtendedPresentation",
+        "Global",
+        "ClientManagedApplication",
+        "Server",
+        "ExternalConnection",
+        "ClientOrdinaryApplication",
+        "ServerCall",
+        "Privileged",
+        "ReturnValuesReuse",
+        "AvailabilityForChoice",
+        "AvailabilityForAppearance",
+        "NamePrefix",
+        "ConfigurationExtensionCompatibilityMode",
+        "DefaultRunMode",
+        "ScriptVariant",
+        "DefaultRoles",
+        "Vendor",
+        "Version",
+        "UpdateCatalogAddress",
+        "UseManagedFormInOrdinaryApplication",
+        "UseOrdinaryFormInManagedApplication",
+        "AdditionalFullTextSearchDictionaries",
+        "CommonSettingsStorage",
+        "ReportsUserSettingsStorage",
+        "ReportsVariantsStorage",
+        "FormDataSettingsStorage",
+        "DynamicListsUserSettingsStorage",
+        "URLExternalDataStorage",
+        "DefaultReportForm",
+        "DefaultReportVariantForm",
+        "DefaultReportSettingsForm",
+        "DefaultReportAppearanceTemplate",
+        "DefaultDynamicListSettingsForm",
+        "DefaultSearchForm",
+        "DefaultDataHistoryChangeHistoryForm",
+        "DefaultDataHistoryVersionDataForm",
+        "DefaultDataHistoryVersionDifferencesForm",
+        "DefaultCollaborationSystemUsersChoiceForm",
+        "RequiredMobileApplicationPermissions",
+        "UsedMobileApplicationFunctionalities",
+        "StandaloneConfigurationRestrictionRoles",
+        "MobileApplicationURLs",
+        "AllowedIncomingShareRequestTypes",
+        "MainClientApplicationWindowMode",
+        "DefaultInterface",
+        "DefaultStyle",
+        "DefaultLanguage",
+        "BriefInformation",
+        "DetailedInformation",
+        "Copyright",
+        "VendorInformationAddress",
+        "ConfigurationInformationAddress",
+        "ObjectAutonumerationMode",
+        "ModalityUseMode",
+        "SynchronousPlatformExtensionAndAddInCallUseMode",
+        "InterfaceCompatibilityMode",
+        "DatabaseTablespacesUseMode",
+        "CompatibilityMode",
+        "DefaultConstantsForm",
+        "DefaultForm",
+        "AuxiliaryForm",
+        "RegisteredDocuments",
+        "References",
+        "Numerator",
+        "Posting",
+        "RealTimePosting",
+        "RegisterRecordsDeletion",
+        "RegisterRecordsWritingOnPost",
+        "SequenceFilling",
+        "RegisterRecords",
+        "PostInPrivilegedMode",
+        "UnpostInPrivilegedMode",
+        "Source",
+        "Event",
+        "Handler",
+        "DistributedInfoBase",
+        "IncludeConfigurationExtensions",
+        "Location",
+        "PrivilegedGetMode",
+        "RootURL",
+        "ReuseSessions",
+        "SessionMaxAge",
+        "Template",
+        "HTTPMethod",
+        "DefaultRecordForm",
+        "AuxiliaryRecordForm",
+        "InformationRegisterPeriodicity",
+        "WriteMode",
+        "MainFilterOnPeriod",
+        "EnableTotalsSliceFirst",
+        "EnableTotalsSliceLast",
+        "RecordPresentation",
+        "ExtendedRecordPresentation",
+        "Master",
+        "MainFilter",
+        "TypeReductionMode",
+        "ExternalIntegrationServiceAddress",
+        "ExternalIntegrationServiceChannelName",
+        "MessageDirection",
+        "ReceiveMessageProcessing",
+        "Transactioned",
+        "Switchable",
+        "LanguageCode",
+        "MainDataCompositionSchema",
+        "DefaultSettingsForm",
+        "AuxiliarySettingsForm",
+        "DefaultVariantForm",
+        "VariantsStorage",
+        "SettingsStorage",
+        "MethodName",
+        "Description",
+        "Key",
+        "Predefined",
+        "RestartCountOnFailure",
+        "RestartIntervalOnFailure",
+        "DefaultSaveForm",
+        "DefaultLoadForm",
+        "AuxiliarySaveForm",
+        "AuxiliaryLoadForm",
+        "Value",
+        "IncludeInCommandInterface",
+        "UseOneCommand",
+        "TaskNumberAutoPrefix",
+        "Addressing",
+        "MainAddressingAttribute",
+        "CurrentPerformer",
+        "AddressingDimension",
+        "Namespace",
+        "XDTOPackages",
+        "DescriptorFileName",
+        "XDTOReturningValueType",
+        "Nillable",
+        "ProcedureName",
+        "XDTOValueType",
+        "TransferDirection",
+        "LocationURL"
+      ],
+      "childMin": {
+        "Name": 1,
+        "Synonym": 1,
+        "Comment": 0,
+        "Type": 0,
+        "PasswordMode": 0,
+        "Format": 0,
+        "EditFormat": 0,
+        "ToolTip": 0,
+        "MarkNegatives": 0,
+        "Mask": 0,
+        "MultiLine": 0,
+        "ExtendedEdit": 0,
+        "MinValue": 0,
+        "MaxValue": 0,
+        "FillChecking": 0,
+        "ChoiceFoldersAndItems": 0,
+        "ChoiceParameterLinks": 0,
+        "ChoiceParameters": 0,
+        "QuickChoice": 0,
+        "CreateOnInput": 0,
+        "ChoiceForm": 0,
+        "LinkByType": 0,
+        "ChoiceHistoryOnInput": 0,
+        "Indexing": 0,
+        "FullTextSearch": 0,
+        "DataHistory": 0,
+        "UseStandardCommands": 0,
+        "DefaultListForm": 0,
+        "AuxiliaryListForm": 0,
+        "RegisterType": 0,
+        "IncludeHelpInContents": 0,
+        "DataLockControlMode": 0,
+        "EnableTotalsSplitting": 0,
+        "ListPresentation": 0,
+        "ExtendedListPresentation": 0,
+        "Explanation": 0,
+        "DenyIncompleteValues": 0,
+        "UseInTotals": 0,
+        "StandardAttributes": 0,
+        "FormType": 0,
+        "UsePurposes": 0,
+        "EditType": 0,
+        "InputByString": 0,
+        "SearchStringModeOnInputByString": 0,
+        "ChoiceDataGetModeOnInputByString": 0,
+        "FullTextSearchOnInputByString": 0,
+        "DefaultObjectForm": 0,
+        "DefaultChoiceForm": 0,
+        "AuxiliaryObjectForm": 0,
+        "AuxiliaryChoiceForm": 0,
+        "NumberType": 0,
+        "NumberLength": 0,
+        "NumberAllowedLength": 0,
+        "CheckUnique": 0,
+        "Characteristics": 0,
+        "Autonumbering": 0,
+        "BasedOn": 0,
+        "NumberPeriodicity": 0,
+        "Task": 0,
+        "CreateTaskInPrivilegedMode": 0,
+        "DataLockFields": 0,
+        "ObjectPresentation": 0,
+        "ExtendedObjectPresentation": 0,
+        "UpdateDataHistoryImmediatelyAfterWrite": 0,
+        "ExecuteAfterWriteDataHistoryVersionProcessing": 0,
+        "FillFromFillingValue": 0,
+        "FillValue": 0,
+        "TemplateType": 0,
+        "LineNumberLength": 0,
+        "Periodicity": 0,
+        "ActionPeriod": 0,
+        "BasePeriod": 0,
+        "Schedule": 0,
+        "ScheduleValue": 0,
+        "ScheduleDate": 0,
+        "ChartOfCalculationTypes": 0,
+        "ScheduleLink": 0,
+        "BaseDimension": 0,
+        "Hierarchical": 0,
+        "HierarchyType": 0,
+        "LimitLevelCount": 0,
+        "LevelCount": 0,
+        "FoldersOnTop": 0,
+        "Owners": 0,
+        "SubordinationUse": 0,
+        "CodeLength": 0,
+        "DescriptionLength": 0,
+        "CodeType": 0,
+        "CodeAllowedLength": 0,
+        "CodeSeries": 0,
+        "DefaultPresentation": 0,
+        "PredefinedDataUpdate": 0,
+        "ChoiceMode": 0,
+        "DefaultFolderForm": 0,
+        "DefaultFolderChoiceForm": 0,
+        "AuxiliaryFolderForm": 0,
+        "AuxiliaryFolderChoiceForm": 0,
+        "Use": 0,
+        "Group": 0,
+        "CommandParameterType": 0,
+        "ParameterUseMode": 0,
+        "ModifiesData": 0,
+        "Representation": 0,
+        "Picture": 0,
+        "Shortcut": 0,
+        "OnMainServerUnavalableBehavior": 0,
+        "DependenceOnCalculationTypes": 0,
+        "BaseCalculationTypes": 0,
+        "ActionPeriodUse": 0,
+        "StandardTabularSections": 0,
+        "CharacteristicExtValues": 0,
+        "Category": 0,
+        "Content": 0,
+        "AutoUse": 0,
+        "DataSeparation": 0,
+        "SeparatedDataUse": 0,
+        "DataSeparationValue": 0,
+        "DataSeparationUse": 0,
+        "ConditionalSeparation": 0,
+        "UsersSeparation": 0,
+        "AuthenticationSeparation": 0,
+        "ConfigurationExtensionsSeparation": 0,
+        "ExtendedPresentation": 0,
+        "Global": 0,
+        "ClientManagedApplication": 0,
+        "Server": 0,
+        "ExternalConnection": 0,
+        "ClientOrdinaryApplication": 0,
+        "ServerCall": 0,
+        "Privileged": 0,
+        "ReturnValuesReuse": 0,
+        "AvailabilityForChoice": 0,
+        "AvailabilityForAppearance": 0,
+        "NamePrefix": 0,
+        "ConfigurationExtensionCompatibilityMode": 0,
+        "DefaultRunMode": 0,
+        "ScriptVariant": 0,
+        "DefaultRoles": 0,
+        "Vendor": 0,
+        "Version": 0,
+        "UpdateCatalogAddress": 0,
+        "UseManagedFormInOrdinaryApplication": 0,
+        "UseOrdinaryFormInManagedApplication": 0,
+        "AdditionalFullTextSearchDictionaries": 0,
+        "CommonSettingsStorage": 0,
+        "ReportsUserSettingsStorage": 0,
+        "ReportsVariantsStorage": 0,
+        "FormDataSettingsStorage": 0,
+        "DynamicListsUserSettingsStorage": 0,
+        "URLExternalDataStorage": 0,
+        "DefaultReportForm": 0,
+        "DefaultReportVariantForm": 0,
+        "DefaultReportSettingsForm": 0,
+        "DefaultReportAppearanceTemplate": 0,
+        "DefaultDynamicListSettingsForm": 0,
+        "DefaultSearchForm": 0,
+        "DefaultDataHistoryChangeHistoryForm": 0,
+        "DefaultDataHistoryVersionDataForm": 0,
+        "DefaultDataHistoryVersionDifferencesForm": 0,
+        "DefaultCollaborationSystemUsersChoiceForm": 0,
+        "RequiredMobileApplicationPermissions": 0,
+        "UsedMobileApplicationFunctionalities": 0,
+        "StandaloneConfigurationRestrictionRoles": 0,
+        "MobileApplicationURLs": 0,
+        "AllowedIncomingShareRequestTypes": 0,
+        "MainClientApplicationWindowMode": 0,
+        "DefaultInterface": 0,
+        "DefaultStyle": 0,
+        "DefaultLanguage": 0,
+        "BriefInformation": 0,
+        "DetailedInformation": 0,
+        "Copyright": 0,
+        "VendorInformationAddress": 0,
+        "ConfigurationInformationAddress": 0,
+        "ObjectAutonumerationMode": 0,
+        "ModalityUseMode": 0,
+        "SynchronousPlatformExtensionAndAddInCallUseMode": 0,
+        "InterfaceCompatibilityMode": 0,
+        "DatabaseTablespacesUseMode": 0,
+        "CompatibilityMode": 0,
+        "DefaultConstantsForm": 0,
+        "DefaultForm": 0,
+        "AuxiliaryForm": 0,
+        "RegisteredDocuments": 0,
+        "References": 0,
+        "Numerator": 0,
+        "Posting": 0,
+        "RealTimePosting": 0,
+        "RegisterRecordsDeletion": 0,
+        "RegisterRecordsWritingOnPost": 0,
+        "SequenceFilling": 0,
+        "RegisterRecords": 0,
+        "PostInPrivilegedMode": 0,
+        "UnpostInPrivilegedMode": 0,
+        "Source": 0,
+        "Event": 0,
+        "Handler": 0,
+        "DistributedInfoBase": 0,
+        "IncludeConfigurationExtensions": 0,
+        "Location": 0,
+        "PrivilegedGetMode": 0,
+        "RootURL": 0,
+        "ReuseSessions": 0,
+        "SessionMaxAge": 0,
+        "Template": 0,
+        "HTTPMethod": 0,
+        "DefaultRecordForm": 0,
+        "AuxiliaryRecordForm": 0,
+        "InformationRegisterPeriodicity": 0,
+        "WriteMode": 0,
+        "MainFilterOnPeriod": 0,
+        "EnableTotalsSliceFirst": 0,
+        "EnableTotalsSliceLast": 0,
+        "RecordPresentation": 0,
+        "ExtendedRecordPresentation": 0,
+        "Master": 0,
+        "MainFilter": 0,
+        "TypeReductionMode": 0,
+        "ExternalIntegrationServiceAddress": 0,
+        "ExternalIntegrationServiceChannelName": 0,
+        "MessageDirection": 0,
+        "ReceiveMessageProcessing": 0,
+        "Transactioned": 0,
+        "Switchable": 0,
+        "LanguageCode": 0,
+        "MainDataCompositionSchema": 0,
+        "DefaultSettingsForm": 0,
+        "AuxiliarySettingsForm": 0,
+        "DefaultVariantForm": 0,
+        "VariantsStorage": 0,
+        "SettingsStorage": 0,
+        "MethodName": 0,
+        "Description": 0,
+        "Key": 0,
+        "Predefined": 0,
+        "RestartCountOnFailure": 0,
+        "RestartIntervalOnFailure": 0,
+        "DefaultSaveForm": 0,
+        "DefaultLoadForm": 0,
+        "AuxiliarySaveForm": 0,
+        "AuxiliaryLoadForm": 0,
+        "Value": 0,
+        "IncludeInCommandInterface": 0,
+        "UseOneCommand": 0,
+        "TaskNumberAutoPrefix": 0,
+        "Addressing": 0,
+        "MainAddressingAttribute": 0,
+        "CurrentPerformer": 0,
+        "AddressingDimension": 0,
+        "Namespace": 0,
+        "XDTOPackages": 0,
+        "DescriptorFileName": 0,
+        "XDTOReturningValueType": 0,
+        "Nillable": 0,
+        "ProcedureName": 0,
+        "XDTOValueType": 0,
+        "TransferDirection": 0,
+        "LocationURL": 0
+      },
+      "childMax": {
+        "Name": 1,
+        "Synonym": 1,
+        "Comment": 1,
+        "Type": 1,
+        "PasswordMode": 1,
+        "Format": 1,
+        "EditFormat": 1,
+        "ToolTip": 1,
+        "MarkNegatives": 1,
+        "Mask": 1,
+        "MultiLine": 1,
+        "ExtendedEdit": 1,
+        "MinValue": 1,
+        "MaxValue": 1,
+        "FillChecking": 1,
+        "ChoiceFoldersAndItems": 1,
+        "ChoiceParameterLinks": 1,
+        "ChoiceParameters": 1,
+        "QuickChoice": 1,
+        "CreateOnInput": 1,
+        "ChoiceForm": 1,
+        "LinkByType": 1,
+        "ChoiceHistoryOnInput": 1,
+        "Indexing": 1,
+        "FullTextSearch": 1,
+        "DataHistory": 1,
+        "UseStandardCommands": 1,
+        "DefaultListForm": 1,
+        "AuxiliaryListForm": 1,
+        "RegisterType": 1,
+        "IncludeHelpInContents": 1,
+        "DataLockControlMode": 1,
+        "EnableTotalsSplitting": 1,
+        "ListPresentation": 1,
+        "ExtendedListPresentation": 1,
+        "Explanation": 1,
+        "DenyIncompleteValues": 1,
+        "UseInTotals": 1,
+        "StandardAttributes": 1,
+        "FormType": 1,
+        "UsePurposes": 1,
+        "EditType": 1,
+        "InputByString": 1,
+        "SearchStringModeOnInputByString": 1,
+        "ChoiceDataGetModeOnInputByString": 1,
+        "FullTextSearchOnInputByString": 1,
+        "DefaultObjectForm": 1,
+        "DefaultChoiceForm": 1,
+        "AuxiliaryObjectForm": 1,
+        "AuxiliaryChoiceForm": 1,
+        "NumberType": 1,
+        "NumberLength": 1,
+        "NumberAllowedLength": 1,
+        "CheckUnique": 1,
+        "Characteristics": 1,
+        "Autonumbering": 1,
+        "BasedOn": 1,
+        "NumberPeriodicity": 1,
+        "Task": 1,
+        "CreateTaskInPrivilegedMode": 1,
+        "DataLockFields": 1,
+        "ObjectPresentation": 1,
+        "ExtendedObjectPresentation": 1,
+        "UpdateDataHistoryImmediatelyAfterWrite": 1,
+        "ExecuteAfterWriteDataHistoryVersionProcessing": 1,
+        "FillFromFillingValue": 1,
+        "FillValue": 1,
+        "TemplateType": 1,
+        "LineNumberLength": 1,
+        "Periodicity": 1,
+        "ActionPeriod": 1,
+        "BasePeriod": 1,
+        "Schedule": 1,
+        "ScheduleValue": 1,
+        "ScheduleDate": 1,
+        "ChartOfCalculationTypes": 1,
+        "ScheduleLink": 1,
+        "BaseDimension": 1,
+        "Hierarchical": 1,
+        "HierarchyType": 1,
+        "LimitLevelCount": 1,
+        "LevelCount": 1,
+        "FoldersOnTop": 1,
+        "Owners": 1,
+        "SubordinationUse": 1,
+        "CodeLength": 1,
+        "DescriptionLength": 1,
+        "CodeType": 1,
+        "CodeAllowedLength": 1,
+        "CodeSeries": 1,
+        "DefaultPresentation": 1,
+        "PredefinedDataUpdate": 1,
+        "ChoiceMode": 1,
+        "DefaultFolderForm": 1,
+        "DefaultFolderChoiceForm": 1,
+        "AuxiliaryFolderForm": 1,
+        "AuxiliaryFolderChoiceForm": 1,
+        "Use": 1,
+        "Group": 1,
+        "CommandParameterType": 1,
+        "ParameterUseMode": 1,
+        "ModifiesData": 1,
+        "Representation": 1,
+        "Picture": 1,
+        "Shortcut": 1,
+        "OnMainServerUnavalableBehavior": 1,
+        "DependenceOnCalculationTypes": 1,
+        "BaseCalculationTypes": 1,
+        "ActionPeriodUse": 1,
+        "StandardTabularSections": 1,
+        "CharacteristicExtValues": 1,
+        "Category": 1,
+        "Content": 1,
+        "AutoUse": 1,
+        "DataSeparation": 1,
+        "SeparatedDataUse": 1,
+        "DataSeparationValue": 1,
+        "DataSeparationUse": 1,
+        "ConditionalSeparation": 1,
+        "UsersSeparation": 1,
+        "AuthenticationSeparation": 1,
+        "ConfigurationExtensionsSeparation": 1,
+        "ExtendedPresentation": 1,
+        "Global": 1,
+        "ClientManagedApplication": 1,
+        "Server": 1,
+        "ExternalConnection": 1,
+        "ClientOrdinaryApplication": 1,
+        "ServerCall": 1,
+        "Privileged": 1,
+        "ReturnValuesReuse": 1,
+        "AvailabilityForChoice": 1,
+        "AvailabilityForAppearance": 1,
+        "NamePrefix": 1,
+        "ConfigurationExtensionCompatibilityMode": 1,
+        "DefaultRunMode": 1,
+        "ScriptVariant": 1,
+        "DefaultRoles": 1,
+        "Vendor": 1,
+        "Version": 1,
+        "UpdateCatalogAddress": 1,
+        "UseManagedFormInOrdinaryApplication": 1,
+        "UseOrdinaryFormInManagedApplication": 1,
+        "AdditionalFullTextSearchDictionaries": 1,
+        "CommonSettingsStorage": 1,
+        "ReportsUserSettingsStorage": 1,
+        "ReportsVariantsStorage": 1,
+        "FormDataSettingsStorage": 1,
+        "DynamicListsUserSettingsStorage": 1,
+        "URLExternalDataStorage": 1,
+        "DefaultReportForm": 1,
+        "DefaultReportVariantForm": 1,
+        "DefaultReportSettingsForm": 1,
+        "DefaultReportAppearanceTemplate": 1,
+        "DefaultDynamicListSettingsForm": 1,
+        "DefaultSearchForm": 1,
+        "DefaultDataHistoryChangeHistoryForm": 1,
+        "DefaultDataHistoryVersionDataForm": 1,
+        "DefaultDataHistoryVersionDifferencesForm": 1,
+        "DefaultCollaborationSystemUsersChoiceForm": 1,
+        "RequiredMobileApplicationPermissions": 1,
+        "UsedMobileApplicationFunctionalities": 1,
+        "StandaloneConfigurationRestrictionRoles": 1,
+        "MobileApplicationURLs": 1,
+        "AllowedIncomingShareRequestTypes": 1,
+        "MainClientApplicationWindowMode": 1,
+        "DefaultInterface": 1,
+        "DefaultStyle": 1,
+        "DefaultLanguage": 1,
+        "BriefInformation": 1,
+        "DetailedInformation": 1,
+        "Copyright": 1,
+        "VendorInformationAddress": 1,
+        "ConfigurationInformationAddress": 1,
+        "ObjectAutonumerationMode": 1,
+        "ModalityUseMode": 1,
+        "SynchronousPlatformExtensionAndAddInCallUseMode": 1,
+        "InterfaceCompatibilityMode": 1,
+        "DatabaseTablespacesUseMode": 1,
+        "CompatibilityMode": 1,
+        "DefaultConstantsForm": 1,
+        "DefaultForm": 1,
+        "AuxiliaryForm": 1,
+        "RegisteredDocuments": 1,
+        "References": 1,
+        "Numerator": 1,
+        "Posting": 1,
+        "RealTimePosting": 1,
+        "RegisterRecordsDeletion": 1,
+        "RegisterRecordsWritingOnPost": 1,
+        "SequenceFilling": 1,
+        "RegisterRecords": 1,
+        "PostInPrivilegedMode": 1,
+        "UnpostInPrivilegedMode": 1,
+        "Source": 1,
+        "Event": 1,
+        "Handler": 1,
+        "DistributedInfoBase": 1,
+        "IncludeConfigurationExtensions": 1,
+        "Location": 1,
+        "PrivilegedGetMode": 1,
+        "RootURL": 1,
+        "ReuseSessions": 1,
+        "SessionMaxAge": 1,
+        "Template": 1,
+        "HTTPMethod": 1,
+        "DefaultRecordForm": 1,
+        "AuxiliaryRecordForm": 1,
+        "InformationRegisterPeriodicity": 1,
+        "WriteMode": 1,
+        "MainFilterOnPeriod": 1,
+        "EnableTotalsSliceFirst": 1,
+        "EnableTotalsSliceLast": 1,
+        "RecordPresentation": 1,
+        "ExtendedRecordPresentation": 1,
+        "Master": 1,
+        "MainFilter": 1,
+        "TypeReductionMode": 1,
+        "ExternalIntegrationServiceAddress": 1,
+        "ExternalIntegrationServiceChannelName": 1,
+        "MessageDirection": 1,
+        "ReceiveMessageProcessing": 1,
+        "Transactioned": 1,
+        "Switchable": 1,
+        "LanguageCode": 1,
+        "MainDataCompositionSchema": 1,
+        "DefaultSettingsForm": 1,
+        "AuxiliarySettingsForm": 1,
+        "DefaultVariantForm": 1,
+        "VariantsStorage": 1,
+        "SettingsStorage": 1,
+        "MethodName": 1,
+        "Description": 1,
+        "Key": 1,
+        "Predefined": 1,
+        "RestartCountOnFailure": 1,
+        "RestartIntervalOnFailure": 1,
+        "DefaultSaveForm": 1,
+        "DefaultLoadForm": 1,
+        "AuxiliarySaveForm": 1,
+        "AuxiliaryLoadForm": 1,
+        "Value": 1,
+        "IncludeInCommandInterface": 1,
+        "UseOneCommand": 1,
+        "TaskNumberAutoPrefix": 1,
+        "Addressing": 1,
+        "MainAddressingAttribute": 1,
+        "CurrentPerformer": 1,
+        "AddressingDimension": 1,
+        "Namespace": 1,
+        "XDTOPackages": 1,
+        "DescriptorFileName": 1,
+        "XDTOReturningValueType": 1,
+        "Nillable": 1,
+        "ProcedureName": 1,
+        "XDTOValueType": 1,
+        "TransferDirection": 1,
+        "LocationURL": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "QuickChoice": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "RealTimePosting": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "ReceiveMessageProcessing": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "RecordPresentation": {
+      "children": [
+        "item"
+      ],
+      "childMin": {
+        "item": 0
+      },
+      "childMax": {
+        "item": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "References": {
+      "children": [
+        "Item"
+      ],
+      "childMin": {
+        "Item": 1
+      },
+      "childMax": {
+        "Item": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "RegisterRecords": {
+      "children": [
+        "Item"
+      ],
+      "childMin": {
+        "Item": 0
+      },
+      "childMax": {
+        "Item": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "RegisterRecordsDeletion": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "RegisterRecordsMap": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "RegisterRecordsWritingOnPost": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "RegisterType": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "RegisteredDocuments": {
+      "children": [
+        "Item"
+      ],
+      "childMin": {
+        "Item": 0
+      },
+      "childMax": {
+        "Item": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "Report": {
+      "children": [
+        "InternalInfo",
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "InternalInfo": 0,
+        "Properties": 0,
+        "ChildObjects": 0
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "ReportsUserSettingsStorage": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "ReportsVariantsStorage": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "Representation": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "RequiredMobileApplicationPermissions": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "Resource": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 1
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "required"
+        }
+      ]
+    },
+    "RestartCountOnFailure": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "RestartIntervalOnFailure": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "ReturnValuesReuse": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "ReuseSessions": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Role": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 0
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "RootURL": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Schedule": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "ScheduleDate": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "ScheduleLink": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "ScheduleValue": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "ScheduledJob": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 0
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "ScriptVariant": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "SearchStringModeOnInputByString": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "SeparatedDataUse": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Sequence": {
+      "children": [
+        "InternalInfo",
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "InternalInfo": 0,
+        "Properties": 0,
+        "ChildObjects": 0
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "SequenceFilling": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Server": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "ServerCall": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "SessionMaxAge": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "SessionParameter": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 0
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "SettingsStorage": {
+      "children": [
+        "InternalInfo",
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "InternalInfo": 0,
+        "Properties": 0,
+        "ChildObjects": 0
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "Shortcut": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Source": {
+      "children": [
+        "Type",
+        "TypeSet"
+      ],
+      "childMin": {
+        "Type": 0,
+        "TypeSet": 0
+      },
+      "childMax": {
+        "Type": -1,
+        "TypeSet": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "StandaloneConfigurationRestrictionRoles": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "StandardAttributes": {
+      "children": [
+        "StandardAttribute"
+      ],
+      "childMin": {
+        "StandardAttribute": 1
+      },
+      "childMax": {
+        "StandardAttribute": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "StandardTabularSections": {
+      "children": [
+        "StandardTabularSection"
+      ],
+      "childMin": {
+        "StandardTabularSection": 1
+      },
+      "childMax": {
+        "StandardTabularSection": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "StyleItem": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 0
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "SubordinationUse": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Subsystem": {
+      "children": [
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "Properties": 0,
+        "ChildObjects": 0
+      },
+      "childMax": {
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "Switchable": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "SynchronousPlatformExtensionAndAddInCallUseMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Synonym": {
+      "children": [
+        "item"
+      ],
+      "childMin": {
+        "item": 0
+      },
+      "childMax": {
+        "item": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "TabularSection": {
+      "children": [
+        "InternalInfo",
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "InternalInfo": 1,
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "required"
+        }
+      ]
+    },
+    "Task": {
+      "children": [
+        "InternalInfo",
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "InternalInfo": 0,
+        "Properties": 0,
+        "ChildObjects": 0
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "TaskNumberAutoPrefix": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Template": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 0
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "TemplateType": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "ToolTip": {
+      "children": [
+        "item"
+      ],
+      "childMin": {
+        "item": 0
+      },
+      "childMax": {
+        "item": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "Transactioned": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "TransferDirection": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Type": {
+      "children": [
+        "Type",
+        "NumberQualifiers",
+        "TypeSet",
+        "StringQualifiers",
+        "DateQualifiers"
+      ],
+      "childMin": {
+        "Type": 0,
+        "NumberQualifiers": 0,
+        "TypeSet": 0,
+        "StringQualifiers": 0,
+        "DateQualifiers": 0
+      },
+      "childMax": {
+        "Type": -1,
+        "NumberQualifiers": 1,
+        "TypeSet": -1,
+        "StringQualifiers": 1,
+        "DateQualifiers": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": []
+    },
+    "TypeReductionMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "URLExternalDataStorage": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "URLTemplate": {
+      "children": [
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "childMax": {
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "required"
+        }
+      ]
+    },
+    "UnpostInPrivilegedMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "UpdateCatalogAddress": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "UpdateDataHistoryImmediatelyAfterWrite": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "Use": {
+      "children": [
+        "Item"
+      ],
+      "childMin": {
+        "Item": 0
+      },
+      "childMax": {
+        "Item": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": []
+    },
+    "UseInTotals": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "UseManagedFormInOrdinaryApplication": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "UseOneCommand": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "UseOrdinaryFormInManagedApplication": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "UsePurposes": {
+      "children": [
+        "Value"
+      ],
+      "childMin": {
+        "Value": 1
+      },
+      "childMax": {
+        "Value": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "UseStandardCommands": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "UsedMobileApplicationFunctionalities": {
+      "children": [
+        "functionality"
+      ],
+      "childMin": {
+        "functionality": 38
+      },
+      "childMax": {
+        "functionality": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "UsersSeparation": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Value": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:anyType"
+    },
+    "VariantsStorage": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "Vendor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "VendorInformationAddress": {
+      "children": [
+        "item"
+      ],
+      "childMin": {
+        "item": 1
+      },
+      "childMax": {
+        "item": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "Version": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "WSReference": {
+      "children": [
+        "InternalInfo",
+        "Properties"
+      ],
+      "childMin": {
+        "InternalInfo": 0,
+        "Properties": 0
+      },
+      "childMax": {
+        "InternalInfo": 1,
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "WebService": {
+      "children": [
+        "Properties",
+        "ChildObjects"
+      ],
+      "childMin": {
+        "Properties": 0,
+        "ChildObjects": 0
+      },
+      "childMax": {
+        "Properties": 1,
+        "ChildObjects": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "WriteMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "XDTOPackage": {
+      "children": [
+        "Properties"
+      ],
+      "childMin": {
+        "Properties": 0
+      },
+      "childMax": {
+        "Properties": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": true,
+      "attributes": [
+        {
+          "name": "uuid",
+          "type": "xs:string",
+          "use": "optional"
+        }
+      ]
+    },
+    "XDTOPackages": {
+      "children": [
+        "Item"
+      ],
+      "childMin": {
+        "Item": 0
+      },
+      "childMax": {
+        "Item": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "XDTOReturningValueType": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "XDTOValueType": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    }
+  },
+  "source": "http_v8.1c.ru_8.3_MDClasses.xsd",
+  "targetNamespace": "http://v8.1c.ru/8.3/MDClasses",
+  "imports": [
+    {
+      "namespace": "http://v8.1c.ru/8.1/data/core",
+      "schemaLocation": "http_v8.1c.ru_8.1_data_core.xsd"
+    },
+    {
+      "namespace": "http://v8.1c.ru/8.2/managed-application/core",
+      "schemaLocation": "http_v8.1c.ru_8.2_managed-application_core.xsd"
+    },
+    {
+      "namespace": "http://v8.1c.ru/8.3/xcf/readable",
+      "schemaLocation": "http_v8.1c.ru_8.3_xcf_readable.xsd"
+    },
+    {
+      "namespace": "http://www.w3.org/2001/XMLSchema-instance",
+      "schemaLocation": ""
+    },
+    {
+      "namespace": "http://v8.1c.ru/8.1/data/ui",
+      "schemaLocation": "http_v8.1c.ru_8.1_data_ui.xsd"
+    }
+  ],
+  "globalElementsCount": 332,
+  "namedComplexTypes": [],
+  "namedSimpleTypes": [],
+  "exportJsonBasename": "MDClasses",
+  "mergeNote": "Дополнено из предыдущего JSON: сохранены корни/элементы, отсутствующие в XSD; ChildObjects — объединение списков дочерних элементов."
+}

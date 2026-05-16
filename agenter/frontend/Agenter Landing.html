@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Agenter — Агентная разработка для 1С:Предприятие</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="landing.css" />
+</head>
+<body class="lp">
+
+<!-- ============ HEADER ============ -->
+<header class="lp-header" id="lp-header">
+  <div class="container lp-header-inner">
+    <a href="#" class="lp-brand">
+      <div class="lp-brand-mark"></div>
+      <div class="lp-brand-name">Agenter</div>
+    </a>
+    <nav class="lp-nav">
+      <a href="#solution">Решение</a>
+      <a href="#how">Как работает</a>
+      <a href="#pricing">Тарифы</a>
+      <a href="#audience">Для кого</a>
+      <a href="#blog">Блог</a>
+    </nav>
+    <div class="lp-header-cta">
+      <a href="#" class="lp-btn">Войти</a>
+      <a href="#cta" class="lp-btn primary">Начать бесплатно</a>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="lp-hero">
+  <div class="container lp-hero-grid">
+    <div class="reveal in">
+      <div class="lp-eyebrow">
+        <span class="dot"></span>
+        <span>v0.9.4 · публичная бета</span>
+      </div>
+      <h1 class="lp-h1">Агент, который понимает вашу 1С и делает доработки <em>под ключ</em></h1>
+      <p class="lp-hero-sub">От промпта до готового расширения в базе — за минуты. Без редактора кода, без ручного XML, без часов на анализ конфигурации. Только результат, который сразу попадает в продакшн.</p>
+      <div class="lp-hero-actions">
+        <a href="#cta" class="lp-btn primary xl">Запустить демо</a>
+        <a href="#" class="lp-play">
+          <span class="lp-play-icon">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3v18l15-9z"/></svg>
+          </span>
+          Смотреть 2-минутное видео
+        </a>
+      </div>
+    </div>
+
+    <div class="reveal in delay-2" style="position: relative;">
+      <div class="hero-mockup">
+        <div class="hero-mockup-bar">
+          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+          <span class="url">app.agenter.io · ERP Производство v4.2</span>
+        </div>
+        <div class="hero-mockup-body">
+          <div class="hm-side">
+            <div class="hm-side-label">Мои базы</div>
+            <div class="hm-base active"><span class="hm-base-ic">ERP</span><span>ERP Произв.</span><span class="dot"></span></div>
+            <div class="hm-base"><span class="hm-base-ic">ЗУП</span><span>ЗУП КОРП</span><span class="dot"></span></div>
+            <div class="hm-base"><span class="hm-base-ic">УТ</span><span>УТ 11.5</span><span class="dot gray"></span></div>
+            <div class="hm-base"><span class="hm-base-ic">БП</span><span>БП 3.0</span><span class="dot gray"></span></div>
+          </div>
+          <div class="hm-main">
+            <div class="hm-msg-user">Добавь учёт серий номенклатуры в РТУ с контролем остатков</div>
+            <div class="hm-agent">
+              <div class="hm-agent-av"></div>
+              <div class="hm-agent-body">
+                <div class="hm-agent-text">Принял задачу. Готовлю расширение без правки типовой конфигурации.</div>
+                <div class="hm-log">
+                  <div class="hm-log-row" style="animation-delay:0ms"><span class="ts">09:41</span><span class="mk"></span><span class="tx">Анализ структуры РТУ</span></div>
+                  <div class="hm-log-row" style="animation-delay:140ms"><span class="ts">09:41</span><span class="mk"></span><span class="tx">Поиск зависимостей по сериям</span></div>
+                  <div class="hm-log-row" style="animation-delay:280ms"><span class="ts">09:42</span><span class="mk"></span><span class="tx">Создание реквизита СерияНоменклатуры</span></div>
+                  <div class="hm-log-row" style="animation-delay:420ms"><span class="ts">09:43</span><span class="mk"></span><span class="tx">Модификация формы и УПД</span></div>
+                  <div class="hm-log-row" style="animation-delay:560ms"><span class="ts">09:44</span><span class="mk"></span><span class="tx">Валидация BSL-кода</span></div>
+                  <div class="hm-log-row run" style="animation-delay:700ms"><span class="ts">09:45</span><span class="mk"></span><span class="tx">Загрузка в тестовую базу…</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-side-card tl blue">
+        <div class="ic">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+        </div>
+        <div>
+          <div class="hsc-title">12 объектов изменено</div>
+          <div class="hsc-sub">за 4.2с · 0 ошибок</div>
+        </div>
+      </div>
+      <div class="hero-side-card br">
+        <div class="ic">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div>
+          <div class="hsc-title">Загружено в базу</div>
+          <div class="hsc-sub">через десктоп-ассистент</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="trust-bar reveal">
+      <div class="trust-label">Уже используют 40+ команд 1С и франчайзи по всей России</div>
+      <div class="trust-logos">
+        <div class="trust-logo"><span class="mark"></span>Северо-Запад</div>
+        <div class="trust-logo"><span class="mark circle"></span>ПрофИТ</div>
+        <div class="trust-logo"><span class="mark diamond"></span>СофтЛайн</div>
+        <div class="trust-logo"><span class="mark outline"></span>АксиомаКонсалт</div>
+        <div class="trust-logo"><span class="mark"></span>УралБизнесПром</div>
+        <div class="trust-logo"><span class="mark circle"></span>ВолгаИТ</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PAINS ============ -->
+<section class="lp-section" id="pains">
+  <div class="container">
+    <div class="lp-section-head reveal">
+      <div class="section-eyebrow">Контекст рынка</div>
+      <h2 class="lp-h2">Разработка на 1С всё ещё отнимает недели</h2>
+      <p class="lp-section-sub">Доработки типовых конфигураций превратились в узкое горло для франчайзи и внутренних команд. Стоимость растёт, сроки уходят, senior-кадров не хватает.</p>
+    </div>
+
+    <div class="pains-grid">
+      <div class="pain-card reveal">
+        <div class="pain-num">01 / Кадры</div>
+        <div class="pain-title">Senior-разработчики стоят 3 500–5 000 ₽ в час и почти не доступны на рынке</div>
+        <div class="pain-desc">Найти инженера, который одновременно знает ERP 2, БСП и нюансы расширений — задача на месяцы. Текучесть высокая, а выпускников 1С-курсов до боевых задач нужно растить ещё год.</div>
+        <div class="pain-stat"><span class="pain-stat-value">+38%</span><span class="pain-stat-label">рост ставок senior-разработчиков 1С за 2 года</span></div>
+      </div>
+
+      <div class="pain-card reveal delay-1">
+        <div class="pain-num">02 / Скорость</div>
+        <div class="pain-title">Цикл «задача → расширение в базе» занимает 1–3 недели</div>
+        <div class="pain-desc">Анализ конфигурации, обсуждение ТЗ, разработка, тестирование, согласование, выгрузка — даже простая доработка проходит десяток рук. Клиент ждёт, маржа тает.</div>
+        <div class="pain-stat"><span class="pain-stat-value">14 дней</span><span class="pain-stat-label">средний срок типовой доработки в франчайзи</span></div>
+      </div>
+
+      <div class="pain-card reveal delay-2">
+        <div class="pain-num">03 / Рутина</div>
+        <div class="pain-title">Ручная работа с XML, индексацией и выгрузкой расширений</div>
+        <div class="pain-desc">Каждое изменение — это конфигуратор, динамические обновления, отладочные циклы и копание в зависимостях метаданных. Дорогостоящий труд тратится на механические операции.</div>
+        <div class="pain-stat"><span class="pain-stat-value">~40%</span><span class="pain-stat-label">времени разработчика уходит на рутину, а не на логику</span></div>
+      </div>
+
+      <div class="pain-card reveal delay-3">
+        <div class="pain-num">04 / Масштаб</div>
+        <div class="pain-title">Команда не масштабируется — каждый новый проект увеличивает риск ошибок</div>
+        <div class="pain-desc">Чем больше параллельных доработок и баз клиентов, тем выше шанс конфликта расширений, регрессии и провала тестирования. Качество начинает зависеть от одного-двух экспертов.</div>
+        <div class="pain-stat"><span class="pain-stat-value">×3,2</span><span class="pain-stat-label">рост числа инцидентов при масштабировании без автоматизации</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SOLUTION ============ -->
+<section class="lp-section" id="solution" style="padding-top: 40px;">
+  <div class="container">
+    <div class="lp-section-head center reveal" style="max-width: 720px;">
+      <div class="section-eyebrow">Решение</div>
+      <h2 class="lp-h2">Agenter — ваш персональный senior-разработчик 1С</h2>
+      <p class="lp-section-sub">Агентная платформа, которая читает вашу конфигурацию, понимает её архитектуру и собирает рабочие расширения по описанию задачи на русском языке.</p>
+    </div>
+
+    <div class="solution-mockup-wrap reveal delay-2">
+      <div class="solution-mockup">
+        <div class="sm-bar">
+          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+          <span class="label">app.agenter.io / ERP Производство v4.2 / Сессия #4821</span>
+          <span class="meta"><span class="dot"></span> Десктоп-ассистент подключён · ping 12ms</span>
+        </div>
+        <div class="sm-body">
+          <div class="sm-chat">
+            <div class="sm-msg-user">Добавь в документ <code style="background:rgba(255,255,255,0.5);border:1px solid rgba(37,99,235,0.18);padding:1px 5px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:12.5px;">РеализацияТоваровУслуг</code> учёт серий номенклатуры с контролем остатков и выводом серии в печатную форму УПД.</div>
+            <div class="sm-agent">
+              <div class="sm-agent-av"></div>
+              <div style="flex:1;min-width:0;">
+                <div class="sm-agent-name">Agenter</div>
+                <div class="sm-agent-text">Принял задачу. Справочник <code>СерииНоменклатуры</code> уже в конфигурации, но не привязан к РТУ. Готовлю расширение, типовую не правлю.</div>
+                <div class="sm-log">
+                  <div class="sm-log-head">
+                    <span style="font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--text-2);">RUN</span>
+                    <span>Выполнение задачи · 6 шагов</span>
+                    <span style="margin-left:auto;color:#047857;">✓ COMPLETED · 4.2s</span>
+                  </div>
+                  <div class="sm-log-rows">
+                    <div class="sm-log-row"><span class="ts">09:41:02</span><span class="mk"></span><span class="tx">Анализ структуры документа РеализацияТоваровУслуг</span><span class="meta">1.2с</span></div>
+                    <div class="sm-log-row"><span class="ts">09:41:08</span><span class="mk"></span><span class="tx">Поиск зависимостей по сериям номенклатуры</span><span class="meta">0.8с</span></div>
+                    <div class="sm-log-row"><span class="ts">09:41:14</span><span class="mk"></span><span class="tx">Создание реквизита СерияНоменклатуры</span><span class="meta">СпрСсылка</span></div>
+                    <div class="sm-log-row"><span class="ts">09:41:21</span><span class="mk"></span><span class="tx">Модификация формы документа и печатной формы УПД</span><span class="meta">2 формы</span></div>
+                    <div class="sm-log-row"><span class="ts">09:41:34</span><span class="mk"></span><span class="tx">Валидация BSL-кода расширения</span><span class="meta">0 errors</span></div>
+                    <div class="sm-log-row"><span class="ts">09:41:39</span><span class="mk"></span><span class="tx">Загрузка расширения в тестовую базу</span><span class="meta">✓</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="sm-side">
+            <h4>Десктоп-ассистент</h4>
+            <div class="sm-host">
+              <div class="sm-host-ic">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m4 17 6-6-6-6M12 19h8"/></svg>
+              </div>
+              <div>
+                <div class="sm-host-name">Подключён · ERP Производство</div>
+                <div class="sm-host-meta">v1.4.2 · 8.3.24 · WIN-DEV-04</div>
+              </div>
+            </div>
+            <h4>Изменения в сессии</h4>
+            <div class="sm-changes">
+              <div class="sm-ch-row"><span class="sm-ch-tag add">+</span><span>Реквизит СерияНоменклатуры</span></div>
+              <div class="sm-ch-row"><span class="sm-ch-tag mod">~</span><span>Форма документа РТУ</span></div>
+              <div class="sm-ch-row"><span class="sm-ch-tag add">+</span><span>РН ОстаткиТоваровПоСериям</span></div>
+              <div class="sm-ch-row"><span class="sm-ch-tag mod">~</span><span>ПечатнаяФорма_УПД</span></div>
+              <div class="sm-ch-row"><span class="sm-ch-tag add">+</span><span>Подписка ПриПроведенииРТУ</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="how" style="padding-top: 24px;">
+      <div class="lp-section-head center reveal" style="max-width: 640px; margin-bottom: 40px;">
+        <div class="section-eyebrow">Как это работает</div>
+        <h2 class="lp-h2" style="font-size: 32px;">От установки до первого расширения — за один день</h2>
+      </div>
+      <div class="timeline">
+        <div class="tl-step accent reveal">
+          <div class="tl-num">1</div>
+          <div class="tl-title">Подключение к базе</div>
+          <div class="tl-desc">Десктоп-ассистент устанавливается за минуту, подключается к серверной или файловой базе и строит локальный индекс конфигурации.</div>
+        </div>
+        <div class="tl-step reveal delay-1">
+          <div class="tl-num">2</div>
+          <div class="tl-title">Постановка задачи</div>
+          <div class="tl-desc">Описание на естественном языке в чате — с уточнениями, скриншотами, ТЗ или ссылкой на конкретный объект конфигурации.</div>
+        </div>
+        <div class="tl-step reveal delay-2">
+          <div class="tl-num">3</div>
+          <div class="tl-title">Анализ через BSL Atlas</div>
+          <div class="tl-desc">Агент работает поверх BSL Atlas и MCP: читает метаданные, разбирает зависимости, выбирает безопасную стратегию доработки через расширение.</div>
+        </div>
+        <div class="tl-step reveal delay-3">
+          <div class="tl-num">4</div>
+          <div class="tl-title">Выгрузка в базу</div>
+          <div class="tl-desc">Готовое расширение валидируется, тестируется и автоматически загружается в вашу тестовую (или прод) базу через десктоп-ассистент.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BENEFITS ============ -->
+<section class="lp-section benefits" id="benefits">
+  <div class="container">
+    <div class="lp-section-head center reveal" style="max-width: 680px;">
+      <div class="section-eyebrow">Что вы получаете</div>
+      <h2 class="lp-h2">Скорость senior-команды без её стоимости</h2>
+      <p class="lp-section-sub">Шесть измеримых эффектов, которые директор франчайзи или ИТ-директор предприятия видит уже в первый месяц использования.</p>
+    </div>
+
+    <div class="benefits-grid reveal">
+      <div class="benefit">
+        <div class="benefit-ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+        </div>
+        <div class="benefit-title">Время разработки в 5–10 раз меньше</div>
+        <div class="benefit-desc">Типовая доработка, которая занимала 14 дней, делается за 4 часа. Простые правки — за минуты прямо в чате.</div>
+        <div class="benefit-metric">→ −85% к среднему сроку задачи</div>
+      </div>
+      <div class="benefit">
+        <div class="benefit-ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg>
+        </div>
+        <div class="benefit-title">Меньше зависимости от senior-кадров</div>
+        <div class="benefit-desc">Middle-разработчик с Agenter закрывает задачи уровня senior. Узкое горло «один эксперт на проект» исчезает.</div>
+        <div class="benefit-metric">→ −60% к ФОТ на типовых доработках</div>
+      </div>
+      <div class="benefit">
+        <div class="benefit-ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3zM3 9h18M9 21V9"/></svg>
+        </div>
+        <div class="benefit-title">Возможность брать больше проектов</div>
+        <div class="benefit-desc">Та же команда — в 3–4 раза больше параллельных клиентов. Не нужно отказываться от заказов из-за загрузки разработчиков.</div>
+        <div class="benefit-metric">→ +220% к выручке на разработчика</div>
+      </div>
+      <div class="benefit">
+        <div class="benefit-ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="benefit-title">Минимальный риск ошибок</div>
+        <div class="benefit-desc">Каждое расширение проходит автоматическую валидацию BSL и проверку контрактов с типовой конфигурацией перед выгрузкой.</div>
+        <div class="benefit-metric">→ 0 регрессий в типовой конфигурации</div>
+      </div>
+      <div class="benefit">
+        <div class="benefit-ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="benefit-title">Полная безопасность контура</div>
+        <div class="benefit-desc">Конфигурация и BSL-код остаются на вашем сервере. В облако уходят только зашифрованные эмбеддинги для семантического поиска.</div>
+        <div class="benefit-metric">→ Совместимо с требованиями 152-ФЗ</div>
+      </div>
+      <div class="benefit">
+        <div class="benefit-ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M22 21v-2a4 4 0 0 0-3-3.87M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="benefit-title">Масштабирование без найма</div>
+        <div class="benefit-desc">Подключение нового клиента или базы — это новая строчка в Agenter, а не вакансия и три месяца онбординга.</div>
+        <div class="benefit-metric">→ 1 день вместо 90 дней на вход в проект</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AUDIENCE ============ -->
+<section class="lp-section" id="audience">
+  <div class="container">
+    <div class="lp-section-head reveal">
+      <div class="section-eyebrow">Для кого</div>
+      <h2 class="lp-h2">Кому Agenter уже окупается в первый месяц</h2>
+      <p class="lp-section-sub">Платформа спроектирована для команд, у которых разработка на 1С — основной актив или критичная инфраструктура.</p>
+    </div>
+
+    <div class="audience-grid">
+      <div class="aud-card reveal">
+        <div class="aud-tag">A · Бизнес</div>
+        <div class="aud-title">Руководители франчайзи 1С</div>
+        <div class="aud-desc">Растёт маржа на проектах, очередь заявок не превращается в потерянных клиентов, прогноз сроков — не обещание, а расчёт.</div>
+        <ul class="aud-bullets">
+          <li>Выручка на разработчика выше</li>
+          <li>SLA по срокам выполняется</li>
+          <li>Меньше зависимость от ключевых людей</li>
+        </ul>
+      </div>
+      <div class="aud-card reveal delay-1">
+        <div class="aud-tag">B · Инженеры</div>
+        <div class="aud-title">Senior-разработчики 1С</div>
+        <div class="aud-desc">Освобождение от рутины: XML, проводки изменений и отладочные циклы делает агент. У вас остаются архитектурные задачи.</div>
+        <ul class="aud-bullets">
+          <li>Фокус на сложной логике, а не на формах</li>
+          <li>Code review агентских результатов</li>
+          <li>Управление командой без микроменеджмента</li>
+        </ul>
+      </div>
+      <div class="aud-card reveal delay-2">
+        <div class="aud-tag">C · Внедрение</div>
+        <div class="aud-title">Команды внедрения и интеграторы</div>
+        <div class="aud-desc">Быстрая настройка типовых конфигураций под клиента: меньше времени на проект, выше шанс попасть в бюджет и срок.</div>
+        <ul class="aud-bullets">
+          <li>Ускоренная локализация конфигураций</li>
+          <li>Шаблонные доработки за минуты</li>
+          <li>Передача базы заказчику без долгов</li>
+        </ul>
+      </div>
+      <div class="aud-card reveal delay-3">
+        <div class="aud-tag">D · Заказчик</div>
+        <div class="aud-title">ИТ-директора предприятий на 1С:ERP</div>
+        <div class="aud-desc">Контроль над собственной 1С-инфраструктурой: внутренняя команда закрывает 80% задач без подрядчиков и долгих переговоров.</div>
+        <ul class="aud-bullets">
+          <li>Снижение зависимости от франчайзи</li>
+          <li>Прозрачный журнал всех изменений</li>
+          <li>On-premise развёртывание с SLA</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRICING ============ -->
+<section class="lp-section" id="pricing">
+  <div class="container">
+    <div class="lp-section-head center reveal" style="max-width: 640px;">
+      <div class="section-eyebrow">Тарифы</div>
+      <h2 class="lp-h2">Прозрачная цена за уровень разработчика, который работает 24/7</h2>
+      <p class="lp-section-sub">Все планы включают десктоп-ассистент, локальную индексацию и неограниченные сессии. Отличия — в количестве пользователей, баз и приоритете моделей.</p>
+    </div>
+
+    <div class="pricing-grid">
+      <!-- Starter -->
+      <div class="price-card reveal">
+        <div class="price-name">Starter</div>
+        <div class="price-desc">Для одного разработчика и небольшого франчайзи, который пробует агентную разработку.</div>
+        <div class="price-row">
+          <div class="price-amt">9 900</div>
+          <div class="price-period">₽ / месяц</div>
+        </div>
+        <div class="price-note">за 1 рабочее место · НДС включён</div>
+        <button class="price-cta">Начать с Starter</button>
+        <ul class="price-list">
+          <li>1 разработчик · 3 базы 1С</li>
+          <li>Базовый набор агентов и шаблонов</li>
+          <li>Локальная индексация конфигурации</li>
+          <li>Чат-сессии без ограничения по времени</li>
+          <li>Поддержка по почте · 1 рабочий день</li>
+        </ul>
+      </div>
+
+      <!-- Professional -->
+      <div class="price-card featured reveal delay-1">
+        <div class="price-badge">САМЫЙ ПОПУЛЯРНЫЙ</div>
+        <div class="price-name">Professional</div>
+        <div class="price-desc">Оптимально для франчайзи и команд внедрения с несколькими параллельными клиентами.</div>
+        <div class="price-row">
+          <div class="price-amt">24 900</div>
+          <div class="price-period">₽ / месяц</div>
+        </div>
+        <div class="price-note">за команду до 5 человек · НДС включён</div>
+        <button class="price-cta">Начать с Professional</button>
+        <ul class="price-list">
+          <li>До 5 разработчиков · неограниченные базы</li>
+          <li>Приоритетный доступ к флагманским моделям</li>
+          <li>Маркетплейс промптов и шаблонов команды</li>
+          <li>Совместные сессии и общая история задач</li>
+          <li>Управление ролями, журнал аудита</li>
+          <li>Поддержка в чате · 2 часа SLA</li>
+        </ul>
+      </div>
+
+      <!-- Enterprise -->
+      <div class="price-card reveal delay-2">
+        <div class="price-name">Enterprise</div>
+        <div class="price-desc">Для крупных холдингов, ИТ-департаментов и франчайзи с собственным контуром безопасности.</div>
+        <div class="price-row">
+          <div class="price-amt">По запросу</div>
+        </div>
+        <div class="price-note">от 250 000 ₽ / месяц</div>
+        <button class="price-cta">Связаться с отделом продаж</button>
+        <ul class="price-list">
+          <li>On-premise развёртывание в вашем контуре</li>
+          <li>Кастомные агенты и обучение на ваших паттернах</li>
+          <li>SSO · SCIM · интеграция с журналом ИБ</li>
+          <li>SLA 99,9% · dedicated customer success</li>
+          <li>Сертифицированный канал связи</li>
+          <li>Юридическое сопровождение и DPA</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pricing-foot">
+      <span>14 дней бесплатно на любом тарифе</span>
+      <span class="sep"></span>
+      <span>Без банковской карты</span>
+      <span class="sep"></span>
+      <span>Расторжение в один клик</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CASES / SOCIAL PROOF ============ -->
+<section class="lp-section" id="cases" style="padding-top: 40px;">
+  <div class="container">
+    <div class="lp-section-head reveal">
+      <div class="section-eyebrow">Социальное доказательство</div>
+      <h2 class="lp-h2">Команды, которые уже считают эффект в часах и рублях</h2>
+    </div>
+
+    <div class="cases-grid">
+      <div class="case-card reveal">
+        <div class="case-quote">«Сократили срок типовой доработки с 14 дней до 4 часов. За первый квартал закрыли в полтора раза больше проектов той же командой».</div>
+        <div class="case-stats">
+          <div>
+            <div class="case-stat-value">−93%</div>
+            <div class="case-stat-label">время на типовую доработку РТУ</div>
+          </div>
+          <div>
+            <div class="case-stat-value">+58%</div>
+            <div class="case-stat-label">выручка отдела разработки за квартал</div>
+          </div>
+        </div>
+        <div class="case-meta">
+          <div class="case-avatar">АП</div>
+          <div>
+            <div class="case-name">Андрей Петров</div>
+            <div class="case-role">CTO франчайзи «Северо-Запад» · 28 разработчиков</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="case-card compact reveal delay-1">
+        <div class="case-quote">«Middle-разработчик закрывает задачи, которые раньше уходили только к ведущему. Узкое горло убрали без найма».</div>
+        <div class="case-meta">
+          <div class="case-avatar">ЕЛ</div>
+          <div>
+            <div class="case-name">Елена Лисицына</div>
+            <div class="case-role">Руководитель отдела 1С, ПрофИТ</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="case-card compact reveal delay-2">
+        <div class="case-quote">«Конфигурация не покидает наш контур — у безопасников не было ни одного возражения. Внедрили за две недели».</div>
+        <div class="case-meta">
+          <div class="case-avatar">ДК</div>
+          <div>
+            <div class="case-name">Дмитрий Ковалёв</div>
+            <div class="case-role">ИТ-директор, УралБизнесПром</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="lp-section" id="faq">
+  <div class="container">
+    <div class="lp-section-head center reveal" style="max-width: 640px;">
+      <div class="section-eyebrow">FAQ</div>
+      <h2 class="lp-h2">Часто задаваемые вопросы</h2>
+    </div>
+    <div class="faq reveal">
+      <div class="faq-item open">
+        <button class="faq-q"><span class="faq-q-text">Уходит ли мой код 1С в облако?</span><span class="faq-q-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></span></button>
+        <div class="faq-a">Нет. Десктоп-ассистент выполняет всю индексацию локально на вашей машине или сервере. В облако уходят только зашифрованные векторные представления для семантического поиска — ни исходники модулей, ни имена реквизитов, ни тексты ТЗ их не покидают. Для Enterprise доступно полностью on-premise развёртывание.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q"><span class="faq-q-text">С какими конфигурациями работает Agenter?</span><span class="faq-q-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></span></button>
+        <div class="faq-a">Поддерживаются 1С:ERP, УТ 11, КА 2, БП 3, ЗУП 3, Розница 2.3, Документооборот 3 и любые БСП-совместимые конфигурации на платформе 8.3.20+. Кастомные конфигурации подключаются без отдельной интеграции — агент сам разбирает структуру при первой индексации.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q"><span class="faq-q-text">Меняет ли Agenter типовую конфигурацию?</span><span class="faq-q-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></span></button>
+        <div class="faq-a">По умолчанию — нет. Все доработки реализуются через расширения конфигурации. Это сохраняет возможность стандартного обновления типовой и снижает риск регрессий. При необходимости агент может предложить правку основной конфигурации, но только с явным подтверждением разработчика.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q"><span class="faq-q-text">Можно ли откатить изменение, если результат не устроил?</span><span class="faq-q-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></span></button>
+        <div class="faq-a">Да. Каждое расширение версионируется автоматически — можно вернуться к любой предыдущей версии в один клик. История всех сессий и изменений хранится бессрочно на тарифе Professional и выше.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q"><span class="faq-q-text">Подходит ли Agenter для продакшн-баз?</span><span class="faq-q-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></span></button>
+        <div class="faq-a">Рекомендованный сценарий — работа с тестовой копией с последующим переносом проверенных расширений в продакшн. Прямое подключение к продакшн-базе доступно с дополнительными подтверждениями и журналом аудита, и используется только для безопасных операций (отчёты, печатные формы).</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q"><span class="faq-q-text">Как Agenter сравнивается с обычным AI-чатом или Copilot?</span><span class="faq-q-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></span></button>
+        <div class="faq-a">AI-чаты не знают вашей конкретной конфигурации и не умеют выгружать расширения в базу. Agenter работает с реальной структурой метаданных через BSL Atlas и MCP, валидирует BSL-код и доводит задачу до загруженного расширения, а не до фрагмента кода в окне.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL CTA ============ -->
+<section class="lp-section tight" id="cta">
+  <div class="container">
+    <div class="final-cta reveal">
+      <h2>Запустите своего senior-разработчика 1С сегодня</h2>
+      <p>14 дней бесплатно. Без банковской карты. За первую сессию вы увидите, как промпт превращается в готовое расширение в вашей тестовой базе.</p>
+      <div class="actions">
+        <a href="#" class="lp-btn primary xl">Начать бесплатно</a>
+        <a href="#" class="lp-btn xl">Заказать демо · 30 минут</a>
+      </div>
+      <div class="meta">Уже работают с Agenter: 40+ команд · 184 базы · 2 100+ задач за месяц</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="lp-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#" class="lp-brand">
+          <div class="lp-brand-mark"></div>
+          <div class="lp-brand-name">Agenter</div>
+        </a>
+        <p>Агентная платформа для профессиональной разработки и доработок на 1С:Предприятие. Сделано инженерами 1С для инженеров 1С.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Продукт</h4>
+        <a href="#solution">Решение</a>
+        <a href="#how">Как работает</a>
+        <a href="#pricing">Тарифы</a>
+        <a href="#">Дорожная карта</a>
+        <a href="#">Изменения</a>
+      </div>
+      <div class="footer-col">
+        <h4>Ресурсы</h4>
+        <a href="#">Документация</a>
+        <a href="#">Гайды по 1С</a>
+        <a href="#">BSL Atlas</a>
+        <a href="#blog">Блог</a>
+        <a href="#">Поддержка</a>
+      </div>
+      <div class="footer-col">
+        <h4>Компания</h4>
+        <a href="#">О нас</a>
+        <a href="#">Карьера</a>
+        <a href="#">Партнёры</a>
+        <a href="#">Безопасность</a>
+        <a href="#">Контакты</a>
+      </div>
+      <div class="footer-col">
+        <h4>Связаться</h4>
+        <a href="mailto:hello@agenter.io">hello@agenter.io</a>
+        <a href="tel:+74951234567">+7 495 123-45-67</a>
+        <a href="#">Telegram-канал</a>
+        <a href="#">Заказать звонок</a>
+      </div>
+    </div>
+    <div class="footer-bot">
+      <div>© 2026 Agenter. Все права защищены.</div>
+      <div class="links">
+        <a href="#">Политика конфиденциальности</a>
+        <a href="#">Условия использования</a>
+        <a href="#">Обработка данных</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Header scroll state
+  const header = document.getElementById('lp-header');
+  const onScroll = () => {
+    if (window.scrollY > 8) header.classList.add('scrolled');
+    else header.classList.remove('scrolled');
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // Reveal on scroll
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal:not(.in)').forEach(el => io.observe(el));
+
+  // FAQ accordion
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+</script>
+
+</body>
+</html>

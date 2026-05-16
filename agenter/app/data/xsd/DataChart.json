@@ -1,0 +1,3377 @@
+{
+  "roots": [
+    "animation",
+    "autoFullInterval",
+    "autoMaxValue",
+    "autoMinValue",
+    "autoText",
+    "autoTransposition",
+    "backColor",
+    "backIntervals",
+    "baseData",
+    "baseVal",
+    "baseValue",
+    "beginGaugeAngle",
+    "bkgColor",
+    "border",
+    "borderColor",
+    "bottom",
+    "cacheKey",
+    "chBorder",
+    "chBorderColor",
+    "chColor",
+    "chFont",
+    "chTxtColor",
+    "chart",
+    "chart3Dcrd",
+    "chartIsInit",
+    "chartType",
+    "circleExpandMode",
+    "circleLabelType",
+    "collection",
+    "color",
+    "colorPalette",
+    "colorPaletteDescription",
+    "colorPriority",
+    "contentCacheItem",
+    "curPoint",
+    "curSeries",
+    "currentLevel",
+    "dataSourceDescription",
+    "dataTable",
+    "dayFormatRule",
+    "drawEmpty",
+    "dtFormat",
+    "dtHAlign",
+    "dtHorLines",
+    "dtKeys",
+    "dtVerLines",
+    "elementsChart",
+    "elementsIsInit",
+    "elementsLegend",
+    "elementsTitle",
+    "endGaugeAngle",
+    "extKey",
+    "extTitle",
+    "fixedVariantInterval",
+    "fixedVariantMeasure",
+    "font",
+    "format",
+    "fullIntervalBegin",
+    "fullIntervalEnd",
+    "funnelGapSumPercent",
+    "funnelNeckHeightPercent",
+    "funnelNeckWidthPercent",
+    "gaugeBushColor",
+    "gaugeBushThickness",
+    "gaugeLabelsArcDirection",
+    "gaugeLabelsLocation",
+    "gaugeQualityBands",
+    "gaugeThickness",
+    "gaugeValuesPresentation",
+    "gridLine",
+    "gridLinesShowMode",
+    "hatchBetweenIntervalsColor",
+    "hideBaseVal",
+    "id",
+    "innerRadiusDonutChart",
+    "interval",
+    "intervalDrawType",
+    "intervalTextRepresentation",
+    "isAutoPointName",
+    "isAutoSeriesName",
+    "isDataSourceMode",
+    "isExpand",
+    "isGradient",
+    "isIndicator",
+    "isLight",
+    "isOutline",
+    "isPointsDesign",
+    "isRandomizedNewValues",
+    "isSeriesDesign",
+    "isShowLegend",
+    "isShowPointsScale",
+    "isShowScale",
+    "isShowScaleVL",
+    "isShowSeriesScale",
+    "isShowTitle",
+    "isShowValuesScale",
+    "isTransposed",
+    "isTransposition",
+    "isTrnspCh",
+    "isTrnspLeg",
+    "isTrnspTtl",
+    "item",
+    "itemKey",
+    "keepScaleVariant",
+    "key",
+    "labelArea",
+    "labelColor",
+    "labelFont",
+    "labelFormat",
+    "labelOrientation",
+    "labelText",
+    "labels",
+    "labelsBkgColor",
+    "labelsBorder",
+    "labelsBorderColor",
+    "labelsColor",
+    "labelsDelimiter",
+    "labelsFont",
+    "labelsLocation",
+    "lbFormat",
+    "lbpFormat",
+    "left",
+    "leftKey",
+    "legColor",
+    "legFont",
+    "legTxtColor",
+    "legendIsInit",
+    "legendPlacement",
+    "legendScrollEnable",
+    "level",
+    "lgBorder",
+    "lgBorderColor",
+    "line",
+    "linksColor",
+    "linksLine",
+    "location",
+    "mainColor",
+    "marker",
+    "maxMode",
+    "maxSeries",
+    "maxSeriesPrc",
+    "maxValue",
+    "maxValueDetectionMethod",
+    "measure",
+    "minValue",
+    "minValueDetectionMethod",
+    "multiStageLinkColor",
+    "multiStageLinkLine",
+    "noneVariantChars",
+    "noneVariantMeasure",
+    "outboundColor",
+    "paletteKind",
+    "parentKey",
+    "picture",
+    "placement",
+    "plotAreaPlacement",
+    "points",
+    "pointsAxis",
+    "pointsConnection",
+    "pointsCurId",
+    "pointsDropLinesShowMode",
+    "pointsScale",
+    "radarScaleType",
+    "realDataItems",
+    "realExSeriesData",
+    "realPiePoint",
+    "realPointCount",
+    "realPointData",
+    "realSeriesCount",
+    "realSeriesData",
+    "realStockSeries",
+    "rebuildTime",
+    "referenceBand",
+    "referenceLine",
+    "right",
+    "rightKey",
+    "scaleColor",
+    "scaleLabelLocation",
+    "scaleLine",
+    "scaleStep",
+    "secondColor",
+    "semitransparencyPercent",
+    "series",
+    "seriesCurId",
+    "seriesScale",
+    "show",
+    "showData",
+    "showInChart",
+    "showPereodicalLabels",
+    "showPointsText",
+    "showTitle",
+    "showValueText",
+    "spaceMode",
+    "splineMode",
+    "splineStrain",
+    "strIsChanged",
+    "surfaceColor",
+    "testMode",
+    "text",
+    "textColor",
+    "textPlacement",
+    "ticks",
+    "timeScale",
+    "title",
+    "titleArea",
+    "titleAreaPlacement",
+    "titleIsInit",
+    "titleText",
+    "titleTextSource",
+    "toolTip",
+    "top",
+    "translucencePercent",
+    "transparent",
+    "transparentLabelsBkg",
+    "ttlBorder",
+    "ttlBorderColor",
+    "ttlColor",
+    "ttlFont",
+    "ttlTxtColor",
+    "useValuesReverseBehavior",
+    "userMaxValue",
+    "userMinValue",
+    "valData",
+    "valInfo",
+    "value",
+    "valueIsPointNumber",
+    "valuesAxis",
+    "valuesDropLinesShowMode",
+    "valuesScale",
+    "valuesToolTipShowMode",
+    "verticalScrollEnable",
+    "verticalStretch",
+    "visualBegin",
+    "vsFormat",
+    "xLabelsOrientation"
+  ],
+  "elements": {
+    "animation": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "autoFullInterval": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "autoMaxValue": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "autoMinValue": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "autoText": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "autoTransposition": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "backColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "backIntervals": {
+      "children": [
+        "collection",
+        "ticks"
+      ],
+      "childMin": {
+        "collection": 1,
+        "ticks": 1
+      },
+      "childMax": {
+        "collection": 1,
+        "ticks": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "baseData": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "baseVal": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "baseValue": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "beginGaugeAngle": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "bkgColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "border": {
+      "children": [
+        "style"
+      ],
+      "childMin": {
+        "style": 1
+      },
+      "childMax": {
+        "style": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "width",
+          "type": "xs:boolean",
+          "use": "required"
+        }
+      ]
+    },
+    "borderColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "bottom": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:decimal"
+    },
+    "cacheKey": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "chBorder": {
+      "children": [
+        "style"
+      ],
+      "childMin": {
+        "style": 1
+      },
+      "childMax": {
+        "style": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "width",
+          "type": "xs:boolean",
+          "use": "required"
+        }
+      ]
+    },
+    "chBorderColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "chColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "chFont": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "bold",
+          "type": "xs:boolean",
+          "use": "optional"
+        },
+        {
+          "name": "faceName",
+          "type": "xs:string",
+          "use": "optional"
+        },
+        {
+          "name": "height",
+          "type": "xs:integer",
+          "use": "optional"
+        },
+        {
+          "name": "italic",
+          "type": "xs:boolean",
+          "use": "optional"
+        },
+        {
+          "name": "kind",
+          "type": "xs:string",
+          "use": "required"
+        },
+        {
+          "name": "ref",
+          "type": "xs:string",
+          "use": "optional"
+        },
+        {
+          "name": "scale",
+          "type": "xs:integer",
+          "use": "optional"
+        },
+        {
+          "name": "strikeout",
+          "type": "xs:boolean",
+          "use": "optional"
+        },
+        {
+          "name": "underline",
+          "type": "xs:boolean",
+          "use": "optional"
+        }
+      ]
+    },
+    "chTxtColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "chart": {
+      "children": [
+        "seriesCurId",
+        "pointsCurId",
+        "isSeriesDesign",
+        "realSeriesCount",
+        "realExSeriesData",
+        "isPointsDesign",
+        "realPointCount",
+        "curSeries",
+        "curPoint",
+        "chartType",
+        "circleLabelType",
+        "labelsDelimiter",
+        "labelsLocation",
+        "lbFormat",
+        "lbpFormat",
+        "labelsColor",
+        "labelsFont",
+        "transparentLabelsBkg",
+        "labelsBkgColor",
+        "labelsBorder",
+        "labelsBorderColor",
+        "circleExpandMode",
+        "chart3Dcrd",
+        "title",
+        "isShowTitle",
+        "isShowLegend",
+        "ttlBorder",
+        "ttlBorderColor",
+        "lgBorder",
+        "lgBorderColor",
+        "chBorder",
+        "chBorderColor",
+        "transparent",
+        "bkgColor",
+        "isTrnspTtl",
+        "ttlColor",
+        "isTrnspLeg",
+        "legColor",
+        "isTrnspCh",
+        "chColor",
+        "ttlTxtColor",
+        "legTxtColor",
+        "chTxtColor",
+        "ttlFont",
+        "legFont",
+        "chFont",
+        "isShowScale",
+        "isShowScaleVL",
+        "isShowSeriesScale",
+        "isShowPointsScale",
+        "isShowValuesScale",
+        "vsFormat",
+        "xLabelsOrientation",
+        "scaleLine",
+        "scaleColor",
+        "isAutoSeriesName",
+        "isAutoPointName",
+        "maxMode",
+        "maxSeries",
+        "maxSeriesPrc",
+        "spaceMode",
+        "baseVal",
+        "isOutline",
+        "realPiePoint",
+        "realStockSeries",
+        "isLight",
+        "isGradient",
+        "isTransposition",
+        "hideBaseVal",
+        "dataTable",
+        "dtVerLines",
+        "dtHorLines",
+        "dtHAlign",
+        "dtFormat",
+        "dtKeys",
+        "paletteKind",
+        "animation",
+        "rebuildTime",
+        "isTransposed",
+        "autoTransposition",
+        "legendScrollEnable",
+        "surfaceColor",
+        "radarScaleType",
+        "gaugeValuesPresentation",
+        "gaugeQualityBands",
+        "beginGaugeAngle",
+        "endGaugeAngle",
+        "gaugeThickness",
+        "gaugeLabelsLocation",
+        "gaugeLabelsArcDirection",
+        "gaugeBushThickness",
+        "gaugeBushColor",
+        "autoMaxValue",
+        "userMaxValue",
+        "autoMinValue",
+        "userMinValue",
+        "elementsIsInit",
+        "titleIsInit",
+        "legendIsInit",
+        "chartIsInit",
+        "elementsChart",
+        "elementsLegend",
+        "elementsTitle",
+        "borderColor",
+        "border",
+        "dataSourceDescription",
+        "isDataSourceMode",
+        "isRandomizedNewValues",
+        "splineStrain",
+        "translucencePercent",
+        "funnelNeckHeightPercent",
+        "funnelNeckWidthPercent",
+        "funnelGapSumPercent",
+        "multiStageLinkLine",
+        "multiStageLinkColor",
+        "valuesAxis",
+        "pointsAxis",
+        "valuesScale",
+        "legendPlacement",
+        "plotAreaPlacement",
+        "titleAreaPlacement",
+        "colorPaletteDescription"
+      ],
+      "childMin": {
+        "seriesCurId": 1,
+        "pointsCurId": 1,
+        "isSeriesDesign": 1,
+        "realSeriesCount": 1,
+        "realExSeriesData": 1,
+        "isPointsDesign": 1,
+        "realPointCount": 1,
+        "curSeries": 1,
+        "curPoint": 1,
+        "chartType": 1,
+        "circleLabelType": 1,
+        "labelsDelimiter": 1,
+        "labelsLocation": 1,
+        "lbFormat": 1,
+        "lbpFormat": 1,
+        "labelsColor": 1,
+        "labelsFont": 1,
+        "transparentLabelsBkg": 1,
+        "labelsBkgColor": 1,
+        "labelsBorder": 1,
+        "labelsBorderColor": 1,
+        "circleExpandMode": 1,
+        "chart3Dcrd": 1,
+        "title": 1,
+        "isShowTitle": 1,
+        "isShowLegend": 1,
+        "ttlBorder": 1,
+        "ttlBorderColor": 1,
+        "lgBorder": 1,
+        "lgBorderColor": 1,
+        "chBorder": 1,
+        "chBorderColor": 1,
+        "transparent": 1,
+        "bkgColor": 1,
+        "isTrnspTtl": 1,
+        "ttlColor": 1,
+        "isTrnspLeg": 1,
+        "legColor": 1,
+        "isTrnspCh": 1,
+        "chColor": 1,
+        "ttlTxtColor": 1,
+        "legTxtColor": 1,
+        "chTxtColor": 1,
+        "ttlFont": 1,
+        "legFont": 1,
+        "chFont": 1,
+        "isShowScale": 1,
+        "isShowScaleVL": 1,
+        "isShowSeriesScale": 1,
+        "isShowPointsScale": 1,
+        "isShowValuesScale": 1,
+        "vsFormat": 1,
+        "xLabelsOrientation": 1,
+        "scaleLine": 1,
+        "scaleColor": 1,
+        "isAutoSeriesName": 1,
+        "isAutoPointName": 1,
+        "maxMode": 1,
+        "maxSeries": 1,
+        "maxSeriesPrc": 1,
+        "spaceMode": 1,
+        "baseVal": 1,
+        "isOutline": 1,
+        "realPiePoint": 1,
+        "realStockSeries": 1,
+        "isLight": 1,
+        "isGradient": 1,
+        "isTransposition": 1,
+        "hideBaseVal": 1,
+        "dataTable": 1,
+        "dtVerLines": 1,
+        "dtHorLines": 1,
+        "dtHAlign": 1,
+        "dtFormat": 1,
+        "dtKeys": 1,
+        "paletteKind": 1,
+        "animation": 1,
+        "rebuildTime": 1,
+        "isTransposed": 1,
+        "autoTransposition": 1,
+        "legendScrollEnable": 1,
+        "surfaceColor": 1,
+        "radarScaleType": 1,
+        "gaugeValuesPresentation": 1,
+        "gaugeQualityBands": 1,
+        "beginGaugeAngle": 1,
+        "endGaugeAngle": 1,
+        "gaugeThickness": 1,
+        "gaugeLabelsLocation": 1,
+        "gaugeLabelsArcDirection": 1,
+        "gaugeBushThickness": 1,
+        "gaugeBushColor": 1,
+        "autoMaxValue": 1,
+        "userMaxValue": 1,
+        "autoMinValue": 1,
+        "userMinValue": 1,
+        "elementsIsInit": 1,
+        "titleIsInit": 1,
+        "legendIsInit": 1,
+        "chartIsInit": 1,
+        "elementsChart": 1,
+        "elementsLegend": 1,
+        "elementsTitle": 1,
+        "borderColor": 1,
+        "border": 1,
+        "dataSourceDescription": 1,
+        "isDataSourceMode": 1,
+        "isRandomizedNewValues": 1,
+        "splineStrain": 1,
+        "translucencePercent": 1,
+        "funnelNeckHeightPercent": 1,
+        "funnelNeckWidthPercent": 1,
+        "funnelGapSumPercent": 1,
+        "multiStageLinkLine": 1,
+        "multiStageLinkColor": 1,
+        "valuesAxis": 1,
+        "pointsAxis": 1,
+        "valuesScale": 0,
+        "legendPlacement": 0,
+        "plotAreaPlacement": 0,
+        "titleAreaPlacement": 0,
+        "colorPaletteDescription": 0
+      },
+      "childMax": {
+        "seriesCurId": 1,
+        "pointsCurId": 1,
+        "isSeriesDesign": 1,
+        "realSeriesCount": 1,
+        "realExSeriesData": 1,
+        "isPointsDesign": 1,
+        "realPointCount": 1,
+        "curSeries": 1,
+        "curPoint": 1,
+        "chartType": 1,
+        "circleLabelType": 1,
+        "labelsDelimiter": 1,
+        "labelsLocation": 1,
+        "lbFormat": 1,
+        "lbpFormat": 1,
+        "labelsColor": 1,
+        "labelsFont": 1,
+        "transparentLabelsBkg": 1,
+        "labelsBkgColor": 1,
+        "labelsBorder": 1,
+        "labelsBorderColor": 1,
+        "circleExpandMode": 1,
+        "chart3Dcrd": 1,
+        "title": 1,
+        "isShowTitle": 1,
+        "isShowLegend": 1,
+        "ttlBorder": 1,
+        "ttlBorderColor": 1,
+        "lgBorder": 1,
+        "lgBorderColor": 1,
+        "chBorder": 1,
+        "chBorderColor": 1,
+        "transparent": 1,
+        "bkgColor": 1,
+        "isTrnspTtl": 1,
+        "ttlColor": 1,
+        "isTrnspLeg": 1,
+        "legColor": 1,
+        "isTrnspCh": 1,
+        "chColor": 1,
+        "ttlTxtColor": 1,
+        "legTxtColor": 1,
+        "chTxtColor": 1,
+        "ttlFont": 1,
+        "legFont": 1,
+        "chFont": 1,
+        "isShowScale": 1,
+        "isShowScaleVL": 1,
+        "isShowSeriesScale": 1,
+        "isShowPointsScale": 1,
+        "isShowValuesScale": 1,
+        "vsFormat": 1,
+        "xLabelsOrientation": 1,
+        "scaleLine": 1,
+        "scaleColor": 1,
+        "isAutoSeriesName": 1,
+        "isAutoPointName": 1,
+        "maxMode": 1,
+        "maxSeries": 1,
+        "maxSeriesPrc": 1,
+        "spaceMode": 1,
+        "baseVal": 1,
+        "isOutline": 1,
+        "realPiePoint": 1,
+        "realStockSeries": 1,
+        "isLight": 1,
+        "isGradient": 1,
+        "isTransposition": 1,
+        "hideBaseVal": 1,
+        "dataTable": 1,
+        "dtVerLines": 1,
+        "dtHorLines": 1,
+        "dtHAlign": 1,
+        "dtFormat": 1,
+        "dtKeys": 1,
+        "paletteKind": 1,
+        "animation": 1,
+        "rebuildTime": 1,
+        "isTransposed": 1,
+        "autoTransposition": 1,
+        "legendScrollEnable": 1,
+        "surfaceColor": 1,
+        "radarScaleType": 1,
+        "gaugeValuesPresentation": 1,
+        "gaugeQualityBands": 1,
+        "beginGaugeAngle": 1,
+        "endGaugeAngle": 1,
+        "gaugeThickness": 1,
+        "gaugeLabelsLocation": 1,
+        "gaugeLabelsArcDirection": 1,
+        "gaugeBushThickness": 1,
+        "gaugeBushColor": 1,
+        "autoMaxValue": 1,
+        "userMaxValue": 1,
+        "autoMinValue": 1,
+        "userMinValue": 1,
+        "elementsIsInit": 1,
+        "titleIsInit": 1,
+        "legendIsInit": 1,
+        "chartIsInit": 1,
+        "elementsChart": 1,
+        "elementsLegend": 1,
+        "elementsTitle": 1,
+        "borderColor": 1,
+        "border": 1,
+        "dataSourceDescription": 1,
+        "isDataSourceMode": 1,
+        "isRandomizedNewValues": 1,
+        "splineStrain": 1,
+        "translucencePercent": 1,
+        "funnelNeckHeightPercent": 1,
+        "funnelNeckWidthPercent": 1,
+        "funnelGapSumPercent": 1,
+        "multiStageLinkLine": 1,
+        "multiStageLinkColor": 1,
+        "valuesAxis": 1,
+        "pointsAxis": 1,
+        "valuesScale": 1,
+        "legendPlacement": 1,
+        "plotAreaPlacement": 1,
+        "titleAreaPlacement": 1,
+        "colorPaletteDescription": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "chart3Dcrd": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "chartIsInit": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "chartType": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "circleExpandMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "circleLabelType": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "collection": {
+      "children": [
+        "ticks"
+      ],
+      "childMin": {
+        "ticks": 1
+      },
+      "childMax": {
+        "ticks": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "color": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "colorPalette": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "colorPaletteDescription": {
+      "children": [
+        "colorPalette"
+      ],
+      "childMin": {
+        "colorPalette": 1
+      },
+      "childMax": {
+        "colorPalette": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "colorPriority": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "contentCacheItem": {
+      "children": [
+        "mainColor",
+        "secondColor",
+        "backColor",
+        "textColor",
+        "hatchBetweenIntervalsColor"
+      ],
+      "childMin": {
+        "mainColor": 1,
+        "secondColor": 1,
+        "backColor": 0,
+        "textColor": 0,
+        "hatchBetweenIntervalsColor": 0
+      },
+      "childMax": {
+        "mainColor": 1,
+        "secondColor": 1,
+        "backColor": 1,
+        "textColor": 1,
+        "hatchBetweenIntervalsColor": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "curPoint": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "curSeries": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "currentLevel": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "dataSourceDescription": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "dataTable": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "dayFormatRule": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "drawEmpty": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "dtFormat": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "dtHAlign": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "dtHorLines": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "dtKeys": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "dtVerLines": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "elementsChart": {
+      "children": [
+        "left",
+        "right",
+        "top",
+        "bottom"
+      ],
+      "childMin": {
+        "left": 1,
+        "right": 1,
+        "top": 1,
+        "bottom": 1
+      },
+      "childMax": {
+        "left": 1,
+        "right": 1,
+        "top": 1,
+        "bottom": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "elementsIsInit": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "elementsLegend": {
+      "children": [
+        "left",
+        "right",
+        "top",
+        "bottom"
+      ],
+      "childMin": {
+        "left": 1,
+        "right": 1,
+        "top": 1,
+        "bottom": 1
+      },
+      "childMax": {
+        "left": 1,
+        "right": 1,
+        "top": 1,
+        "bottom": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "elementsTitle": {
+      "children": [
+        "left",
+        "right",
+        "top",
+        "bottom"
+      ],
+      "childMin": {
+        "left": 1,
+        "right": 1,
+        "top": 1,
+        "bottom": 1
+      },
+      "childMax": {
+        "left": 1,
+        "right": 1,
+        "top": 1,
+        "bottom": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "endGaugeAngle": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "extKey": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "extTitle": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "fixedVariantInterval": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "fixedVariantMeasure": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "font": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "kind",
+          "type": "xs:string",
+          "use": "required"
+        }
+      ]
+    },
+    "format": {
+      "children": [
+        "item"
+      ],
+      "childMin": {
+        "item": 0
+      },
+      "childMax": {
+        "item": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "fullIntervalBegin": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:dateTime"
+    },
+    "fullIntervalEnd": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:dateTime"
+    },
+    "funnelGapSumPercent": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "funnelNeckHeightPercent": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "funnelNeckWidthPercent": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "gaugeBushColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "gaugeBushThickness": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "gaugeLabelsArcDirection": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "gaugeLabelsLocation": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "gaugeQualityBands": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "useTextStr",
+          "type": "xs:boolean",
+          "use": "required"
+        },
+        {
+          "name": "useTooltipStr",
+          "type": "xs:boolean",
+          "use": "required"
+        }
+      ]
+    },
+    "gaugeThickness": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "gaugeValuesPresentation": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "gridLine": {
+      "children": [
+        "style"
+      ],
+      "childMin": {
+        "style": 1
+      },
+      "childMax": {
+        "style": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "gap",
+          "type": "xs:boolean",
+          "use": "required"
+        },
+        {
+          "name": "width",
+          "type": "xs:boolean",
+          "use": "required"
+        }
+      ]
+    },
+    "gridLinesShowMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "hatchBetweenIntervalsColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "hideBaseVal": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "id": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "innerRadiusDonutChart": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "interval": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "intervalDrawType": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "intervalTextRepresentation": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "isAutoPointName": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "isAutoSeriesName": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "isDataSourceMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "isExpand": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "isGradient": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "isIndicator": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "isLight": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "isOutline": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "isPointsDesign": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "isRandomizedNewValues": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "isSeriesDesign": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "isShowLegend": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "isShowPointsScale": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "isShowScale": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "isShowScaleVL": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "isShowSeriesScale": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "isShowTitle": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "isShowValuesScale": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "isTransposed": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "isTransposition": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "isTrnspCh": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "isTrnspLeg": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "isTrnspTtl": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "item": {
+      "children": [
+        "valData",
+        "valInfo",
+        "toolTip"
+      ],
+      "childMin": {
+        "valData": 1,
+        "valInfo": 1,
+        "toolTip": 1
+      },
+      "childMax": {
+        "valData": 1,
+        "valInfo": 1,
+        "toolTip": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "itemKey": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "keepScaleVariant": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "key": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "labelArea": {
+      "children": [
+        "font",
+        "textColor",
+        "backColor",
+        "border",
+        "borderColor"
+      ],
+      "childMin": {
+        "font": 1,
+        "textColor": 1,
+        "backColor": 1,
+        "border": 1,
+        "borderColor": 1
+      },
+      "childMax": {
+        "font": 1,
+        "textColor": 1,
+        "backColor": 1,
+        "border": 1,
+        "borderColor": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "labelColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "labelFont": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "bold",
+          "type": "xs:boolean",
+          "use": "optional"
+        },
+        {
+          "name": "faceName",
+          "type": "xs:string",
+          "use": "optional"
+        },
+        {
+          "name": "height",
+          "type": "xs:integer",
+          "use": "required"
+        },
+        {
+          "name": "italic",
+          "type": "xs:boolean",
+          "use": "optional"
+        },
+        {
+          "name": "kind",
+          "type": "xs:string",
+          "use": "required"
+        },
+        {
+          "name": "ref",
+          "type": "xs:string",
+          "use": "optional"
+        },
+        {
+          "name": "scale",
+          "type": "xs:integer",
+          "use": "optional"
+        },
+        {
+          "name": "strikeout",
+          "type": "xs:boolean",
+          "use": "optional"
+        },
+        {
+          "name": "underline",
+          "type": "xs:boolean",
+          "use": "optional"
+        }
+      ]
+    },
+    "labelFormat": {
+      "children": [
+        "item"
+      ],
+      "childMin": {
+        "item": 1
+      },
+      "childMax": {
+        "item": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "labelOrientation": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "labelText": {
+      "children": [
+        "item"
+      ],
+      "childMin": {
+        "item": 1
+      },
+      "childMax": {
+        "item": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "labels": {
+      "children": [
+        "ticks"
+      ],
+      "childMin": {
+        "ticks": 1
+      },
+      "childMax": {
+        "ticks": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "labelsBkgColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "labelsBorder": {
+      "children": [
+        "style"
+      ],
+      "childMin": {
+        "style": 1
+      },
+      "childMax": {
+        "style": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "width",
+          "type": "xs:boolean",
+          "use": "required"
+        }
+      ]
+    },
+    "labelsBorderColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "labelsColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "labelsDelimiter": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "labelsFont": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "kind",
+          "type": "xs:string",
+          "use": "required"
+        }
+      ]
+    },
+    "labelsLocation": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "lbFormat": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "lbpFormat": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "left": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:decimal"
+    },
+    "leftKey": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "legColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "legFont": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "bold",
+          "type": "xs:boolean",
+          "use": "optional"
+        },
+        {
+          "name": "faceName",
+          "type": "xs:string",
+          "use": "optional"
+        },
+        {
+          "name": "height",
+          "type": "xs:integer",
+          "use": "optional"
+        },
+        {
+          "name": "italic",
+          "type": "xs:boolean",
+          "use": "optional"
+        },
+        {
+          "name": "kind",
+          "type": "xs:string",
+          "use": "required"
+        },
+        {
+          "name": "ref",
+          "type": "xs:string",
+          "use": "optional"
+        },
+        {
+          "name": "scale",
+          "type": "xs:integer",
+          "use": "optional"
+        },
+        {
+          "name": "strikeout",
+          "type": "xs:boolean",
+          "use": "optional"
+        },
+        {
+          "name": "underline",
+          "type": "xs:boolean",
+          "use": "optional"
+        }
+      ]
+    },
+    "legTxtColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "legendIsInit": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "legendPlacement": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "legendScrollEnable": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "level": {
+      "children": [
+        "measure",
+        "interval",
+        "show",
+        "line",
+        "scaleColor",
+        "dayFormatRule",
+        "format",
+        "labels",
+        "backColor",
+        "textColor",
+        "showPereodicalLabels"
+      ],
+      "childMin": {
+        "measure": 1,
+        "interval": 1,
+        "show": 1,
+        "line": 1,
+        "scaleColor": 1,
+        "dayFormatRule": 1,
+        "format": 1,
+        "labels": 1,
+        "backColor": 1,
+        "textColor": 1,
+        "showPereodicalLabels": 1
+      },
+      "childMax": {
+        "measure": 1,
+        "interval": 1,
+        "show": 1,
+        "line": 1,
+        "scaleColor": 1,
+        "dayFormatRule": 1,
+        "format": 1,
+        "labels": 1,
+        "backColor": 1,
+        "textColor": 1,
+        "showPereodicalLabels": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "lgBorder": {
+      "children": [
+        "style"
+      ],
+      "childMin": {
+        "style": 1
+      },
+      "childMax": {
+        "style": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "width",
+          "type": "xs:boolean",
+          "use": "required"
+        }
+      ]
+    },
+    "lgBorderColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "line": {
+      "children": [
+        "style"
+      ],
+      "childMin": {
+        "style": 1
+      },
+      "childMax": {
+        "style": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "gap",
+          "type": "xs:boolean",
+          "use": "required"
+        },
+        {
+          "name": "width",
+          "type": "xs:integer",
+          "use": "required"
+        }
+      ]
+    },
+    "linksColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "linksLine": {
+      "children": [
+        "style"
+      ],
+      "childMin": {
+        "style": 1
+      },
+      "childMax": {
+        "style": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "gap",
+          "type": "xs:boolean",
+          "use": "required"
+        },
+        {
+          "name": "width",
+          "type": "xs:boolean",
+          "use": "required"
+        }
+      ]
+    },
+    "location": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "mainColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "marker": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "maxMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "maxSeries": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "maxSeriesPrc": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "maxValue": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:anyType"
+    },
+    "maxValueDetectionMethod": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "measure": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "minValue": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:anyType"
+    },
+    "minValueDetectionMethod": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "multiStageLinkColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "multiStageLinkLine": {
+      "children": [
+        "style"
+      ],
+      "childMin": {
+        "style": 1
+      },
+      "childMax": {
+        "style": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "gap",
+          "type": "xs:boolean",
+          "use": "required"
+        },
+        {
+          "name": "width",
+          "type": "xs:boolean",
+          "use": "required"
+        }
+      ]
+    },
+    "noneVariantChars": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "noneVariantMeasure": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "outboundColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "paletteKind": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "parentKey": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "picture": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "placement": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "plotAreaPlacement": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "points": {
+      "children": [
+        "testMode",
+        "value",
+        "contentCacheItem",
+        "autoText",
+        "useValuesReverseBehavior"
+      ],
+      "childMin": {
+        "testMode": 1,
+        "value": 1,
+        "contentCacheItem": 1,
+        "autoText": 1,
+        "useValuesReverseBehavior": 1
+      },
+      "childMax": {
+        "testMode": 1,
+        "value": 1,
+        "contentCacheItem": 1,
+        "autoText": 1,
+        "useValuesReverseBehavior": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "pointsAxis": {
+      "children": [
+        "minValueDetectionMethod"
+      ],
+      "childMin": {
+        "minValueDetectionMethod": 0
+      },
+      "childMax": {
+        "minValueDetectionMethod": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "pointsConnection": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "pointsCurId": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "pointsDropLinesShowMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "pointsScale": {
+      "children": [
+        "titleArea",
+        "gridLinesShowMode",
+        "gridLine",
+        "labelColor"
+      ],
+      "childMin": {
+        "titleArea": 1,
+        "gridLinesShowMode": 1,
+        "gridLine": 1,
+        "labelColor": 1
+      },
+      "childMax": {
+        "titleArea": 1,
+        "gridLinesShowMode": 1,
+        "gridLine": 1,
+        "labelColor": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "radarScaleType": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "realDataItems": {
+      "children": [
+        "item"
+      ],
+      "childMin": {
+        "item": 375
+      },
+      "childMax": {
+        "item": -1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "realExSeriesData": {
+      "children": [
+        "id",
+        "color",
+        "line",
+        "marker",
+        "text",
+        "strIsChanged",
+        "isExpand",
+        "isIndicator",
+        "colorPriority"
+      ],
+      "childMin": {
+        "id": 1,
+        "color": 1,
+        "line": 1,
+        "marker": 1,
+        "text": 1,
+        "strIsChanged": 1,
+        "isExpand": 1,
+        "isIndicator": 1,
+        "colorPriority": 1
+      },
+      "childMax": {
+        "id": 1,
+        "color": 1,
+        "line": 1,
+        "marker": 1,
+        "text": 1,
+        "strIsChanged": 1,
+        "isExpand": 1,
+        "isIndicator": 1,
+        "colorPriority": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "realPiePoint": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "realPointCount": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "realPointData": {
+      "children": [
+        "id",
+        "color",
+        "line",
+        "marker",
+        "text",
+        "strIsChanged",
+        "isExpand",
+        "isIndicator",
+        "colorPriority"
+      ],
+      "childMin": {
+        "id": 1,
+        "color": 1,
+        "line": 1,
+        "marker": 1,
+        "text": 1,
+        "strIsChanged": 1,
+        "isExpand": 1,
+        "isIndicator": 1,
+        "colorPriority": 1
+      },
+      "childMax": {
+        "id": 1,
+        "color": 1,
+        "line": 1,
+        "marker": 1,
+        "text": 1,
+        "strIsChanged": 1,
+        "isExpand": 1,
+        "isIndicator": 1,
+        "colorPriority": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "realSeriesCount": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "realSeriesData": {
+      "children": [
+        "id",
+        "color",
+        "line",
+        "marker",
+        "text",
+        "strIsChanged",
+        "isExpand",
+        "isIndicator",
+        "colorPriority"
+      ],
+      "childMin": {
+        "id": 1,
+        "color": 1,
+        "line": 1,
+        "marker": 1,
+        "text": 1,
+        "strIsChanged": 1,
+        "isExpand": 1,
+        "isIndicator": 1,
+        "colorPriority": 1
+      },
+      "childMax": {
+        "id": 1,
+        "color": 1,
+        "line": 1,
+        "marker": 1,
+        "text": 1,
+        "strIsChanged": 1,
+        "isExpand": 1,
+        "isIndicator": 1,
+        "colorPriority": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "realStockSeries": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "rebuildTime": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "referenceBand": {
+      "children": [
+        "labelArea"
+      ],
+      "childMin": {
+        "labelArea": 1
+      },
+      "childMax": {
+        "labelArea": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "referenceLine": {
+      "children": [
+        "value",
+        "labelText",
+        "labelArea",
+        "color",
+        "semitransparencyPercent",
+        "line",
+        "valueIsPointNumber"
+      ],
+      "childMin": {
+        "value": 0,
+        "labelText": 0,
+        "labelArea": 1,
+        "color": 0,
+        "semitransparencyPercent": 0,
+        "line": 0,
+        "valueIsPointNumber": 0
+      },
+      "childMax": {
+        "value": 1,
+        "labelText": 1,
+        "labelArea": 1,
+        "color": 1,
+        "semitransparencyPercent": 1,
+        "line": 1,
+        "valueIsPointNumber": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "right": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:decimal"
+    },
+    "rightKey": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "scaleColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "scaleLabelLocation": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "scaleLine": {
+      "children": [
+        "style"
+      ],
+      "childMin": {
+        "style": 1
+      },
+      "childMax": {
+        "style": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "gap",
+          "type": "xs:boolean",
+          "use": "required"
+        },
+        {
+          "name": "width",
+          "type": "xs:boolean",
+          "use": "required"
+        }
+      ]
+    },
+    "scaleStep": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "secondColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "semitransparencyPercent": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "series": {
+      "children": [
+        "testMode",
+        "value",
+        "contentCacheItem",
+        "autoText",
+        "useValuesReverseBehavior"
+      ],
+      "childMin": {
+        "testMode": 1,
+        "value": 1,
+        "contentCacheItem": 1,
+        "autoText": 1,
+        "useValuesReverseBehavior": 1
+      },
+      "childMax": {
+        "testMode": 1,
+        "value": 1,
+        "contentCacheItem": 1,
+        "autoText": 1,
+        "useValuesReverseBehavior": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "seriesCurId": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "seriesScale": {
+      "children": [
+        "titleArea",
+        "gridLine",
+        "showInChart"
+      ],
+      "childMin": {
+        "titleArea": 1,
+        "gridLine": 1,
+        "showInChart": 1
+      },
+      "childMax": {
+        "titleArea": 1,
+        "gridLine": 1,
+        "showInChart": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "show": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "showData": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "showInChart": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "showPereodicalLabels": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "showPointsText": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "showTitle": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "showValueText": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "spaceMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "splineMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "splineStrain": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:integer"
+    },
+    "strIsChanged": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "surfaceColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "testMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "text": {
+      "children": [
+        "item"
+      ],
+      "childMin": {
+        "item": 1
+      },
+      "childMax": {
+        "item": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "textColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "textPlacement": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "ticks": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "timeScale": {
+      "children": [
+        "placement",
+        "level",
+        "transparent",
+        "backColor",
+        "textColor",
+        "currentLevel"
+      ],
+      "childMin": {
+        "placement": 1,
+        "level": 1,
+        "transparent": 1,
+        "backColor": 1,
+        "textColor": 1,
+        "currentLevel": 1
+      },
+      "childMax": {
+        "placement": 1,
+        "level": 1,
+        "transparent": 1,
+        "backColor": 1,
+        "textColor": 1,
+        "currentLevel": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "title": {
+      "children": [
+        "item"
+      ],
+      "childMin": {
+        "item": 0
+      },
+      "childMax": {
+        "item": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "titleArea": {
+      "children": [
+        "font",
+        "textColor",
+        "backColor",
+        "border",
+        "borderColor",
+        "location",
+        "marker"
+      ],
+      "childMin": {
+        "font": 1,
+        "textColor": 1,
+        "backColor": 1,
+        "border": 1,
+        "borderColor": 1,
+        "location": 0,
+        "marker": 0
+      },
+      "childMax": {
+        "font": 1,
+        "textColor": 1,
+        "backColor": 1,
+        "border": 1,
+        "borderColor": 1,
+        "location": 1,
+        "marker": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "titleAreaPlacement": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "titleIsInit": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "titleText": {
+      "children": [
+        "item"
+      ],
+      "childMin": {
+        "item": 1
+      },
+      "childMax": {
+        "item": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "titleTextSource": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "toolTip": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "top": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:decimal"
+    },
+    "translucencePercent": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "transparent": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "transparentLabelsBkg": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "ttlBorder": {
+      "children": [
+        "style"
+      ],
+      "childMin": {
+        "style": 1
+      },
+      "childMax": {
+        "style": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "width",
+          "type": "xs:boolean",
+          "use": "required"
+        }
+      ]
+    },
+    "ttlBorderColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "ttlColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "ttlFont": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": [
+        {
+          "name": "bold",
+          "type": "xs:boolean",
+          "use": "optional"
+        },
+        {
+          "name": "faceName",
+          "type": "xs:string",
+          "use": "optional"
+        },
+        {
+          "name": "height",
+          "type": "xs:integer",
+          "use": "optional"
+        },
+        {
+          "name": "italic",
+          "type": "xs:boolean",
+          "use": "optional"
+        },
+        {
+          "name": "kind",
+          "type": "xs:string",
+          "use": "required"
+        },
+        {
+          "name": "ref",
+          "type": "xs:string",
+          "use": "optional"
+        },
+        {
+          "name": "scale",
+          "type": "xs:integer",
+          "use": "optional"
+        },
+        {
+          "name": "strikeout",
+          "type": "xs:boolean",
+          "use": "optional"
+        },
+        {
+          "name": "underline",
+          "type": "xs:boolean",
+          "use": "optional"
+        }
+      ]
+    },
+    "ttlTxtColor": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "useValuesReverseBehavior": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "userMaxValue": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "userMinValue": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "valData": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:anyType"
+    },
+    "valInfo": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "value": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:anyType"
+    },
+    "valueIsPointNumber": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "valuesAxis": {
+      "children": [
+        "minValueDetectionMethod"
+      ],
+      "childMin": {
+        "minValueDetectionMethod": 0
+      },
+      "childMax": {
+        "minValueDetectionMethod": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "valuesDropLinesShowMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "valuesScale": {
+      "children": [
+        "titleArea",
+        "gridLinesShowMode"
+      ],
+      "childMin": {
+        "titleArea": 1,
+        "gridLinesShowMode": 1
+      },
+      "childMax": {
+        "titleArea": 1,
+        "gridLinesShowMode": 1
+      },
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "valuesToolTipShowMode": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "verticalScrollEnable": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:boolean"
+    },
+    "verticalStretch": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    },
+    "visualBegin": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:dateTime"
+    },
+    "vsFormat": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": false,
+      "mixed": false,
+      "attributes": []
+    },
+    "xLabelsOrientation": {
+      "children": [],
+      "childMin": {},
+      "childMax": {},
+      "allowAny": false,
+      "simpleType": true,
+      "xsd_type": "xs:string"
+    }
+  },
+  "source": "http_v8.1c.ru_8.2_data_chart.xsd",
+  "targetNamespace": "http://v8.1c.ru/8.2/data/chart",
+  "imports": [
+    {
+      "namespace": "http://v8.1c.ru/8.1/data/core",
+      "schemaLocation": "http_v8.1c.ru_8.1_data_core.xsd"
+    },
+    {
+      "namespace": "http://v8.1c.ru/8.1/data/ui",
+      "schemaLocation": "http_v8.1c.ru_8.1_data_ui.xsd"
+    },
+    {
+      "namespace": "http://www.w3.org/2001/XMLSchema-instance",
+      "schemaLocation": ""
+    }
+  ],
+  "globalElementsCount": 235,
+  "namedComplexTypes": [
+    "Chart",
+    "ChartReferenceBands",
+    "ChartReferenceLines",
+    "ChartScale",
+    "ChartSeriesStackType",
+    "ChartSplineMode",
+    "GanttChart"
+  ],
+  "namedSimpleTypes": [],
+  "exportJsonBasename": "DataChart",
+  "mergeNote": "Дополнено из предыдущего JSON: сохранены корни/элементы, отсутствующие в XSD; ChildObjects — объединение списков дочерних элементов."
+}

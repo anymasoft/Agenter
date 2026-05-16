@@ -1,0 +1,99 @@
+# ============================================================================
+# Agenter project — gitignore
+# ============================================================================
+# Strategy:
+#   - Include: agenter/, .claude/skills/, top-level docs and config templates
+#   - Exclude: secrets, runtime state, user-specific 1C content, big folders
+#               that are separate projects, IDE configs, build artifacts.
+
+# --- Secrets and local config (NEVER commit) -------------------------------
+.env
+.env.local
+*.key
+*.pem
+agenter/.env
+agenter/config/config.json
+.v8-project.json
+agenter/desktop/main.spec
+
+# --- Python --------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.Python
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Node ---------------------------------------------------------------
+node_modules/
+
+# --- Runtime state (regenerated per session) -----------------------------
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+agenter/agenter.db
+agenter/op_state.json
+# Whole agenter/data/ is regenerated runtime content (platform docs index,
+# Chroma vector DBs, proposals, snapshots). Hundreds of MB, not source.
+agenter/data/
+agenter/logs/
+logs/
+**/*.log
+
+# --- Conversation history (private — contains chat with the user) --------
+agenter/docs/external-audit/transcript.md
+agenter/docs/external-audit/transcript_digest.md
+agenter/docs/external-audit/recent_digest.md
+
+# --- 1C user content (separate projects / vendor IP / user's domain) -----
+# These live in C:\BUFFER\ERP\ but are NOT part of the Agenter project.
+# Excluded because: vendor IP (SCHEME), user's business code (ext_src),
+# separate project subtrees, large size, or pre-existing backups,
+# or user-specific business specs (root /docs/ — ТЗ конкретного расширения).
+SCHEME/
+ext_src/
+ext_src_baseline_*/
+_archive/
+_references/
+_vendor/
+mcp-servers/
+tsd-emulator/
+/docs/
+
+# --- IDE ----------------------------------------------------------------
+.idea/
+.vscode/
+*.swp
+*~
+
+# --- OS -----------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Claude Code internals (NOT skills) ---------------------------------
+# We keep .claude/skills/ and CLAUDE.md, but everything else under .claude/
+# is local state (sessions, OAuth tokens, project caches) — exclude.
+.claude/projects/
+.claude/oauth*.json
+.claude/credentials*.json
+.claude/cache/
+.claude/memory/
+.claude/settings.local.json
+
+# --- Big binary blobs not part of source ---------------------------------
+# agenter/tools/ holds ML embedding models (~1.4 GB). Not source code,
+# regenerated/downloaded by setup scripts.
+agenter/tools/
+
+# --- Build artifacts ----------------------------------------------------
+dist/
+build/
+*.exe
+*.msi

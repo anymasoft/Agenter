@@ -1,0 +1,6 @@
+fastapi
+uvicorn[standard]
+anthropic
+pydantic
+aiofiles
+python-dotenv

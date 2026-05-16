@@ -1,0 +1,13 @@
+{
+  "_comment": "Скопируй в config.json и заполни свои значения",
+
+  "backend_ws_url": "ws://localhost:8080/ws/desktop",
+  "bsl_atlas_url":  "http://localhost:8000",
+
+  "ext_src_path": "C:\\Path\\To\\Your\\Extension\\ext_src",
+  "v8_path":      "C:\\Program Files\\1cv8\\8.3.XX.XXXX\\bin",
+  "base_path":    "C:\\Path\\To\\Your\\1C\\Database",
+  "username":     "Администратор",
+  "password":     "",
+  "extension":    "ИмяВашегоРасширения"
+}

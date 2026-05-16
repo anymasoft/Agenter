@@ -1,0 +1,17 @@
+{
+  "v8path": "C:\\Program Files\\1cv8\\8.3.27.1859\\bin",
+  "databases": [
+    {
+      "id": "erp",
+      "name": "My 1C Demo Base",
+      "type": "file",
+      "path": "C:\\Users\\<YourUser>\\Documents\\1C\\<YourBase>",
+      "user": "Администратор",
+      "password": "",
+      "aliases": ["erp", "main"],
+      "branches": ["main"],
+      "configSrc": "C:\\BUFFER\\ERP\\SCHEME"
+    }
+  ],
+  "default": "erp"
+}

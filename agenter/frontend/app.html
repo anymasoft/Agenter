@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Agenter</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="styles.css" />
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
+
+<!-- Markdown-рендерер для финальных ответов LLM (таблицы, заголовки, code blocks) -->
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+<script>
+  // Конфигурация marked один раз: GFM + переводы строк → <br>
+  if (typeof marked !== "undefined") {
+    marked.setOptions({ gfm: true, breaks: true });
+  }
+</script>
+
+<style>
+  html, body, #root { height: 100%; margin: 0; }
+  body { background: var(--bg, #F1F3F6); }
+  #root { display: flex; flex-direction: column; }
+  /* workspace занимает весь экран */
+  .workspace { height: 100vh; width: 100vw; overflow: hidden; }
+  /* main должен ограничивать высоту, чтобы chat-scroll мог скроллить */
+  .main { height: 100%; overflow: hidden; }
+  /* chat и chat-scroll: гарантируем что flex-дети не вырастают за родителя */
+  .chat { min-height: 0; }
+  .chat-scroll { min-height: 0; }
+
+  /* Анимация новых строк лога */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Спиннер выполнения задачи в кнопке отправки */
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  /* Пульсирующий маркер для индикатора прогресса дерева метаданных */
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50%      { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<!-- API layer должен быть готов ДО React-компонентов (SetupWizard вызывает AgenterAPI в useEffect) -->
+<script src="api.js"></script>
+<script src="ws.js"></script>
+
+<!-- React-компоненты -->
+<script type="text/babel" src="icons.jsx"></script>
+<script type="text/babel" src="metadata-tree.jsx"></script>
+<script type="text/babel" src="chat-screen.jsx"></script>
+<script type="text/babel" src="setup-wizard.jsx"></script>
+
+<!-- Рендерим AppRouter — он сам выбирает SetupWizard или ChatScreen -->
+<script type="text/babel">
+const App = () => <AppRouter />;
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+
+<!-- Подключаем backend (после React-рендеринга) -->
+<script src="agenter-connect.js"></script>
+</body>
+</html>

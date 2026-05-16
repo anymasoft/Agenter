@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Agenter Desktop</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="desktop.css" />
+
+<style>
+  html, body { margin: 0; padding: 0; overflow: hidden; height: 100%; background: var(--surface, #fff); -webkit-app-region: no-drag; }
+  #root { height: 100vh; }
+
+  /* Заполняем окно, убираем артефакты design-canvas */
+  .app-win, .settings-win, .wizard {
+    width: 100vw !important;
+    height: 100vh !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* Drag: body=no-drag, .header=drag — управляется через desktop.css */
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
+</head>
+<body>
+<div id="root"></div>
+
+<!-- Дизайн-компоненты (без изменений) -->
+<script type="text/babel" src="desktop-screens.jsx"></script>
+
+<!-- Навигация: мастер первого запуска → главное окно -->
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+const WIZARD_W = 880, WIZARD_H = 620;
+const MAIN_W   = 420, MAIN_H   = 560;
+
+function resizeWindow(w, h) {
+  const doIt = () => window.pywebview?.api?.set_window_size(w, h);
+  if (window.pywebview) doIt();
+  else window.addEventListener('pywebviewready', doIt, { once: true });
+}
+
+const App = () => {
+  const [screen, setScreen] = useState(
+    () => localStorage.getItem('agenter_setup_done') ? 'main' : 'wizard-1'
+  );
+  // Данные формы мастера передаются от Step2 к Step3/Step4
+  const [wizardData, setWizardData] = useState(null);
+
+  // Ресайз окна при смене экрана
+  useEffect(() => {
+    const isMain = screen === 'main' || screen === 'settings';
+    resizeWindow(isMain ? MAIN_W : WIZARD_W, isMain ? MAIN_H : WIZARD_H);
+  }, [screen]);
+
+  const go = (s) => setScreen(s);
+
+  // Завершение мастера: localStorage + Python флаг-файл
+  const finish = () => {
+    localStorage.setItem('agenter_setup_done', '1');
+    window.pywebview?.api?.finish_setup?.();
+    go('main');
+  };
+
+  if (screen === 'wizard-1') return <Step1Welcome onNext={() => go('wizard-2')} onSkip={finish} />;
+  if (screen === 'wizard-2') return <Step2Params
+    onNext={(cfg) => { setWizardData(cfg); go('wizard-3'); }}
+    onBack={() => go('wizard-1')}
+  />;
+  if (screen === 'wizard-3') return <Step3Process config={wizardData} onDone={() => go('wizard-4')} onBack={() => go('wizard-2')} onSkip={finish} />;
+  if (screen === 'wizard-4') return <Step4Done    config={wizardData} onFinish={finish} />;
+  if (screen === 'settings') return <SettingsWindow onClose={() => go('main')} />;
+  return <MainAppWindow onOpenSettings={() => go('settings')} />;
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+
+<!-- Подключаем живые данные от Python -->
+<script src="desktop-connect.js"></script>
+</body>
+</html>
