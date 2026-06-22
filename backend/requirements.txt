@@ -5,3 +5,8 @@ pydantic
 aiofiles
 python-dotenv
 onec_dtools
+
+# Семантический индекс справки (опционально, тяжёлое). CPU-torch ставится
+# транзитивно; для GPU-ускорения: scripts/install-cuda-torch.ps1
+sentence-transformers
+chromadb
