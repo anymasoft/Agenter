@@ -1873,8 +1873,8 @@ def _derive_op_state() -> dict:
     # --- reindex (BSL Atlas): default-путь к индексной БД ----------------
     def _derive_reindex():
         # Дефолтный путь, заданный в инфре проекта.
-        # См. CLAUDE.md: c:\BUFFER\tools\bsl-atlas-data\bsl_index.db
-        db_path = Path("C:/BUFFER/tools/bsl-atlas-data/bsl_index.db")
+        # Индекс BSL Atlas: D:\CURSORIC\_data\bsl-atlas-index\bsl_index.db
+        db_path = Path("D:/CURSORIC/_data/bsl-atlas-index/bsl_index.db")
         if not db_path.exists():
             return None
         size_mb = round(db_path.stat().st_size / 1024 / 1024, 1)
@@ -2314,7 +2314,7 @@ async def check_config():
                     else:
                         checks["bsl_atlas_url"] = {"ok": False, "message": f"HTTP {r.status}"}
         except Exception as e:
-            checks["bsl_atlas_url"] = {"ok": False, "message": "Не отвечает — запусти C:\\BUFFER\\tools\\bsl-atlas\\start.bat"}
+            checks["bsl_atlas_url"] = {"ok": False, "message": "Не отвечает — запусти D:\\CURSORIC\\_toolchain\\bsl-atlas\\start.bat"}
 
     # --- скрипты (technical, обычно ok) ---
     for key, label in [("dump_script", "Скрипт выгрузки"), ("load_script", "Скрипт загрузки")]:
@@ -2363,14 +2363,14 @@ URL  = f"http://{HOST}:{PORT}/ui/app.html"
 # BSL Atlas — отдельный Python-процесс. Запускаем его сами как child, чтобы
 # при закрытии Agenter он закрылся вместе с нами. Если он уже запущен извне —
 # не трогаем, не убиваем при выходе.
-BSL_ATLAS_DIR_DEFAULT = Path("C:/BUFFER/tools/bsl-atlas")
+BSL_ATLAS_DIR_DEFAULT = Path("D:/CURSORIC/_toolchain/bsl-atlas")
 
 # Выделенный порт продукта Agenter для BSL Atlas. :8000 был выбран ранее,
 # но он слишком популярен и часто занят (FastAPI dev-серверы, торговые боты,
 # дашборды). :8765 — наш фиксированный выбор. Если требуется поменять —
 # одновременно правится в:
 #   - agenter/config/config.json::bsl_atlas_url
-#   - C:/BUFFER/tools/bsl-atlas/.env::PORT
+#   - D:/CURSORIC/_toolchain/bsl-atlas/.env::PORT
 BSL_ATLAS_DEFAULT_PORT = 8765
 
 # Глобальный handle нашего BSL Atlas процесса (None если мы его не запускали)
@@ -2523,7 +2523,7 @@ def start_bsl_atlas():
             f"  2) Перенастрой Agenter на другой порт:\n"
             f"     • открой agenter\\config\\config.json\n"
             f"     • замени bsl_atlas_url на http://localhost:18765 (например)\n"
-            f"     • открой C:\\BUFFER\\tools\\bsl-atlas\\.env\n"
+            f"     • открой D:\\CURSORIC\\_toolchain\\bsl-atlas\\.env\n"
             f"     • замени PORT=8765 на PORT=18765\n"
             f"\n"
             f"После этого запусти Agenter заново."

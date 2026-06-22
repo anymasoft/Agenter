@@ -406,7 +406,7 @@ async def reindex_bsl_atlas(cfg: dict, on_log: LogFn) -> dict[str, Any]:
 
     # Размер SQLite-индекса BSL Atlas (если доступен по умолчанию)
     db_candidates = [
-        Path("C:/BUFFER/tools/bsl-atlas-data/bsl_index.db"),
+        Path("D:/CURSORIC/_data/bsl-atlas-index/bsl_index.db"),
     ]
     for cand in db_candidates:
         try:

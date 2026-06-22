@@ -347,7 +347,7 @@ def _get_bsl_atlas_dir() -> Path | None:
     """Ищет установку BSL Atlas: сначала рядом с EXE (бандл), затем dev-путь."""
     candidates = [
         Path(sys.executable).parent / "bsl-atlas",
-        Path("C:/BUFFER/tools/bsl-atlas"),
+        Path("D:/CURSORIC/_toolchain/bsl-atlas"),
     ]
     for d in candidates:
         if d.exists() and ((d / "start.bat").exists() or (d / ".env").exists()):
