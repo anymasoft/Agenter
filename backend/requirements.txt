@@ -4,6 +4,7 @@ anthropic
 pydantic
 aiofiles
 python-dotenv
+claude-agent-sdk
 onec_dtools
 
 # Семантический индекс справки (опционально, тяжёлое). CPU-torch ставится
