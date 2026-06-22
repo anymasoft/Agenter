@@ -263,11 +263,15 @@ $script:generatedTypes = @{
 }
 
 # Types that need ChildObjects element
+# Subsystem added 2026-05-17: 1C platform refuses to load a borrowed
+# subsystem XML without <ChildObjects/>, even if it has no children.
+# (Regression-locked by tests/skills/test_cfe_borrow.py)
 $typesWithChildObjects = @(
 	"Catalog","Document","ExchangePlan","ChartOfAccounts",
 	"ChartOfCharacteristicTypes","ChartOfCalculationTypes",
 	"BusinessProcess","Task","Enum",
-	"InformationRegister","AccumulationRegister","AccountingRegister","CalculationRegister"
+	"InformationRegister","AccumulationRegister","AccountingRegister","CalculationRegister",
+	"Subsystem"
 )
 
 # CommonModule properties to copy from source
