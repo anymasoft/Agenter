@@ -4,3 +4,4 @@ anthropic
 pydantic
 aiofiles
 python-dotenv
+onec_dtools
