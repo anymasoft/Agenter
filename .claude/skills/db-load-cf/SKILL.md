@@ -36,7 +36,7 @@ allowed-tools:
 ## Команда
 
 ```powershell
-powershell.exe -NoProfile -File .claude/skills/db-load-cf/scripts/db-load-cf.ps1 <параметры>
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-load-cf.ps1" <параметры>
 ```
 
 ### Параметры скрипта
@@ -55,27 +55,19 @@ powershell.exe -NoProfile -File .claude/skills/db-load-cf/scripts/db-load-cf.ps1
 
 > `*` — нужен либо `-InfoBasePath`, либо пара `-InfoBaseServer` + `-InfoBaseRef`
 
-## Коды возврата
-
-| Код | Описание |
-|-----|----------|
-| 0 | Успешно |
-| 1 | Ошибка (см. лог) |
-
 ## После выполнения
 
-1. Прочитай лог-файл и покажи результат
-2. **Предложи выполнить `/db-update`** — загрузка CF обновляет только «основную» конфигурацию конфигуратора, для применения к БД нужен `/UpdateDBCfg`
+**Предложи выполнить `/db-update`** — загрузка CF обновляет только «основную» конфигурацию конфигуратора, для применения к БД нужен `/UpdateDBCfg`
 
 ## Примеры
 
 ```powershell
 # Файловая база
-powershell.exe -NoProfile -File .claude/skills/db-load-cf/scripts/db-load-cf.ps1 -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -InputFile "C:\backup\config.cf"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-load-cf.ps1" -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -InputFile "C:\backup\config.cf"
 
 # Серверная база
-powershell.exe -NoProfile -File .claude/skills/db-load-cf/scripts/db-load-cf.ps1 -InfoBaseServer "srv01" -InfoBaseRef "MyApp_Test" -UserName "Admin" -Password "secret" -InputFile "config.cf"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-load-cf.ps1" -InfoBaseServer "srv01" -InfoBaseRef "MyApp_Test" -UserName "Admin" -Password "secret" -InputFile "config.cf"
 
 # Загрузка расширения
-powershell.exe -NoProfile -File .claude/skills/db-load-cf/scripts/db-load-cf.ps1 -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -InputFile "ext.cfe" -Extension "МоёРасширение"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-load-cf.ps1" -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -InputFile "ext.cfe" -Extension "МоёРасширение"
 ```

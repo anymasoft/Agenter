@@ -36,7 +36,7 @@ allowed-tools:
 ## Команда
 
 ```powershell
-powershell.exe -NoProfile -File .claude/skills/db-run/scripts/db-run.ps1 <параметры>
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-run.ps1" <параметры>
 ```
 
 ### Параметры скрипта
@@ -63,14 +63,14 @@ powershell.exe -NoProfile -File .claude/skills/db-run/scripts/db-run.ps1 <пар
 
 ```powershell
 # Простой запуск
-powershell.exe -NoProfile -File .claude/skills/db-run/scripts/db-run.ps1 -InfoBasePath "C:\Bases\MyDB" -UserName "Admin"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-run.ps1" -InfoBasePath "C:\Bases\MyDB" -UserName "Admin"
 
 # Запуск с обработкой
-powershell.exe -NoProfile -File .claude/skills/db-run/scripts/db-run.ps1 -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -Execute "C:\epf\МояОбработка.epf"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-run.ps1" -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -Execute "C:\epf\МояОбработка.epf"
 
 # Открыть по навигационной ссылке
-powershell.exe -NoProfile -File .claude/skills/db-run/scripts/db-run.ps1 -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -URL "e1cib/data/Справочник.Номенклатура"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-run.ps1" -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -URL "e1cib/data/Справочник.Номенклатура"
 
 # Серверная база с параметром запуска
-powershell.exe -NoProfile -File .claude/skills/db-run/scripts/db-run.ps1 -InfoBaseServer "srv01" -InfoBaseRef "MyDB" -UserName "Admin" -Password "secret" -CParam "ЗапуститьОбновление"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-run.ps1" -InfoBaseServer "srv01" -InfoBaseRef "MyDB" -UserName "Admin" -Password "secret" -CParam "ЗапуститьОбновление"
 ```

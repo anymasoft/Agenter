@@ -38,7 +38,7 @@ allowed-tools:
 ## Команда
 
 ```powershell
-powershell.exe -NoProfile -File .claude/skills/db-load-xml/scripts/db-load-xml.ps1 <параметры>
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-load-xml.ps1" <параметры>
 ```
 
 ### Параметры скрипта
@@ -80,30 +80,22 @@ Documents/Заказ.xml
 Documents/Заказ/Forms/ФормаДокумента.xml
 ```
 
-## Коды возврата
-
-| Код | Описание |
-|-----|----------|
-| 0 | Успешно |
-| 1 | Ошибка (см. лог) |
-
 ## После выполнения
 
-1. Прочитай лог и покажи результат
-2. Если `-UpdateDB` не был указан — **предложи выполнить `/db-update`** для применения изменений к БД
+Если `-UpdateDB` не был указан — **предложи выполнить `/db-update`** для применения изменений к БД
 
 ## Примеры
 
 ```powershell
 # Полная загрузка
-powershell.exe -NoProfile -File .claude/skills/db-load-xml/scripts/db-load-xml.ps1 -V8Path "C:\Program Files\1cv8\8.3.25.1257\bin" -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -ConfigDir "C:\WS\cfsrc" -Mode Full
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-load-xml.ps1" -V8Path "C:\Program Files\1cv8\8.3.25.1257\bin" -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -ConfigDir "C:\WS\cfsrc" -Mode Full
 
 # Частичная загрузка конкретных файлов
-powershell.exe -NoProfile -File .claude/skills/db-load-xml/scripts/db-load-xml.ps1 -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -ConfigDir "C:\WS\cfsrc" -Mode Partial -Files "Catalogs/Номенклатура.xml,Catalogs/Номенклатура/Ext/ObjectModule.bsl"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-load-xml.ps1" -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -ConfigDir "C:\WS\cfsrc" -Mode Partial -Files "Catalogs/Номенклатура.xml,Catalogs/Номенклатура/Ext/ObjectModule.bsl"
 
 # Загрузка расширения
-powershell.exe -NoProfile -File .claude/skills/db-load-xml/scripts/db-load-xml.ps1 -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -ConfigDir "C:\WS\ext_src" -Mode Full -Extension "МоёРасширение"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-load-xml.ps1" -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -ConfigDir "C:\WS\ext_src" -Mode Full -Extension "МоёРасширение"
 
 # Загрузка + обновление БД в одном запуске
-powershell.exe -NoProfile -File .claude/skills/db-load-xml/scripts/db-load-xml.ps1 -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -ConfigDir "C:\WS\cfsrc" -Mode Full -UpdateDB
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-load-xml.ps1" -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -ConfigDir "C:\WS\cfsrc" -Mode Full -UpdateDB
 ```

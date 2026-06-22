@@ -29,7 +29,7 @@ allowed-tools:
 ## Команда
 
 ```powershell
-powershell.exe -NoProfile -File .claude/skills/form-edit/scripts/form-edit.ps1 -FormPath "<путь>" -JsonPath "<путь>"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/form-edit.ps1" -FormPath "<путь>" -JsonPath "<путь>"
 ```
 
 ## JSON формат

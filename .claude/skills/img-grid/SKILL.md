@@ -29,7 +29,7 @@ allowed-tools:
 ## Команда
 
 ```bash
-python .claude/skills/img-grid/scripts/overlay-grid.py "<ImagePath>" [-c 50] [-o "<OutputPath>"]
+python "${CLAUDE_SKILL_DIR}/scripts/overlay-grid.py" "<ImagePath>" [-c 50] [-o "<OutputPath>"]
 ```
 
 Требуется Python 3 с библиотекой Pillow (`pip install Pillow`).

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# skd-info v1.3 — Analyze 1C DCS structure
+# skd-info v1.7 — Analyze 1C DCS structure
 # Source: https://github.com/Nikolay-Shirokov/cc-1c-skills
 
 import argparse
@@ -265,6 +265,74 @@ def build_structure_tree(item_node, prefix, is_last, out_lines):
                 build_structure_tree(child, f"{prefix}{continuation}", last, out_lines)
 
 
+def get_support_status_for_path(target_path):
+    try:
+        def root_uuid(xml_path):
+            if not os.path.isfile(xml_path):
+                return None
+            try:
+                mx = etree.parse(xml_path).getroot()
+                for child in mx:
+                    if isinstance(child.tag, str) and child.get("uuid"):
+                        return child.get("uuid")
+            except Exception:
+                pass
+            return None
+        rp = os.path.abspath(target_path)
+        # The target file itself may be the element meta-xml (e.g. Subsystems/X.xml).
+        elem_uuid = root_uuid(rp)
+        bin_path = None
+        d = os.path.dirname(rp)
+        for _ in range(12):
+            if not d:
+                break
+            if not elem_uuid:
+                elem_uuid = root_uuid(d + ".xml")
+            if not bin_path:
+                cand = os.path.join(d, "Ext", "ParentConfigurations.bin")
+                if os.path.exists(cand) or os.path.exists(os.path.join(d, "Configuration.xml")):
+                    bin_path = cand
+            if elem_uuid and bin_path:
+                break
+            parent = os.path.dirname(d)
+            if parent == d:
+                break
+            d = parent
+        if not bin_path or not os.path.exists(bin_path):
+            return "не на поддержке"
+        data = open(bin_path, "rb").read()
+        if len(data) <= 32:
+            return "снято с поддержки (правки свободны)"
+        if data[:3] == b"\xef\xbb\xbf":
+            data = data[3:]
+        text = data.decode("utf-8", "replace")
+        h = re.match(r"\{6,(\d+),(\d+),", text)
+        if not h:
+            return "не на поддержке"
+        g = int(h.group(1))
+        k = int(h.group(2))
+        if k == 0:
+            return "снято с поддержки (правки свободны)"
+        if g == 1:
+            return "конфигурация read-only (возможность изменения выключена) — правки невозможны без включения"
+        if not elem_uuid:
+            return "не на поддержке"
+        best = None
+        for m in re.finditer(r"([0-2]),0," + re.escape(elem_uuid.lower()), text):
+            f1 = int(m.group(1))
+            if best is None or f1 < best:
+                best = f1
+        if best is None:
+            return "не на поддержке"
+        return {
+            0: "на замке — прямая правка сломает обновления; дорабатывай через cfe-* либо включи редактирование объекта",
+            1: "редактируется с сохранением поддержки",
+            2: "снято с поддержки (правки свободны)",
+        }.get(best, "не на поддержке")
+    except Exception:
+        return "не на поддержке"
+
+
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     sys.stderr.reconfigure(encoding="utf-8")
@@ -278,6 +346,7 @@ def main():
     parser.add_argument("-Limit", type=int, default=150)
     parser.add_argument("-Offset", type=int, default=0)
     parser.add_argument("-OutFile", default=None)
+    parser.add_argument("-Raw", action="store_true")
     args = parser.parse_args()
 
     # --- Resolve path ---
@@ -355,6 +424,7 @@ def main():
 
     def show_overview():
         lines.append(f"=== DCS: {template_name} ({total_xml_lines} lines) ===")
+        lines.append(f"Поддержка: {get_support_status_for_path(template_path)}")
         lines.append("")
 
         # Sources
@@ -634,6 +704,13 @@ def main():
             sys.exit(1)
 
         raw_query = unescape_xml("".join(query_node.itertext()))
+
+        # Raw mode: emit verbatim query text only (no headers/TOC/batch split) for round-trip
+        if args.Raw:
+            for ql in raw_query.strip().split("\n"):
+                lines.append(ql.rstrip())
+            return
+
         ds_name_str = (target_ds.find("s:name", NSMAP).text or "")
 
         # Split into batches
@@ -777,8 +854,15 @@ def main():
                 role_parts = []
                 if role is not None:
                     for child in role:
-                        if isinstance(child.tag, str) and (child.text or "").strip() == "true":
+                        if not isinstance(child.tag, str):
+                            continue
+                        txt = (child.text or "").strip()
+                        if txt == "true":
                             role_parts.append(localname(child))
+                        elif txt == "false":
+                            pass
+                        else:
+                            role_parts.append(f"{localname(child)}={txt}")
                 info["role"] = ", ".join(role_parts)
 
                 # UseRestriction
@@ -1712,7 +1796,7 @@ def main():
             sys.exit(0)
         result = result[args.Offset:]
 
-    if len(result) > args.Limit:
+    if not args.Raw and len(result) > args.Limit:
         shown = result[:args.Limit]
         for line in shown:
             print(line)

@@ -24,6 +24,6 @@ allowed-tools:
 ## Команда
 
 ```powershell
-powershell.exe -NoProfile -File .claude/skills/cf-validate/scripts/cf-validate.ps1 -ConfigPath "upload/cfempty"
-powershell.exe -NoProfile -File .claude/skills/cf-validate/scripts/cf-validate.ps1 -ConfigPath "upload/cfempty/Configuration.xml"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/cf-validate.ps1" -ConfigPath "upload/cfempty"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/cf-validate.ps1" -ConfigPath "upload/cfempty/Configuration.xml"
 ```

@@ -26,7 +26,7 @@ allowed-tools:
 ## Команда
 
 ```powershell
-powershell.exe -NoProfile -File .claude/skills/web-stop/scripts/web-stop.ps1 <параметры>
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/web-stop.ps1" <параметры>
 ```
 
 ### Параметры скрипта
@@ -45,8 +45,8 @@ powershell.exe -NoProfile -File .claude/skills/web-stop/scripts/web-stop.ps1 <п
 
 ```powershell
 # Остановить Apache
-powershell.exe -NoProfile -File .claude/skills/web-stop/scripts/web-stop.ps1
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/web-stop.ps1"
 
 # С указанием пути
-powershell.exe -NoProfile -File .claude/skills/web-stop/scripts/web-stop.ps1 -ApachePath "C:\tools\apache24"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/web-stop.ps1" -ApachePath "C:\tools\apache24"
 ```

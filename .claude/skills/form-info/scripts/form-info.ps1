@@ -1,4 +1,4 @@
-﻿# form-info v1.2 — Analyze 1C managed form structure
+﻿# form-info v1.4 — Analyze 1C managed form structure
 # Source: https://github.com/Nikolay-Shirokov/cc-1c-skills
 param(
 	[Parameter(Mandatory=$true)]
@@ -368,6 +368,69 @@ if ($formsIdx -ge 0 -and ($formsIdx + 1) -lt $parts.Count) {
 	}
 }
 
+# --- Support status (Ext/ParentConfigurations.bin) ---
+# See docs/1c-support-state-spec.md. Walks up from the target path, taking the
+# uuid of the nearest element meta-xml (form/template/etc.) and the config root
+# bin. Never throws — degrades to "не на поддержке".
+function Get-SupportStatusForPath([string]$targetPath) {
+	try {
+		$rp = (Resolve-Path $targetPath).Path
+		$elemUuid = $null
+		$binPath = $null
+		# Reads the uuid of the first metadata element in an .xml file (or $null).
+		function Get-RootUuid([string]$xmlPath) {
+			if (-not (Test-Path $xmlPath)) { return $null }
+			try {
+				[xml]$mx = Get-Content -Path $xmlPath -Encoding UTF8
+				$el = $mx.DocumentElement.FirstChild
+				while ($el -and $el.NodeType -ne 'Element') { $el = $el.NextSibling }
+				if ($el) { $u = $el.GetAttribute("uuid"); if ($u) { return $u } }
+			} catch {}
+			return $null
+		}
+		# The target file itself may be the element meta-xml (e.g. Subsystems/X.xml).
+		$elemUuid = Get-RootUuid $rp
+		$d = [System.IO.Path]::GetDirectoryName($rp)
+		for ($i = 0; $i -lt 12 -and $d; $i++) {
+			if (-not $elemUuid) { $elemUuid = Get-RootUuid "$d.xml" }
+			if (-not $binPath) {
+				$cand = Join-Path (Join-Path $d "Ext") "ParentConfigurations.bin"
+				if ((Test-Path $cand) -or (Test-Path (Join-Path $d "Configuration.xml"))) { $binPath = $cand }
+			}
+			if ($elemUuid -and $binPath) { break }
+			$parent = [System.IO.Path]::GetDirectoryName($d)
+			if ($parent -eq $d) { break }
+			$d = $parent
+		}
+		if (-not $binPath -or -not (Test-Path $binPath)) { return "не на поддержке" }
+		$bytes = [System.IO.File]::ReadAllBytes($binPath)
+		if ($bytes.Length -le 32) { return "снято с поддержки (правки свободны)" }
+		$start = 0
+		if ($bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) { $start = 3 }
+		$text = [System.Text.Encoding]::UTF8.GetString($bytes, $start, $bytes.Length - $start)
+		$h = [regex]::Match($text, '^\{6,(\d+),(\d+),')
+		if (-not $h.Success) { return "не на поддержке" }
+		$G = [int]$h.Groups[1].Value
+		$K = [int]$h.Groups[2].Value
+		if ($K -eq 0) { return "снято с поддержки (правки свободны)" }
+		if ($G -eq 1) { return "конфигурация read-only (возможность изменения выключена) — правки невозможны без включения" }
+		if (-not $elemUuid) { return "не на поддержке" }
+		$u = [regex]::Escape($elemUuid.ToLower())
+		$best = $null
+		foreach ($m in [regex]::Matches($text, "([0-2]),0,$u")) {
+			$f1 = [int]$m.Groups[1].Value
+			if ($null -eq $best -or $f1 -lt $best) { $best = $f1 }
+		}
+		if ($null -eq $best) { return "не на поддержке" }
+		switch ($best) {
+			0 { return "на замке — прямая правка сломает обновления; дорабатывай через cfe-* либо включи редактирование объекта" }
+			1 { return "редактируется с сохранением поддержки" }
+			2 { return "снято с поддержки (правки свободны)" }
+		}
+		return "не на поддержке"
+	} catch { return "не на поддержке" }
+}
+
 # --- Collect output ---
 
 $lines = @()
@@ -385,6 +448,7 @@ if ($formTitle) { $header += " — `"$formTitle`"" }
 if ($objectContext) { $header += " ($objectContext)" }
 $header += " ==="
 $lines += $header
+$lines += "Поддержка: $(Get-SupportStatusForPath $FormPath)"
 
 # --- Form properties (Title excluded — shown in header) ---
 
@@ -436,6 +500,62 @@ if ($formEvents -and $formEvents.HasChildNodes) {
 	}
 }
 
+# --- Main AutoCommandBar (form's id=-1 panel) ---
+
+function Format-MainAcb($acbNode) {
+	if (-not $acbNode) { return @() }
+	$result = @()
+	$autofillNode = $acbNode.SelectSingleNode("d:Autofill", $ns)
+	$autofill = $true
+	if ($autofillNode -and $autofillNode.InnerText -eq "false") { $autofill = $false }
+	$halignNode = $acbNode.SelectSingleNode("d:HorizontalAlign", $ns)
+	$flags = @()
+	$flags += if ($autofill) { "autofill" } else { "no-autofill" }
+	if ($halignNode) { $flags += "align=$($halignNode.InnerText)" }
+	$header = "AutoCommandBar [$($flags -join ', ')]"
+	$childItemsNode = $acbNode.SelectSingleNode("d:ChildItems", $ns)
+	$buttons = @()
+	if ($childItemsNode) {
+		foreach ($btn in $childItemsNode.ChildNodes) {
+			if ($btn.NodeType -ne "Element") { continue }
+			if ($skipElements.ContainsKey($btn.LocalName)) { continue }
+			$bName = $btn.GetAttribute("name")
+			$cmdNode = $btn.SelectSingleNode("d:CommandName", $ns)
+			$cmdRef = if ($cmdNode) { $cmdNode.InnerText } else { "" }
+			$locNode = $btn.SelectSingleNode("d:LocationInCommandBar", $ns)
+			$locStr = if ($locNode) { " [$($locNode.InnerText)]" } else { "" }
+			$tag = Get-ElementTag $btn
+			if ($cmdRef) {
+				$buttons += "  $tag $bName -> $cmdRef$locStr"
+			} else {
+				$buttons += "  $tag $bName$locStr"
+			}
+		}
+	}
+	if ($buttons.Count -eq 0 -and $autofill -and -not $halignNode) {
+		# Default empty panel — terse one-liner
+		return @("AutoCommandBar [autofill]")
+	}
+	$result += $header
+	$result += $buttons
+	return $result
+}
+
+# Determine position from CommandBarLocation form property
+$cbLocNode = $root.SelectSingleNode("d:CommandBarLocation", $ns)
+$cbLoc = if ($cbLocNode) { $cbLocNode.InnerText } else { "Auto" }
+$mainAcbNode = $root.SelectSingleNode("d:AutoCommandBar", $ns)
+$acbLines = @()
+if ($cbLoc -ne "None" -and $mainAcbNode) {
+	$acbLines = Format-MainAcb $mainAcbNode
+}
+
+# AutoCommandBar above Elements (Auto/Top)
+if ($acbLines.Count -gt 0 -and ($cbLoc -eq "Auto" -or $cbLoc -eq "Top")) {
+	$lines += ""
+	$lines += $acbLines
+}
+
 # --- Element tree ---
 
 $childItems = $root.SelectSingleNode("d:ChildItems", $ns)
@@ -444,6 +564,12 @@ if ($childItems) {
 	$lines += "Elements:"
 	Build-Tree $childItems "  " $false
 	$lines += $treeLines.ToArray()
+}
+
+# AutoCommandBar below Elements (Bottom)
+if ($acbLines.Count -gt 0 -and $cbLoc -eq "Bottom") {
+	$lines += ""
+	$lines += $acbLines
 }
 
 # --- Attributes ---

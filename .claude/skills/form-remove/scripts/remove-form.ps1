@@ -1,4 +1,4 @@
-﻿# form-remove v1.1 — Remove form from 1C object
+﻿# form-remove v1.2 — Remove form from 1C object
 # Source: https://github.com/Nikolay-Shirokov/cc-1c-skills
 param(
 	[Parameter(Mandatory)]
@@ -12,6 +12,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+[Console]::InputEncoding = [System.Text.Encoding]::UTF8
 
 # --- Проверки ---
 

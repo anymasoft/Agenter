@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-# db-load-git v1.3 — Load Git changes into 1C database
+# db-load-git v1.5 — Load Git changes into 1C database
 # Source: https://github.com/Nikolay-Shirokov/cc-1c-skills
 
 import argparse
 import glob
+import json
 import os
 import random
 import re
@@ -13,23 +14,54 @@ import sys
 import tempfile
 
 
+def _find_project_v8path():
+    """Walk up from CWD to find .v8-project.json and read its v8path."""
+    d = os.getcwd()
+    while True:
+        pf = os.path.join(d, ".v8-project.json")
+        if os.path.isfile(pf):
+            try:
+                with open(pf, encoding="utf-8-sig") as f:
+                    data = json.load(f)
+                v = data.get("v8path")
+                if v:
+                    return v
+            except Exception:
+                pass
+            return None
+        parent = os.path.dirname(d)
+        if parent == d:
+            return None
+        d = parent
+
+
+def _version_key(p):
+    """Numeric sort key from version dir name (.../1cv8/<ver>/bin/1cv8.exe)."""
+    ver = os.path.basename(os.path.dirname(os.path.dirname(p)))
+    return [int(x) for x in re.findall(r"\d+", ver)]
+
+
 def resolve_v8path(v8path):
     """Resolve path to 1cv8.exe."""
     if not v8path:
-        candidates = glob.glob(r"C:\Program Files\1cv8\*\bin\1cv8.exe")
+        v8path = _find_project_v8path()
+    if not v8path:
+        candidates = (
+            glob.glob(r"C:\Program Files\1cv8\*\bin\1cv8.exe")
+            + glob.glob(r"C:\Program Files (x86)\1cv8\*\bin\1cv8.exe")
+        )
         if candidates:
-            candidates.sort()
-            return candidates[-1]
+            v8path = max(candidates, key=_version_key)
+            ver = os.path.basename(os.path.dirname(os.path.dirname(v8path)))
+            print(f"Auto-selected platform {ver}: {v8path}")
         else:
             print("Error: 1cv8.exe not found. Specify -V8Path", file=sys.stderr)
             sys.exit(1)
-    elif os.path.isdir(v8path):
+    if os.path.isdir(v8path):
         v8path = os.path.join(v8path, "1cv8.exe")
-
     if not os.path.isfile(v8path):
         print(f"Error: 1cv8.exe not found at {v8path}", file=sys.stderr)
         sys.exit(1)
-
     return v8path
 
 
@@ -146,14 +178,19 @@ def main():
 
     # --- Filter and map to config files ---
     config_files = []
+    support_skipped = []
 
     for file in changed_files:
         file = file.strip().replace("\\", "/")
         if not file:
             continue
 
-        # Skip service files
-        if file == "ConfigDumpInfo.xml":
+        # Skip service files (not partially loadable). Support-state files are
+        # tracked to warn: support changes apply only via a full load.
+        if file.endswith("ParentConfigurations.bin"):
+            support_skipped.append(file)
+            continue
+        if file == "ConfigDumpInfo.xml" or file.endswith("/ConfigDumpInfo.xml"):
             continue
 
         full_path = os.path.join(args.ConfigDir, file)
@@ -185,6 +222,12 @@ def main():
                                     rel_path = os.path.relpath(abs_path, args.ConfigDir).replace("\\", "/")
                                     if rel_path not in config_files:
                                         config_files.append(rel_path)
+
+    if support_skipped:
+        print("[ВНИМАНИЕ] Состояние поддержки изменено в коммите, но частично не загружается (исключено):", file=sys.stderr)
+        for sf in support_skipped:
+            print(f"  - {sf}", file=sys.stderr)
+        print("  Смена состояния поддержки применяется только полной загрузкой (db-load-xml -Mode Full).", file=sys.stderr)
 
     if len(config_files) == 0:
         print("No configuration files found in changes")

@@ -37,7 +37,7 @@ allowed-tools:
 ## Команда
 
 ```powershell
-powershell.exe -NoProfile -File .claude/skills/db-dump-xml/scripts/db-dump-xml.ps1 <параметры>
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-dump-xml.ps1" <параметры>
 ```
 
 ### Параметры скрипта
@@ -68,30 +68,23 @@ powershell.exe -NoProfile -File .claude/skills/db-dump-xml/scripts/db-dump-xml.p
 | `Partial` | Частичная — выбранные объекты из параметра `-Objects` |
 | `UpdateInfo` | Обновить только ConfigDumpInfo.xml без выгрузки файлов |
 
-## Коды возврата
-
-| Код | Описание |
-|-----|----------|
-| 0 | Успешно |
-| 1 | Ошибка (см. лог) |
-
 > Если пользователь просит выгрузить конкретные объекты — используй `-Mode Partial` с `-Objects`.
 
 ## Примеры
 
 ```powershell
 # Полная выгрузка (файловая база)
-powershell.exe -NoProfile -File .claude/skills/db-dump-xml/scripts/db-dump-xml.ps1 -V8Path "C:\Program Files\1cv8\8.3.25.1257\bin" -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -ConfigDir "C:\WS\cfsrc" -Mode Full
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-dump-xml.ps1" -V8Path "C:\Program Files\1cv8\8.3.25.1257\bin" -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -ConfigDir "C:\WS\cfsrc" -Mode Full
 
 # Инкрементальная выгрузка
-powershell.exe -NoProfile -File .claude/skills/db-dump-xml/scripts/db-dump-xml.ps1 -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -ConfigDir "C:\WS\cfsrc" -Mode Changes
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-dump-xml.ps1" -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -ConfigDir "C:\WS\cfsrc" -Mode Changes
 
 # Частичная выгрузка
-powershell.exe -NoProfile -File .claude/skills/db-dump-xml/scripts/db-dump-xml.ps1 -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -ConfigDir "C:\WS\cfsrc" -Mode Partial -Objects "Справочник.Номенклатура,Документ.Заказ"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-dump-xml.ps1" -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -ConfigDir "C:\WS\cfsrc" -Mode Partial -Objects "Справочник.Номенклатура,Документ.Заказ"
 
 # Серверная база
-powershell.exe -NoProfile -File .claude/skills/db-dump-xml/scripts/db-dump-xml.ps1 -InfoBaseServer "srv01" -InfoBaseRef "MyApp_Dev" -UserName "Admin" -Password "secret" -ConfigDir "C:\WS\cfsrc" -Mode Full
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-dump-xml.ps1" -InfoBaseServer "srv01" -InfoBaseRef "MyApp_Dev" -UserName "Admin" -Password "secret" -ConfigDir "C:\WS\cfsrc" -Mode Full
 
 # Выгрузка расширения
-powershell.exe -NoProfile -File .claude/skills/db-dump-xml/scripts/db-dump-xml.ps1 -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -ConfigDir "C:\WS\ext_src" -Mode Full -Extension "МоёРасширение"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-dump-xml.ps1" -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -ConfigDir "C:\WS\ext_src" -Mode Full -Extension "МоёРасширение"
 ```

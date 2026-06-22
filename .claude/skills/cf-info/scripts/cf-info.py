@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-# cf-info v1.0 — Compact summary of 1C configuration root
+# cf-info v1.3 — Compact summary of 1C configuration root
 # Source: https://github.com/Nikolay-Shirokov/cc-1c-skills
 
 import argparse
 import os
+import re
 import sys
 from collections import OrderedDict
 from lxml import etree
@@ -15,6 +16,7 @@ sys.stderr.reconfigure(encoding="utf-8")
 parser = argparse.ArgumentParser(description="Analyze 1C configuration structure", allow_abbrev=False)
 parser.add_argument("-ConfigPath", "-Path", required=True, help="Path to Configuration.xml or directory")
 parser.add_argument("-Mode", choices=["overview", "brief", "full"], default="overview", help="Output mode")
+parser.add_argument("-Section", "-Name", choices=["home-page"], default=None, help="Drill-down section (alias: -Name)")
 parser.add_argument("-Limit", type=int, default=150, help="Max lines to show")
 parser.add_argument("-Offset", type=int, default=0, help="Lines to skip")
 parser.add_argument("-OutFile", default="", help="Write output to file")
@@ -125,6 +127,173 @@ type_ru_names = {
     "Task": "Задачи", "IntegrationService": "Сервисы интеграции",
 }
 
+# --- Read panel layout (Ext/ClientApplicationInterface.xml) ---
+PANEL_NAMES = {
+    "cbab57f2-a0f3-4f0a-89ea-4cb19570ab75": "Открытых",
+    "b553047f-c9aa-4157-978d-448ecad24248": "Разделов",
+    "13322b22-3960-4d68-93a6-fe2dd7f28ca3": "Избранного",
+    "c933ac92-92cd-459d-81cc-e0c8a83ced99": "История",
+    "b2735bd3-d822-4430-ba59-c9e869693b24": "Функций",
+}
+CAI_NS = "http://v8.1c.ru/8.2/managed-application/core"
+
+def get_panels_layout():
+    cfg_dir = os.path.dirname(config_path)
+    cai_path = os.path.join(cfg_dir, "Ext", "ClientApplicationInterface.xml")
+    if not os.path.isfile(cai_path):
+        return None
+    try:
+        cai_tree = etree.parse(cai_path)
+    except Exception:
+        return None
+    cai_root = cai_tree.getroot()
+    layout = {"top": [], "left": [], "right": [], "bottom": [], "declared": []}
+    for side in ("top", "left", "right", "bottom"):
+        for side_el in cai_root.findall(f"{{{CAI_NS}}}{side}"):
+            slot = []
+            for u in side_el.iter(f"{{{CAI_NS}}}uuid"):
+                key = (u.text or "").strip()
+                slot.append(PANEL_NAMES.get(key, f"?{key}"))
+            if slot:
+                layout[side].append(slot)
+    for pd in cai_root.findall(f"{{{CAI_NS}}}panelDef"):
+        key = pd.get("id", "")
+        layout["declared"].append(PANEL_NAMES.get(key, f"?{key}"))
+    return layout
+
+def format_layout_slots(slots):
+    if not slots:
+        return ""
+    parts = []
+    for slot in slots:
+        if len(slot) == 1:
+            parts.append(slot[0])
+        else:
+            parts.append("Стек(" + ", ".join(slot) + ")")
+    return " | ".join(parts)
+
+panel_layout = get_panels_layout()
+
+# --- Read home page layout (Ext/HomePageWorkArea.xml) ---
+HP_NS = "http://v8.1c.ru/8.3/xcf/extrnprops"
+XR_NS_HP = "http://v8.1c.ru/8.3/xcf/readable"
+
+def get_home_page_layout():
+    cfg_dir = os.path.dirname(config_path)
+    hp_path = os.path.join(cfg_dir, "Ext", "HomePageWorkArea.xml")
+    if not os.path.isfile(hp_path):
+        return None
+    try:
+        hp_tree = etree.parse(hp_path)
+    except Exception:
+        return None
+    hp_root = hp_tree.getroot()
+    result = {"template": "", "left": [], "right": []}
+    tn = hp_root.find(f"{{{HP_NS}}}WorkingAreaTemplate")
+    if tn is not None and tn.text:
+        result["template"] = tn.text.strip()
+    for col_name, key in (("LeftColumn", "left"), ("RightColumn", "right")):
+        col = hp_root.find(f"{{{HP_NS}}}{col_name}")
+        if col is None:
+            continue
+        items = []
+        for it in col.findall(f"{{{HP_NS}}}Item"):
+            f = it.find(f"{{{HP_NS}}}Form")
+            h = it.find(f"{{{HP_NS}}}Height")
+            vis = it.find(f"{{{HP_NS}}}Visibility")
+            common = True
+            roles = []
+            if vis is not None:
+                cn = vis.find(f"{{{XR_NS_HP}}}Common")
+                if cn is not None and cn.text:
+                    common = cn.text.strip() == "true"
+                for v in vis.findall(f"{{{XR_NS_HP}}}Value"):
+                    roles.append({"name": v.get("name", ""), "value": (v.text or "").strip() == "true"})
+            items.append({
+                "form": (f.text or "").strip() if f is not None else "",
+                "height": int((h.text or "10").strip()) if h is not None else 10,
+                "common": common,
+                "roles": roles,
+            })
+        result[key] = items
+    return result
+
+home_page = get_home_page_layout()
+
+# --- Support state (Ext/ParentConfigurations.bin) ---
+# Decodes the 1C support-state file. See docs/1c-support-state-spec.md.
+# Returns None on absent/error; else dict: state='absent'|'removed'|'parsed',
+#   g (0=editing on, 1=off), k (vendor configs), vendors [{vendor,name,version}],
+#   counts [locked, editable, removed] by f1 — record tally (k>1 counts each
+#   vendor block separately); only computed when g==0.
+def read_support_state(bin_path):
+    try:
+        if not os.path.isfile(bin_path):
+            return {"state": "absent"}
+        data = open(bin_path, "rb").read()
+        if len(data) <= 32:
+            return {"state": "removed"}
+        if data[:3] == b"\xef\xbb\xbf":
+            data = data[3:]
+        text = data.decode("utf-8", "replace")
+        h = re.match(r"\{6,(\d+),(\d+),", text)
+        if not h:
+            return None
+        g = int(h.group(1))
+        k = int(h.group(2))
+        if k == 0:
+            return {"state": "removed"}
+        vendors = []
+        for m in re.finditer(r'"((?:[^"]|"")*)","((?:[^"]|"")*)","((?:[^"]|"")*)",\d+,', text):
+            vendors.append({
+                "version": m.group(1).replace('""', '"'),
+                "vendor": m.group(2).replace('""', '"'),
+                "name": m.group(3).replace('""', '"'),
+            })
+        counts = None
+        if g == 0:
+            counts = [0, 0, 0]
+            for m in re.finditer(r"([0-2]),0,[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", text):
+                counts[int(m.group(1))] += 1
+        return {"state": "parsed", "g": g, "k": k, "vendors": vendors, "counts": counts}
+    except Exception:
+        return None
+
+def get_support_lines():
+    config_dir = os.path.dirname(config_path)
+    bin_path = os.path.join(config_dir, "Ext", "ParentConfigurations.bin")
+    st = read_support_state(bin_path)
+    res = []
+    if not st or st["state"] == "absent":
+        if cfg_ext_purpose:
+            res.append("Поддержка:      расширение (CFE), правки свободны")
+        else:
+            res.append("Поддержка:      не на поддержке (своя конфигурация)")
+        return res
+    if st["state"] == "removed":
+        res.append("Поддержка:      снята с поддержки полностью")
+        return res
+    res.append("Поддержка:      на поддержке")
+    if st["g"] == 0:
+        res.append("  Возможность изменения: включена")
+        res.append(f"  Объектов: на замке {st['counts'][0]} / редактируется {st['counts'][1]} / снято {st['counts'][2]}")
+    else:
+        res.append("  Возможность изменения: выключена — вся конфигурация read-only (правки заблокированы)")
+    res.append(f"  Конфигураций поставщика: {st['k']}")
+    if st["k"] > 1:
+        for v in st["vendors"]:
+            res.append(f"  Поставщик: {v['vendor']} — {v['name']} {v['version']}")
+    return res
+
+def format_home_page_item(it, detailed):
+    badges = [f"h={it['height']}"]
+    if not it["common"]:
+        badges.append("скрыта")
+    if it["roles"]:
+        badges.append(f"роли: {len(it['roles'])}" if detailed else f"+{len(it['roles'])} ролей")
+    tail = f" ({', '.join(badges)})" if badges else ""
+    return f"    {it['form']}{tail}"
+
 # --- Count objects in ChildObjects ---
 object_counts = OrderedDict()
 total_objects = 0
@@ -146,6 +315,7 @@ cfg_version = get_prop_text("Version")
 cfg_vendor = get_prop_text("Vendor")
 cfg_compat = get_prop_text("CompatibilityMode")
 cfg_ext_compat = get_prop_text("ConfigurationExtensionCompatibilityMode")
+cfg_ext_purpose = get_prop_text("ConfigurationExtensionPurpose")
 cfg_default_run = get_prop_text("DefaultRunMode")
 cfg_script = get_prop_text("ScriptVariant")
 cfg_default_lang = get_prop_text("DefaultLanguage")
@@ -159,14 +329,14 @@ cfg_db_spaces = get_prop_text("DatabaseTablespacesUseMode")
 cfg_window_mode = get_prop_text("MainClientApplicationWindowMode")
 
 # --- BRIEF mode ---
-if args.Mode == "brief":
+if args.Mode == "brief" and not args.Section:
     syn_part = f' {dash} "{cfg_synonym}"' if cfg_synonym else ""
     ver_part = f" v{cfg_version}" if cfg_version else ""
     compat_part = f" | {cfg_compat}" if cfg_compat else ""
     out(f"Конфигурация: {cfg_name}{syn_part}{ver_part} | {total_objects} объектов{compat_part}")
 
 # --- OVERVIEW mode ---
-if args.Mode == "overview":
+if args.Mode == "overview" and not args.Section:
     syn_part = f' {dash} "{cfg_synonym}"' if cfg_synonym else ""
     ver_part = f" v{cfg_version}" if cfg_version else ""
     out(f"=== Конфигурация: {cfg_name}{syn_part}{ver_part} ===")
@@ -178,6 +348,8 @@ if args.Mode == "overview":
         out(f"Поставщик:      {cfg_vendor}")
     if cfg_version:
         out(f"Версия:         {cfg_version}")
+    for ln in get_support_lines():
+        out(ln)
     out(f"Совместимость:  {cfg_compat}")
     out(f"Режим запуска:  {cfg_default_run}")
     out(f"Язык скриптов:  {cfg_script}")
@@ -186,6 +358,20 @@ if args.Mode == "overview":
     out(f"Модальность:    {cfg_modality}")
     out(f"Интерфейс:      {cfg_intf_compat}")
     out()
+
+    if panel_layout and any(panel_layout[s] for s in ("top", "left", "right", "bottom")):
+        out("--- Раскладка панелей ---")
+        for s in ("top", "left", "right", "bottom"):
+            if panel_layout[s]:
+                out(f"  {s.ljust(7)} {format_layout_slots(panel_layout[s])}")
+        out()
+
+    # Home page (brief summary)
+    if home_page:
+        out("--- Начальная страница ---")
+        out(f"  Шаблон: {home_page['template']}")
+        out(f"  LeftColumn: {len(home_page['left'])}, RightColumn: {len(home_page['right'])}  (детали: -Section home-page)")
+        out()
 
     # Object counts table
     out(f"--- Состав ({total_objects} объектов) ---")
@@ -207,7 +393,30 @@ if args.Mode == "overview":
             out(f"  {padded}  {count}")
 
 # --- FULL mode ---
-if args.Mode == "full":
+# --- Drill-down: -Section home-page ---
+if args.Section == "home-page":
+    if not home_page:
+        out("Файл Ext/HomePageWorkArea.xml не найден")
+    else:
+        out(f"=== Начальная страница: {cfg_name} ===")
+        out()
+        out(f"Шаблон: {home_page['template']}")
+        out()
+        for col_lbl, col_key in (("LeftColumn", "left"), ("RightColumn", "right")):
+            items = home_page[col_key]
+            if not items:
+                out(f"{col_lbl}: —")
+                out()
+                continue
+            out(f"{col_lbl} ({len(items)}):")
+            for it in items:
+                out(format_home_page_item(it, True))
+                for r in it["roles"]:
+                    rval = "true" if r["value"] else "false"
+                    out(f"      {r['name']}: {rval}")
+            out()
+
+if args.Mode == "full" and not args.Section:
     syn_part = f' {dash} "{cfg_synonym}"' if cfg_synonym else ""
     ver_part = f" v{cfg_version}" if cfg_version else ""
     out(f"=== Конфигурация: {cfg_name}{syn_part}{ver_part} ===")
@@ -229,6 +438,8 @@ if args.Mode == "full":
         out(f"Поставщик:      {cfg_vendor}")
     if cfg_version:
         out(f"Версия:         {cfg_version}")
+    for ln in get_support_lines():
+        out(ln)
     cfg_update_addr = get_prop_text("UpdateCatalogAddress")
     if cfg_update_addr:
         out(f"Каталог обн.:   {cfg_update_addr}")
@@ -282,6 +493,26 @@ if args.Mode == "full":
     out(f"Управл.формы в обычн.: {use_mf}")
     out(f"Обычн.формы в управл.: {use_of}")
     out()
+
+    # --- Section: Panel layout ---
+    if panel_layout:
+        out("--- Раскладка панелей ---")
+        for s in ("top", "left", "right", "bottom"):
+            slots = panel_layout[s]
+            if slots:
+                out(f"  {s.ljust(7)} {format_layout_slots(slots)}")
+            else:
+                out(f"  {s.ljust(7)} —")
+        if panel_layout["declared"]:
+            out(f"  объявлено: {', '.join(panel_layout['declared'])}")
+        out()
+
+    # --- Section: Home page (brief summary) ---
+    if home_page:
+        out("--- Начальная страница ---")
+        out(f"  Шаблон: {home_page['template']}")
+        out(f"  LeftColumn: {len(home_page['left'])}, RightColumn: {len(home_page['right'])}  (детали: -Section home-page)")
+        out()
 
     # --- Section: Storages & default forms ---
     out("--- Хранилища и формы по умолчанию ---")

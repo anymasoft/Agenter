@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# erf-init v1.0 — Init 1C external report scaffold
+# erf-init v1.1 — Init 1C external report scaffold
 # Source: https://github.com/Nikolay-Shirokov/cc-1c-skills
 """Generates minimal XML source files for a 1C external report."""
 import sys, os, argparse, uuid

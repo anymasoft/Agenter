@@ -1,4 +1,4 @@
-# form-edit v1.0 — Edit 1C managed form elements (Python port)
+# form-edit v1.3 — Edit 1C managed form elements (Python port)
 # Source: https://github.com/Nikolay-Shirokov/cc-1c-skills
 import argparse
 import json
@@ -10,6 +10,165 @@ from lxml import etree
 
 sys.stdout.reconfigure(encoding="utf-8")
 sys.stderr.reconfigure(encoding="utf-8")
+
+# ============================================================
+# Support guard (Ext/ParentConfigurations.bin) — see docs/1c-support-state-spec.md
+# Blocks edits of vendor objects "на замке" / read-only configs. Trigger = bin
+# present; reaction from .v8-project.json editingAllowedCheck (deny|warn|off,
+# default deny). Never throws (except sys.exit on deny) — errors degrade to allow.
+# ============================================================
+
+def _sg_root_uuid(xml_path):
+    if not os.path.isfile(xml_path):
+        return None
+    try:
+        mx = etree.parse(xml_path).getroot()
+        for child in mx:
+            if isinstance(child.tag, str) and child.get("uuid"):
+                return child.get("uuid")
+    except Exception:
+        return None
+    return None
+
+
+def _sg_find_v8project(start_dir):
+    d = start_dir
+    for _ in range(20):
+        if not d:
+            break
+        pj = os.path.join(d, ".v8-project.json")
+        if os.path.isfile(pj):
+            return pj
+        parent = os.path.dirname(d)
+        if parent == d:
+            break
+        d = parent
+    return None
+
+
+def _sg_get_edit_mode(cfg_dir):
+    try:
+        pj = _sg_find_v8project(os.getcwd()) or _sg_find_v8project(cfg_dir)
+        if not pj:
+            return "deny"
+        proj = json.loads(open(pj, encoding="utf-8-sig").read())
+        cfg_full = os.path.normcase(os.path.abspath(cfg_dir)).rstrip("\\/")
+        for db in proj.get("databases", []):
+            src = db.get("configSrc")
+            if src:
+                src_full = os.path.normcase(os.path.abspath(src)).rstrip("\\/")
+                if cfg_full == src_full or cfg_full.startswith(src_full + os.sep):
+                    if db.get("editingAllowedCheck"):
+                        return db["editingAllowedCheck"]
+        if proj.get("editingAllowedCheck"):
+            return proj["editingAllowedCheck"]
+        return "deny"
+    except Exception:
+        return "deny"
+
+
+def assert_edit_allowed(target_path, require):
+    try:
+        rp = os.path.abspath(target_path)
+        elem_uuid = _sg_root_uuid(rp)
+        cfg_dir = None
+        bin_path = None
+        d = rp if os.path.isdir(rp) else os.path.dirname(rp)
+        for _ in range(12):
+            if not d:
+                break
+            if not elem_uuid:
+                elem_uuid = _sg_root_uuid(d + ".xml")
+            if not cfg_dir:
+                cand = os.path.join(d, "Ext", "ParentConfigurations.bin")
+                if os.path.exists(cand) or os.path.exists(os.path.join(d, "Configuration.xml")):
+                    cfg_dir = d
+                    bin_path = cand
+            if elem_uuid and cfg_dir:
+                break
+            parent = os.path.dirname(d)
+            if parent == d:
+                break
+            d = parent
+        if not elem_uuid and cfg_dir:
+            elem_uuid = _sg_root_uuid(os.path.join(cfg_dir, "Configuration.xml"))
+        if not bin_path or not os.path.exists(bin_path):
+            return
+        data = open(bin_path, "rb").read()
+        if len(data) <= 32:
+            return
+        if data[:3] == b"\xef\xbb\xbf":
+            data = data[3:]
+        text = data.decode("utf-8", "replace")
+        h = re.match(r"\{6,(\d+),(\d+),", text)
+        if not h:
+            return
+        g = int(h.group(1))
+        k = int(h.group(2))
+        if k == 0:
+            return
+        best = None
+        if elem_uuid:
+            for m in re.finditer(r"([0-2]),0," + re.escape(elem_uuid.lower()), text):
+                f1 = int(m.group(1))
+                if best is None or f1 < best:
+                    best = f1
+        blocked = False
+        code = ""
+        reason = ""
+        if g == 1:
+            blocked = True
+            code = "capability-off"
+            reason = "возможность изменения конфигурации выключена (вся конфигурация read-only)"
+        elif require == "removed":
+            if best is not None and best != 2:
+                blocked = True
+                code = "not-removed"
+                reason = "объект не снят с поддержки — удаление сломает обновления"
+        else:
+            if best is not None and best == 0:
+                blocked = True
+                code = "locked"
+                reason = "объект на замке — редактирование сломает обновления"
+        if not blocked:
+            return
+        mode = _sg_get_edit_mode(cfg_dir)
+        if mode == "off":
+            return
+        if mode == "warn":
+            sys.stderr.write(f"[support-guard] ПРЕДУПРЕЖДЕНИЕ: {reason}. Цель: {rp}\n")
+            return
+        head = "[support-guard] Редактирование отклонено: это объект типовой конфигурации на поддержке поставщика, прямое редактирование молча сломает будущие обновления."
+        cfe = "Рекомендуемый путь: внести доработку в расширение (навыки cfe-borrow / cfe-patch-method) — состояние поддержки менять не нужно, обновления вендора сохраняются."
+        off_note = "Снять проверку для этой базы: editingAllowedCheck = warn|off в .v8-project.json."
+        if code == "capability-off":
+            state = f"Состояние: у всей конфигурации выключена возможность изменения (режим read-only «из коробки») — поэтому объект «{rp}» редактировать нельзя."
+            fix = (
+                "Либо снять защиту явно (навык support-edit, два шага):\n"
+                f'  1. support-edit -Path "{cfg_dir}" -Capability on — включить возможность изменения (объекты пока остаются на замке);\n'
+                f'  2. support-edit -Path "{rp}" -Set editable — открыть этот объект для редактирования.\n'
+                "  Изменение применяется в базу полной загрузкой выгрузки и обходит механизм обновлений вендора."
+            )
+        elif code == "not-removed":
+            state = f"Состояние: объект «{rp}» на поддержке (не снят с поддержки) — его удаление разорвёт обновления вендора."
+            fix = (
+                "Либо сначала снять объект с поддержки, затем удалять:\n"
+                f'  support-edit -Path "{rp}" -Set off-support — объект уходит из-под обновлений, после этого удаление безопасно.'
+            )
+        else:
+            state = f"Состояние: объект «{rp}» на замке (возможность изменения конфигурации включена, но сам объект не редактируется)."
+            fix = (
+                "Либо разрешить редактирование этого объекта (навык support-edit, выбрать одно):\n"
+                f'  support-edit -Path "{rp}" -Set editable — редактировать и дальше получать обновления вендора (возможны конфликты слияния);\n'
+                f'  support-edit -Path "{rp}" -Set off-support — снять с поддержки: обновления по объекту больше не приходят.'
+            )
+        sys.stderr.write(head + "\n" + state + "\n" + cfe + "\n" + fix + "\n" + off_note + "\n")
+        sys.exit(1)
+    except SystemExit:
+        raise
+    except Exception:
+        return
+
 
 # ── arg parsing ──────────────────────────────────────────────
 
@@ -63,6 +222,7 @@ if not os.path.exists(json_path):
     sys.exit(1)
 
 resolved_form_path = os.path.abspath(form_path)
+assert_edit_allowed(resolved_form_path, "editable")
 xml_parser = etree.XMLParser(remove_blank_text=False)
 try:
     tree = etree.parse(resolved_form_path, xml_parser)
@@ -363,6 +523,14 @@ def get_element_name(el, type_key):
     if "name" in el and el["name"]:
         return str(el["name"])
     return str(el[type_key])
+
+
+def _assert_edit_unique(name, seen, ctx):
+    # Уникальность имён внутри JSON-определения (1С: своя коллекция — свой неймспейс).
+    if name in seen:
+        print(f"[ERROR] Duplicate {ctx} '{name}' in JSON definition — names must be unique in 1C form")
+        sys.exit(1)
+    seen.add(name)
 
 
 known_events = {
@@ -988,7 +1156,26 @@ if elements_list:
     # Detect indent level
     child_indent = get_child_indent(target_ci)
 
-    # Check for duplicate element names
+    # Имена элементов уникальны (требование 1С). Сначала — внутри самого JSON-определения
+    # (рекурсивно по children/columns).
+    def _walk_elem_names(el, seen):
+        tk = None
+        for key in ELEMENT_KEYS:
+            if key in el and el[key] is not None:
+                tk = key
+                break
+        if tk:
+            _assert_edit_unique(get_element_name(el, tk), seen, "element name")
+        for c in el.get("children", []):
+            _walk_elem_names(c, seen)
+        for c in el.get("columns", []):
+            _walk_elem_names(c, seen)
+
+    dsl_elem_names = set()
+    for el in elements_list:
+        _walk_elem_names(el, dsl_elem_names)
+
+    # Затем — против уже существующих элементов формы (дубль = битый XML, форма не откроется).
     for el in elements_list:
         type_key = None
         for key in ELEMENT_KEYS:
@@ -999,7 +1186,8 @@ if elements_list:
             el_name = get_element_name(el, type_key)
             existing = find_element(root_ci, el_name) if root_ci is not None else None
             if existing is not None:
-                print(f"[WARN] Element '{el_name}' already exists in form (id={existing.get('id')})")
+                print(f"[ERROR] Element '{el_name}' already exists in form (id={existing.get('id')}) — element names must be unique")
+                sys.exit(1)
 
     # Remember starting element ID for companion counting
     start_elem_id = next_elem_id
@@ -1054,6 +1242,19 @@ if attrs_list:
     attr_child_indent = get_child_indent(attrs_section)
     if not attr_child_indent:
         attr_child_indent = "\t\t"
+
+    # Уникальность имён реквизитов: внутри JSON-определения (+ колонки в пределах реквизита) и
+    # против уже существующих реквизитов формы.
+    dsl_attr_names = set()
+    for attr in attrs_list:
+        _assert_edit_unique(str(attr["name"]), dsl_attr_names, "attribute name")
+        if attr.get("columns"):
+            dsl_col_names = set()
+            for col in attr["columns"]:
+                _assert_edit_unique(str(col["name"]), dsl_col_names, f"column name of '{attr['name']}'")
+        if attrs_section.find(f"f:Attribute[@name='{attr['name']}']", NS) is not None:
+            print(f"[ERROR] Attribute '{attr['name']}' already exists in form — attribute names must be unique")
+            sys.exit(1)
 
     # Generate attribute fragments
     xml_lines.clear()
@@ -1115,6 +1316,14 @@ if cmds_list:
     cmd_child_indent = get_child_indent(cmds_section)
     if not cmd_child_indent:
         cmd_child_indent = "\t\t"
+
+    # Уникальность имён команд: внутри JSON-определения и против существующих команд формы.
+    dsl_cmd_names = set()
+    for cmd in cmds_list:
+        _assert_edit_unique(str(cmd["name"]), dsl_cmd_names, "command name")
+        if cmds_section.find(f"f:Command[@name='{cmd['name']}']", NS) is not None:
+            print(f"[ERROR] Command '{cmd['name']}' already exists in form — command names must be unique")
+            sys.exit(1)
 
     xml_lines.clear()
     X(f"<_F {ALL_NS_DECL}>")

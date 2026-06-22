@@ -30,7 +30,7 @@ allowed-tools:
 ## Команда
 
 ```powershell
-powershell.exe -NoProfile -File .claude/skills/help-add/scripts/add-help.ps1 -ObjectName "<ObjectName>" [-Lang "<Lang>"] [-SrcDir "<SrcDir>"]
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/add-help.ps1" -ObjectName "<ObjectName>" [-Lang "<Lang>"] [-SrcDir "<SrcDir>"]
 ```
 
 ## Что делает скрипт

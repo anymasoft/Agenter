@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# form-validate v1.4 — Validate 1C managed form
+# form-validate v1.7 — Validate 1C managed form
 # Source: https://github.com/Nikolay-Shirokov/cc-1c-skills
 
 import argparse
@@ -182,7 +182,8 @@ def main():
             report_error("AutoCommandBar element missing")
 
     # --- Collect all elements with IDs ---
-    element_ids = {}  # id -> name
+    element_ids = {}    # id -> name
+    element_names = {}  # name -> id (имена элементов уникальны в пределах формы)
     all_elements = []  # list of dicts {Name, Tag, Id, ParentName, Node}
 
     def collect_elements(node, parent_name):
@@ -210,6 +211,12 @@ def main():
                         report_error(f"Duplicate element id={eid}: '{name}' and '{element_ids[eid]}'")
                     else:
                         element_ids[eid] = name
+
+                    # Имена элементов уникальны (требование 1С)
+                    if name in element_names:
+                        report_error(f"Duplicate element name '{name}': id={eid} and id={element_names[name]}")
+                    else:
+                        element_names[name] = eid
 
                 child_items = child.find(f"{{{F_NS}}}ChildItems")
                 if child_items is not None:
@@ -252,6 +259,9 @@ def main():
         attr_name = attr.get("name", "")
         attr_id = attr.get("id", "")
         if attr_name:
+            # Имена реквизитов уникальны среди реквизитов (отдельный неймспейс от элементов)
+            if attr_name in attr_map:
+                report_error(f"Duplicate attribute name '{attr_name}': id={attr_id} and id={attr_map[attr_name].get('id', '')}")
             attr_map[attr_name] = attr
         if attr_id:
             if attr_id in attr_ids:
@@ -261,6 +271,7 @@ def main():
 
         # Column IDs uniqueness within parent
         col_ids = {}
+        col_names = {}  # имена колонок уникальны в пределах своего реквизита
         columns = attr.find(f"{{{F_NS}}}Columns")
         if columns is not None:
             for col in columns.findall(f"{{{F_NS}}}Column"):
@@ -271,6 +282,11 @@ def main():
                         report_error(f"Duplicate column id={col_id} in '{attr_name}': '{col_name}' and '{col_ids[col_id]}'")
                     else:
                         col_ids[col_id] = col_name
+                if col_name:
+                    if col_name in col_names:
+                        report_error(f"Duplicate column name '{col_name}' in '{attr_name}': id={col_id} and id={col_names[col_name]}")
+                    else:
+                        col_names[col_name] = col_id
 
     if not stopped:
         if attr_ids:
@@ -289,6 +305,9 @@ def main():
         cmd_name = cmd.get("name", "")
         cmd_id = cmd.get("id", "")
         if cmd_name:
+            # Имена команд уникальны среди команд (отдельный неймспейс)
+            if cmd_name in cmd_map:
+                report_error(f"Duplicate command name '{cmd_name}': id={cmd_id} and id={cmd_map[cmd_name].get('id', '')}")
             cmd_map[cmd_name] = cmd
         if cmd_id:
             if cmd_id in cmd_ids:
@@ -299,6 +318,18 @@ def main():
     if not stopped:
         if cmd_ids:
             report_ok(f"Unique command IDs: {len(cmd_ids)} entries")
+
+    # --- Collect parameters (separate name pool, без id) ---
+    param_names = {}  # name -> True (имена параметров уникальны среди параметров)
+    params_parent = root.find(f"{{{F_NS}}}Parameters")
+    if params_parent is not None:
+        for param in params_parent.findall(f"{{{F_NS}}}Parameter"):
+            param_name = param.get("name", "")
+            if param_name:
+                if param_name in param_names:
+                    report_error(f"Duplicate parameter name '{param_name}'")
+                else:
+                    param_names[param_name] = True
 
     # --- Check 4: Companion elements ---
     companion_rules = {
@@ -376,11 +407,43 @@ def main():
             if not data_path:
                 continue
 
+            # Opaque platform-internal DataPath shapes — not validatable from Form.xml alone:
+            #   - bare numeric (e.g. "10", "1000003") — internal index
+            #   - "N/M:<uuid>" — metadata reference by UUID
+            if re.match(r'^\d+$', data_path) or re.match(r'^\d+/\d+:[0-9a-fA-F-]+$', data_path):
+                continue
+
             path_checked += 1
 
             clean_path = re.sub(r'\[\d+\]', '', data_path)
+            # Strip leading '~' (current row of DynamicList: ~\u0421\u043f\u0438\u0441\u043e\u043a.\u041f\u043e\u043b\u0435)
+            if clean_path.startswith('~'):
+                clean_path = clean_path[1:]
             segments = clean_path.split(".")
             root_attr = segments[0]
+
+            # Resolve Items.<TableName>.CurrentData.<Field>... \u2014 table element, not attribute
+            if root_attr == 'Items':
+                if len(segments) < 3 or segments[2] != 'CurrentData':
+                    report_warn(f"[{tag}] '{el_name}': DataPath='{data_path}' \u2014 unknown Items.* shape, expected Items.<Table>.CurrentData.*")
+                    continue
+                table_name = segments[1]
+                table_el = None
+                for candidate in all_elements:
+                    if candidate["Tag"] == 'Table' and candidate["Name"] == table_name:
+                        table_el = candidate
+                        break
+                if table_el is None:
+                    report_error(f"[{tag}] '{el_name}': DataPath='{data_path}' \u2014 table element '{table_name}' not found")
+                    path_errors += 1
+                    continue
+                table_dp_node = table_el["Node"].find(f"{{{F_NS}}}DataPath")
+                if table_dp_node is None or not (table_dp_node.text or "").strip():
+                    continue
+                table_dp = re.sub(r'\[\d+\]', '', (table_dp_node.text or "").strip())
+                if table_dp.startswith('~'):
+                    table_dp = table_dp[1:]
+                root_attr = table_dp.split(".")[0]
 
             if root_attr not in attr_map:
                 report_error(f"[{tag}] '{el_name}': DataPath='{data_path}' \u2014 attribute '{root_attr}' not found")

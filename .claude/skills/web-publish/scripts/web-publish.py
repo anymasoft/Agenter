@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# web-publish v1.2 — Publish 1C infobase via Apache
+# web-publish v1.3 — Publish 1C infobase via Apache
 # Source: https://github.com/Nikolay-Shirokov/cc-1c-skills
 
 """
@@ -11,6 +11,7 @@
 
 import argparse
 import glob
+import json
 import os
 import re
 import shutil
@@ -22,6 +23,33 @@ import urllib.request
 import zipfile
 
 import psutil
+
+
+def _find_project_v8path():
+    """Walk up from CWD to find .v8-project.json and read its v8path."""
+    d = os.getcwd()
+    while True:
+        pf = os.path.join(d, ".v8-project.json")
+        if os.path.isfile(pf):
+            try:
+                with open(pf, encoding="utf-8-sig") as f:
+                    data = json.load(f)
+                v = data.get("v8path")
+                if v:
+                    return v
+            except Exception:
+                pass
+            return None
+        parent = os.path.dirname(d)
+        if parent == d:
+            return None
+        d = parent
+
+
+def _version_key(p):
+    """Numeric sort key from version dir name (.../1cv8/<ver>/bin/1cv8.exe)."""
+    ver = os.path.basename(os.path.dirname(os.path.dirname(p)))
+    return [int(x) for x in re.findall(r"\d+", ver)]
 
 
 def get_our_httpd(httpd_exe_norm):
@@ -78,10 +106,17 @@ def main():
     # --- Resolve V8Path ---
     v8_path = args.V8Path
     if not v8_path:
-        candidates = glob.glob(r'C:\Program Files\1cv8\*\bin\1cv8.exe')
-        candidates.sort(reverse=True)
+        v8_path = _find_project_v8path()
+    if not v8_path:
+        candidates = (
+            glob.glob(r'C:\Program Files\1cv8\*\bin\1cv8.exe')
+            + glob.glob(r'C:\Program Files (x86)\1cv8\*\bin\1cv8.exe')
+        )
         if candidates:
-            v8_path = os.path.dirname(candidates[0])
+            best = max(candidates, key=_version_key)
+            v8_path = os.path.dirname(best)
+            ver = os.path.basename(os.path.dirname(v8_path))
+            print(f'Auto-selected platform {ver}: {v8_path}')
         else:
             print('Error: платформа 1С не найдена. Укажите -V8Path', file=sys.stderr)
             sys.exit(1)

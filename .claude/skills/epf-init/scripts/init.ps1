@@ -1,4 +1,4 @@
-﻿# epf-init v1.0 — Init 1C external data processor scaffold
+﻿# epf-init v1.1 — Init 1C external data processor scaffold
 # Source: https://github.com/Nikolay-Shirokov/cc-1c-skills
 param(
 	[Parameter(Mandatory)]
@@ -10,6 +10,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+[Console]::InputEncoding = [System.Text.Encoding]::UTF8
 
 $uuid1 = [guid]::NewGuid().ToString()
 $uuid2 = [guid]::NewGuid().ToString()

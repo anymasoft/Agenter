@@ -23,10 +23,10 @@ allowed-tools:
 
 ```powershell
 # Из файла
-powershell.exe -NoProfile -File .claude/skills/skd-compile/scripts/skd-compile.ps1 -DefinitionFile "<json>" -OutputPath "<Template.xml>"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/skd-compile.ps1" -DefinitionFile "<json>" -OutputPath "<Template.xml>"
 
 # Из строки (без промежуточного файла)
-powershell.exe -NoProfile -File .claude/skills/skd-compile/scripts/skd-compile.ps1 -Value '<json-string>' -OutputPath "<Template.xml>"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/skd-compile.ps1" -Value '<json-string>' -OutputPath "<Template.xml>"
 ```
 
 ## JSON DSL — краткий справочник
@@ -88,11 +88,20 @@ powershell.exe -NoProfile -File .claude/skills/skd-compile/scripts/skd-compile.p
 
 Многоязычный заголовок: `"title": { "ru": "...", "en": "..." }`. Применимо везде, где принимается title/presentation (поля, calculatedFields, parameters, settingsVariants, availableValues и пр.). Строка эквивалентна `{ "ru": "..." }`.
 
-Типы: `string`, `string(N)`, `decimal(D,F)`, `boolean`, `date`, `dateTime`, `CatalogRef.X`, `DocumentRef.X`, `EnumRef.X`, `StandardPeriod`. Ссылочные типы эмитируются с inline namespace `d5p1:` (`http://v8.1c.ru/8.1/data/enterprise/current-config`). Сборка EPF со ссылочными типами требует базу с соответствующей конфигурацией.
+Типы: `string`, `string(N)`, `decimal`, `decimal(D)`, `decimal(D,F)`, `boolean`, `date`, `dateTime`, `CatalogRef.X`, `DocumentRef.X`, `EnumRef.X`, `StandardPeriod`. Ссылочные типы эмитируются с inline namespace `d5p1:` (`http://v8.1c.ru/8.1/data/enterprise/current-config`). Сборка EPF со ссылочными типами требует базу с соответствующей конфигурацией.
+
+`decimal` без скобок = `10,2` (деньги по умолчанию), `decimal(N)` = `N,0` (целое); `,nonneg` в конце скобок → AllowedSign=Nonnegative.
 
 Составной тип (несколько типов значений) — массив в объектной форме: `"type": ["CatalogRef.A", "CatalogRef.B"]`. Квалификаторы (`(N)`, `(D,F)`) применяются к каждому элементу.
 
-Роли: `@dimension`, `@account`, `@balance`, `@period`.
+Роли (shorthand или объект):
+
+- `@`-флаги: `@dimension`, `@account`, `@balance`, `@period`, `@required`, `@autoOrder`, `@ignoreNullValues`
+- KV: `balanceGroupName`, `balanceType` (`OpeningBalance`/`ClosingBalance`), `parentDimension`, `accountTypeExpression`, `expression`, `orderType` (`Asc`/`Desc`), `periodNumber`, `periodType`
+
+```
+"Сумма: decimal(15,2) @balance balanceGroupName=Сумма balanceType=OpeningBalance"
+```
 
 Ограничения: `#noField`, `#noFilter`, `#noGroup`, `#noOrder`.
 
@@ -101,6 +110,7 @@ powershell.exe -NoProfile -File .claude/skills/skd-compile/scripts/skd-compile.p
 Дополнительные ключи объектной формы:
 - `"presentationExpression": "<выражение>"` — что показывать вместо значения поля. Исходное значение остаётся «под капотом» для перехода/расшифровки.
 - `"appearance": { "<параметр>": "<значение>" }` — оформление колонки по умолчанию (применяется во всех вариантах настроек). Ключи — параметры платформы (`ГоризонтальноеПоложение`, `МинимальнаяШирина`, `Формат`, `Текст` и т.п.).
+- `"orderExpression": { "expression": "<выражение>", "orderType": "Asc"/"Desc", "autoOrder": true/false }` — сортировка поля по выражению (например `ЕстьNULL(Поле.Порядок, 10000)`).
 
 ```json
 { "field": "Сумма", "title": "Сумма продажи", "type": "decimal(15,2)",
@@ -142,10 +152,20 @@ Shorthand: `"Имя [Заголовок]: тип = значение @флаги"
 
 Флаги shorthand:
 - `@autoDates` — добавляет к параметру StandardPeriod пару дат `НачалоПериода`/`КонецПериода`, вычисляемых из него. Используй их в тексте запроса как `&НачалоПериода`/`&КонецПериода`; пользователь выбирает только сам период. По умолчанию сам параметр получает `use=Always` и `denyIncompleteValues=true` (чтобы производные даты всегда были заполнены); в объектной форме можно явно переопределить.
-- `@valueList` — `<valueListAllowed>true</valueListAllowed>` — разрешает передавать список значений
+- `@valueList` — `<valueListAllowed>true</valueListAllowed>` — разрешает передавать список значений (при значении-списке ниже подразумевается автоматически)
 - `@hidden` — скрытый параметр: `availableAsField=false` + исключается из `"dataParameters": "auto"`
 
 Объектная форма: `title`, `hidden: true`, `valueListAllowed: true`, `availableAsField: false`, `denyIncompleteValues: true`, `use: "Always"`.
+
+Значение-список: несколько значений по умолчанию через запятую в `значение` (для запятой внутри значения — кавычки `'...'`). В объектной форме — массив в `value`.
+
+```json
+"parameters": [
+  "Виды: ChartOfCharacteristicTypesRef.ВидыСубконтоХозрасчетные = ПланВидовХарактеристик.ВидыСубконтоХозрасчетные.Контрагенты, ПланВидовХарактеристик.ВидыСубконтоХозрасчетные.Договоры"
+]
+```
+
+Если значения по умолчанию нет — пропусти `=` в shorthand или укажи `"value": null` в объектной форме.
 
 Список допустимых значений (availableValues):
 

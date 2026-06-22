@@ -24,6 +24,6 @@ allowed-tools:
 ## Команда
 
 ```powershell
-powershell.exe -NoProfile -File ".claude/skills/subsystem-validate/scripts/subsystem-validate.ps1" -SubsystemPath "Subsystems/Продажи"
-powershell.exe -NoProfile -File ".claude/skills/subsystem-validate/scripts/subsystem-validate.ps1" -SubsystemPath "Subsystems/Продажи.xml"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/subsystem-validate.ps1" -SubsystemPath "Subsystems/Продажи"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/subsystem-validate.ps1" -SubsystemPath "Subsystems/Продажи.xml"
 ```

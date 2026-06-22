@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# remove-form v1.0 — Remove form from 1C object
+# remove-form v1.1 — Remove form from 1C object
 # Source: https://github.com/Nikolay-Shirokov/cc-1c-skills
 
 import argparse

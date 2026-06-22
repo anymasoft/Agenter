@@ -1,4 +1,4 @@
-﻿# db-load-git v1.3 — Load Git changes into 1C database
+﻿# db-load-git v1.5 — Load Git changes into 1C database
 # Source: https://github.com/Nikolay-Shirokov/cc-1c-skills
 <#
 .SYNOPSIS
@@ -120,15 +120,40 @@ function Get-ObjectXmlFromSubFile {
 
 # --- Resolve V8Path (skip if DryRun) ---
 if (-not $DryRun) {
+    function Find-ProjectV8Path {
+        $dir = (Get-Location).Path
+        while ($dir) {
+            $pf = Join-Path $dir ".v8-project.json"
+            if (Test-Path $pf) {
+                try {
+                    $j = Get-Content $pf -Raw -Encoding UTF8 | ConvertFrom-Json
+                    if ($j.v8path) { return [string]$j.v8path }
+                } catch {}
+                return $null
+            }
+            $parent = Split-Path $dir -Parent
+            if (-not $parent -or $parent -eq $dir) { break }
+            $dir = $parent
+        }
+        return $null
+    }
+
     if (-not $V8Path) {
-        $found = Get-ChildItem "C:\Program Files\1cv8\*\bin\1cv8.exe" -ErrorAction SilentlyContinue | Sort-Object FullName -Descending | Select-Object -First 1
+        $V8Path = Find-ProjectV8Path
+    }
+    if (-not $V8Path) {
+        $found = Get-ChildItem @("C:\Program Files\1cv8\*\bin\1cv8.exe", "C:\Program Files (x86)\1cv8\*\bin\1cv8.exe") -ErrorAction SilentlyContinue |
+            Sort-Object { try { [version]$_.Directory.Parent.Name } catch { [version]"0.0" } } -Descending |
+            Select-Object -First 1
         if ($found) {
             $V8Path = $found.FullName
+            Write-Host "Auto-selected platform $($found.Directory.Parent.Name): $V8Path" -ForegroundColor Yellow
         } else {
             Write-Host "Error: 1cv8.exe not found. Specify -V8Path" -ForegroundColor Red
             exit 1
         }
-    } elseif (Test-Path $V8Path -PathType Container) {
+    }
+    if (Test-Path $V8Path -PathType Container) {
         $V8Path = Join-Path $V8Path "1cv8.exe"
     }
 
@@ -216,13 +241,16 @@ Write-Host "Git changes detected: $($changedFiles.Count) files"
 
 # --- Filter and map to config files ---
 $configFiles = @()
+$supportSkipped = @()
 
 foreach ($file in $changedFiles) {
     $file = $file.Trim().Replace('\', '/')
     if ([string]::IsNullOrWhiteSpace($file)) { continue }
 
-    # Skip service files
-    if ($file -eq "ConfigDumpInfo.xml") { continue }
+    # Skip service files (not partially loadable). Support-state files are tracked
+    # to warn the user: support changes apply only via a full load.
+    if ($file -match 'ParentConfigurations\.bin$') { $supportSkipped += $file; continue }
+    if ($file -eq "ConfigDumpInfo.xml" -or $file -match '(^|/)ConfigDumpInfo\.xml$') { continue }
 
     $fullPath = Join-Path $ConfigDir $file
 
@@ -263,6 +291,12 @@ foreach ($file in $changedFiles) {
             }
         }
     }
+}
+
+if ($supportSkipped.Count -gt 0) {
+    Write-Host "[ВНИМАНИЕ] Состояние поддержки изменено в коммите, но частично не загружается (исключено):" -ForegroundColor Yellow
+    foreach ($sf in $supportSkipped) { Write-Host "  - $sf" -ForegroundColor Yellow }
+    Write-Host "  Смена состояния поддержки применяется только полной загрузкой (db-load-xml -Mode Full)." -ForegroundColor Yellow
 }
 
 if ($configFiles.Count -eq 0) {

@@ -31,7 +31,7 @@ allowed-tools:
 ## Команда
 
 ```powershell
-powershell.exe -NoProfile -File .claude/skills/db-create/scripts/db-create.ps1 <параметры>
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-create.ps1" <параметры>
 ```
 
 ### Параметры скрипта
@@ -48,31 +48,23 @@ powershell.exe -NoProfile -File .claude/skills/db-create/scripts/db-create.ps1 <
 
 > `*` — нужен либо `-InfoBasePath`, либо пара `-InfoBaseServer` + `-InfoBaseRef`
 
-## Коды возврата
-
-| Код | Описание |
-|-----|----------|
-| 0 | Успешно |
-| 1 | Ошибка (см. лог) |
-
 ## После создания
 
-1. Прочитай лог-файл и покажи результат
-2. Предложи зарегистрировать базу в `.v8-project.json` (через `/db-list add`)
+Предложи зарегистрировать базу в `.v8-project.json` (через `/db-list add`)
 3. Если указан шаблон `/UseTemplate` — предупреди что конфигурация будет загружена из шаблона
 
 ## Примеры
 
 ```powershell
 # Создать файловую базу
-powershell.exe -NoProfile -File .claude/skills/db-create/scripts/db-create.ps1 -InfoBasePath "C:\Bases\NewDB"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-create.ps1" -InfoBasePath "C:\Bases\NewDB"
 
 # Создать серверную базу
-powershell.exe -NoProfile -File .claude/skills/db-create/scripts/db-create.ps1 -InfoBaseServer "srv01" -InfoBaseRef "MyApp_Test"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-create.ps1" -InfoBaseServer "srv01" -InfoBaseRef "MyApp_Test"
 
 # Создать из шаблона CF
-powershell.exe -NoProfile -File .claude/skills/db-create/scripts/db-create.ps1 -InfoBasePath "C:\Bases\NewDB" -UseTemplate "C:\Templates\config.cf"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-create.ps1" -InfoBasePath "C:\Bases\NewDB" -UseTemplate "C:\Templates\config.cf"
 
 # Создать и добавить в список баз
-powershell.exe -NoProfile -File .claude/skills/db-create/scripts/db-create.ps1 -InfoBasePath "C:\Bases\NewDB" -AddToList -ListName "Новая база"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-create.ps1" -InfoBasePath "C:\Bases\NewDB" -AddToList -ListName "Новая база"
 ```

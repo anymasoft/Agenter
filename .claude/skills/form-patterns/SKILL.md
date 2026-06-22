@@ -41,9 +41,9 @@ allowed-tools: []
 ├─ Информационные надписи (label, hyperlink)
 Рабочая область
 ├─ Таблица данных или Pages с вкладками
-Кнопки действий
-├─ Выполнить / Применить (defaultButton)
-├─ Закрыть (stdCommand: Close)
+Главная АКП формы (autoCmdBar)
+├─ Выполнить / Применить (defaultButton: true)
+└─ Закрыть (stdCommand: Close)
 ```
 
 **События:** OnCreateAtServer, OnOpen, NotificationProcessing
@@ -90,12 +90,12 @@ allowed-tools: []
 ├─ Шаг1: описание + параметры
 ├─ Шаг2: основная работа
 └─ Шаг3: результат
-Кнопки (horizontal)
-├─ Назад (command), Далее (command, defaultButton), Выполнить (command)
+Главная АКП формы (autoCmdBar)
+├─ Назад, Далее (defaultButton: true), Выполнить
 └─ Закрыть (stdCommand: Close)
 ```
 
-**Свойства:** windowOpeningMode=LockOwnerWindow, commandBarLocation=None
+**Свойства:** windowOpeningMode=LockOwnerWindow
 
 ---
 
@@ -111,7 +111,7 @@ allowed-tools: []
 | Номер+Дата | `ГруппаНомерДата` | horizontal |
 | Подвал | `ГруппаПодвал` | vertical |
 | Итоги | `ГруппаИтоги` | horizontal |
-| Кнопки | `ГруппаКнопок` | horizontal |
+| Главная АКП формы | `ФормаКоманднаяПанель` | autoCmdBar |
 | Страницы | `ГруппаСтраницы` / `Страницы` | pages |
 | Предупреждение | `ГруппаПредупреждение` | horizontal, visible:false |
 | Доп. секция | `ГруппаДополнительно` / `ГруппаПрочее` | vertical, collapse |
@@ -150,7 +150,7 @@ allowed-tools: []
 
 1. **Порядок чтения.** Сверху вниз, слева направо. Самое важное — вверху.
 2. **Двухколоночная шапка.** Основные реквизиты слева (контрагент, склад), организационные справа (организация, подразделение).
-3. **Кнопки действий внизу.** Главная кнопка — `defaultButton: true`. Закрыть — всегда последняя.
+3. **Кнопки действий — на главной АКП формы** (`autoCmdBar`), не в отдельной группе на форме. Главная кнопка — `defaultButton: true`. Закрыть — всегда последняя.
 4. **Таблицы — основная область.** Табличные части занимают большую часть формы, обычно на Pages.
 5. **Итоги рядом с таблицей.** В подвале, горизонтальная группа, все поля readOnly.
 6. **Фильтры — отдельная зона.** Над списком, alwaysHorizontal, пара «флажок + поле» на каждый фильтр.
@@ -166,8 +166,8 @@ allowed-tools: []
 Для необязательных секций (подписи, дополнительно, прочее):
 
 ```json
-{ "group": "vertical", "name": "ГруппаПодписи", "title": "Подписи",
-  "behavior": "Collapsible", "collapsed": true, "children": [...] }
+{ "group": "collapsible", "name": "ГруппаПодписи", "title": "Подписи",
+  "collapsed": true, "children": [...] }
 ```
 
 ### Баннер-предупреждение
@@ -233,7 +233,7 @@ allowed-tools: []
       { "input": "ДанныеКоличество", "path": "Объект.Данные.Количество", "on": ["OnChange"] },
       { "input": "ДанныеСумма", "path": "Объект.Данные.Сумма", "readOnly": true }
     ]},
-    { "group": "horizontal", "name": "ГруппаКнопок", "children": [
+    { "autoCmdBar": "ФормаКоманднаяПанель", "children": [
       { "button": "Загрузить", "command": "Загрузить", "title": "Загрузить из файла", "defaultButton": true },
       { "button": "Очистить", "command": "Очистить", "title": "Очистить таблицу" },
       { "button": "Закрыть", "stdCommand": "Close" }

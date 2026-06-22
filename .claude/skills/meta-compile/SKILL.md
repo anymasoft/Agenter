@@ -23,7 +23,7 @@ allowed-tools:
 ## Команда
 
 ```powershell
-powershell.exe -NoProfile -File .claude/skills/meta-compile/scripts/meta-compile.ps1 -JsonPath "<json>" -OutputDir "<ConfigDir>"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/meta-compile.ps1" -JsonPath "<json>" -OutputDir "<ConfigDir>"
 ```
 
 | Параметр | Описание |

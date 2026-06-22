@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# cf-init v1.1 — Create empty 1C configuration scaffold
+# cf-init v1.2 — Create empty 1C configuration scaffold
 # Source: https://github.com/Nikolay-Shirokov/cc-1c-skills
 """Generates minimal XML source files for a 1C configuration."""
 import sys, os, argparse, uuid
@@ -184,20 +184,50 @@ def main():
 \t</Language>
 </MetaDataObject>'''
 
+    # --- Ext/ClientApplicationInterface.xml (default ERP-style panel layout) ---
+    # Open panel on top, Sections panel on left; Functions/Favorites/History declared
+    # via panelDef but not placed by default. Without this file the web client renders
+    # section icons without labels (icon-only mode).
+    open_panel_inst = new_uuid()
+    sections_panel_inst = new_uuid()
+    cai_xml = f'''<?xml version="1.0" encoding="UTF-8"?>
+<ClientApplicationInterface xmlns="http://v8.1c.ru/8.2/managed-application/core" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="InterfaceLayouter">
+\t<top>
+\t\t<panel id="{open_panel_inst}">
+\t\t\t<uuid>cbab57f2-a0f3-4f0a-89ea-4cb19570ab75</uuid>
+\t\t</panel>
+\t</top>
+\t<left>
+\t\t<panel id="{sections_panel_inst}">
+\t\t\t<uuid>b553047f-c9aa-4157-978d-448ecad24248</uuid>
+\t\t</panel>
+\t</left>
+\t<panelDef id="b553047f-c9aa-4157-978d-448ecad24248"/>
+\t<panelDef id="13322b22-3960-4d68-93a6-fe2dd7f28ca3"/>
+\t<panelDef id="c933ac92-92cd-459d-81cc-e0c8a83ced99"/>
+\t<panelDef id="cbab57f2-a0f3-4f0a-89ea-4cb19570ab75"/>
+\t<panelDef id="b2735bd3-d822-4430-ba59-c9e869693b24"/>
+</ClientApplicationInterface>'''
+
     # --- Create directories ---
     os.makedirs(output_dir, exist_ok=True)
     lang_dir = os.path.join(output_dir, "Languages")
     os.makedirs(lang_dir, exist_ok=True)
+    ext_dir = os.path.join(output_dir, "Ext")
+    os.makedirs(ext_dir, exist_ok=True)
 
     # --- Write files ---
     write_utf8_bom(cfg_file, cfg_xml)
     lang_file = os.path.join(lang_dir, "Русский.xml")
     write_utf8_bom(lang_file, lang_xml)
+    cai_file = os.path.join(ext_dir, "ClientApplicationInterface.xml")
+    write_utf8_bom(cai_file, cai_xml)
 
     print(f"[OK] Создана конфигурация: {name}")
     print(f"     Каталог:            {output_dir}")
     print(f"     Configuration.xml:  {cfg_file}")
     print(f"     Languages:          {lang_file}")
+    print(f"     Ext/CAI:            {cai_file}")
 
 if __name__ == '__main__':
     main()

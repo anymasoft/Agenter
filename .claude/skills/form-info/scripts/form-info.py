@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# form-info v1.2 — Analyze 1C managed form structure
+# form-info v1.4 — Analyze 1C managed form structure
 # Source: https://github.com/Nikolay-Shirokov/cc-1c-skills
 
 import argparse
@@ -336,6 +336,78 @@ def build_tree(child_items_node, prefix, tree_lines, expand="", state=None):
                 build_tree(ci, prefix + continuation, tree_lines, expand, state)
 
 
+# --- Support status (Ext/ParentConfigurations.bin) ---
+# See docs/1c-support-state-spec.md. Walks up from the target path, taking the
+# uuid of the nearest element meta-xml and the config root bin. Never throws —
+# degrades to "не на поддержке".
+def get_support_status_for_path(target_path):
+    try:
+        def root_uuid(xml_path):
+            if not os.path.isfile(xml_path):
+                return None
+            try:
+                mx = etree.parse(xml_path).getroot()
+                for child in mx:
+                    if isinstance(child.tag, str) and child.get("uuid"):
+                        return child.get("uuid")
+            except Exception:
+                pass
+            return None
+        rp = os.path.abspath(target_path)
+        # The target file itself may be the element meta-xml (e.g. Subsystems/X.xml).
+        elem_uuid = root_uuid(rp)
+        bin_path = None
+        d = os.path.dirname(rp)
+        for _ in range(12):
+            if not d:
+                break
+            if not elem_uuid:
+                elem_uuid = root_uuid(d + ".xml")
+            if not bin_path:
+                cand = os.path.join(d, "Ext", "ParentConfigurations.bin")
+                if os.path.exists(cand) or os.path.exists(os.path.join(d, "Configuration.xml")):
+                    bin_path = cand
+            if elem_uuid and bin_path:
+                break
+            parent = os.path.dirname(d)
+            if parent == d:
+                break
+            d = parent
+        if not bin_path or not os.path.exists(bin_path):
+            return "не на поддержке"
+        data = open(bin_path, "rb").read()
+        if len(data) <= 32:
+            return "снято с поддержки (правки свободны)"
+        if data[:3] == b"\xef\xbb\xbf":
+            data = data[3:]
+        text = data.decode("utf-8", "replace")
+        h = re.match(r"\{6,(\d+),(\d+),", text)
+        if not h:
+            return "не на поддержке"
+        g = int(h.group(1))
+        k = int(h.group(2))
+        if k == 0:
+            return "снято с поддержки (правки свободны)"
+        if g == 1:
+            return "конфигурация read-only (возможность изменения выключена) — правки невозможны без включения"
+        if not elem_uuid:
+            return "не на поддержке"
+        best = None
+        for m in re.finditer(r"([0-2]),0," + re.escape(elem_uuid.lower()), text):
+            f1 = int(m.group(1))
+            if best is None or f1 < best:
+                best = f1
+        if best is None:
+            return "не на поддержке"
+        return {
+            0: "на замке — прямая правка сломает обновления; дорабатывай через cfe-* либо включи редактирование объекта",
+            1: "редактируется с сохранением поддержки",
+            2: "снято с поддержки (правки свободны)",
+        }.get(best, "не на поддержке")
+    except Exception:
+        return "не на поддержке"
+
+
 # --- Main ---
 
 def main():
@@ -441,6 +513,7 @@ def main():
         header += f" ({object_context})"
     header += " ==="
     lines.append(header)
+    lines.append(f"Поддержка: {get_support_status_for_path(form_path)}")
 
     # --- Form properties (Title excluded -- shown in header) ---
     prop_names = [
@@ -484,6 +557,50 @@ def main():
             ct_str = f"[{ct}]" if ct else ""
             lines.append(f"  {e_name}{ct_str} -> {e_handler}")
 
+    # --- Main AutoCommandBar (form's id=-1 panel) ---
+    def format_main_acb(acb_node):
+        if acb_node is None:
+            return []
+        autofill_node = acb_node.find("d:Autofill", NSMAP)
+        autofill = not (autofill_node is not None and autofill_node.text == "false")
+        halign_node = acb_node.find("d:HorizontalAlign", NSMAP)
+        flags = ["autofill" if autofill else "no-autofill"]
+        if halign_node is not None and halign_node.text:
+            flags.append(f"align={halign_node.text}")
+        ci_node = acb_node.find("d:ChildItems", NSMAP)
+        buttons = []
+        if ci_node is not None:
+            for btn in ci_node:
+                if not isinstance(btn.tag, str):
+                    continue
+                ln = etree.QName(btn).localname
+                if ln in SKIP_ELEMENTS:
+                    continue
+                b_name = btn.get("name", "")
+                cmd_node = btn.find("d:CommandName", NSMAP)
+                cmd_ref = cmd_node.text if cmd_node is not None and cmd_node.text else ""
+                loc_node = btn.find("d:LocationInCommandBar", NSMAP)
+                loc_str = f" [{loc_node.text}]" if loc_node is not None and loc_node.text else ""
+                tag = get_element_tag(btn)
+                if cmd_ref:
+                    buttons.append(f"  {tag} {b_name} -> {cmd_ref}{loc_str}")
+                else:
+                    buttons.append(f"  {tag} {b_name}{loc_str}")
+        if not buttons and autofill and halign_node is None:
+            return ["AutoCommandBar [autofill]"]
+        return [f"AutoCommandBar [{', '.join(flags)}]"] + buttons
+
+    cb_loc_node = root.find("d:CommandBarLocation", NSMAP)
+    cb_loc = cb_loc_node.text if cb_loc_node is not None and cb_loc_node.text else "Auto"
+    main_acb_node = root.find("d:AutoCommandBar", NSMAP)
+    acb_lines = []
+    if cb_loc != "None" and main_acb_node is not None:
+        acb_lines = format_main_acb(main_acb_node)
+
+    if acb_lines and cb_loc in ("Auto", "Top"):
+        lines.append("")
+        lines.extend(acb_lines)
+
     # --- Element tree ---
     tree_state = {"has_collapsed": False}
     child_items = root.find("d:ChildItems", NSMAP)
@@ -493,6 +610,10 @@ def main():
         tree_lines = []
         build_tree(child_items, "  ", tree_lines, expand, tree_state)
         lines.extend(tree_lines)
+
+    if acb_lines and cb_loc == "Bottom":
+        lines.append("")
+        lines.extend(acb_lines)
 
     # --- Attributes ---
     attrs_node = root.find("d:Attributes", NSMAP)

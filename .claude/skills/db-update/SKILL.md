@@ -35,7 +35,7 @@ allowed-tools:
 ## Команда
 
 ```powershell
-powershell.exe -NoProfile -File .claude/skills/db-update/scripts/db-update.ps1 <параметры>
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-update.ps1" <параметры>
 ```
 
 ### Параметры скрипта
@@ -66,13 +66,6 @@ powershell.exe -NoProfile -File .claude/skills/db-update/scripts/db-update.ps1 <
 | `-BackgroundSuspend` | Приостановить |
 | `-BackgroundResume` | Возобновить |
 
-## Коды возврата
-
-| Код | Описание |
-|-----|----------|
-| 0 | Успешно |
-| 1 | Ошибка (см. лог) |
-
 ## Предупреждения
 
 - Если обновление **не динамическое** — потребуется **монопольный доступ** к базе (все пользователи должны выйти)
@@ -83,11 +76,11 @@ powershell.exe -NoProfile -File .claude/skills/db-update/scripts/db-update.ps1 <
 
 ```powershell
 # Обычное обновление (файловая база)
-powershell.exe -NoProfile -File .claude/skills/db-update/scripts/db-update.ps1 -InfoBasePath "C:\Bases\MyDB" -UserName "Admin"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-update.ps1" -InfoBasePath "C:\Bases\MyDB" -UserName "Admin"
 
 # Динамическое обновление (серверная база)
-powershell.exe -NoProfile -File .claude/skills/db-update/scripts/db-update.ps1 -InfoBaseServer "srv01" -InfoBaseRef "MyDB" -UserName "Admin" -Password "secret" -Dynamic "+"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-update.ps1" -InfoBaseServer "srv01" -InfoBaseRef "MyDB" -UserName "Admin" -Password "secret" -Dynamic "+"
 
 # Обновление расширения
-powershell.exe -NoProfile -File .claude/skills/db-update/scripts/db-update.ps1 -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -Extension "МоёРасширение"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-update.ps1" -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -Extension "МоёРасширение"
 ```

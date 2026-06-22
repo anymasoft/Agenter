@@ -31,7 +31,7 @@ allowed-tools:
 ## Команда
 
 ```powershell
-powershell.exe -NoProfile -File .claude/skills/template-remove/scripts/remove-template.ps1 -ObjectName "<ObjectName>" -TemplateName "<TemplateName>" [-SrcDir "<SrcDir>"]
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/remove-template.ps1" -ObjectName "<ObjectName>" -TemplateName "<TemplateName>" [-SrcDir "<SrcDir>"]
 ```
 
 ## Что удаляется

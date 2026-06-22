@@ -41,7 +41,7 @@ allowed-tools:
 ## Команда
 
 ```powershell
-powershell.exe -NoProfile -File .claude/skills/web-publish/scripts/web-publish.ps1 <параметры>
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/web-publish.ps1" <параметры>
 ```
 
 ### Параметры скрипта
@@ -88,14 +88,14 @@ powershell.exe -NoProfile -File .claude/skills/web-publish/scripts/web-publish.p
 
 ```powershell
 # Файловая база
-powershell.exe -NoProfile -File .claude/skills/web-publish/scripts/web-publish.ps1 -InfoBasePath "C:\Bases\MyDB" -UserName "Admin"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/web-publish.ps1" -InfoBasePath "C:\Bases\MyDB" -UserName "Admin"
 
 # С явным именем публикации и портом
-powershell.exe -NoProfile -File .claude/skills/web-publish/scripts/web-publish.ps1 -InfoBasePath "C:\Bases\MyDB" -AppName "mydb" -Port 9090
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/web-publish.ps1" -InfoBasePath "C:\Bases\MyDB" -AppName "mydb" -Port 9090
 
 # Серверная база
-powershell.exe -NoProfile -File .claude/skills/web-publish/scripts/web-publish.ps1 -InfoBaseServer "srv01" -InfoBaseRef "MyDB" -UserName "Admin" -Password "secret"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/web-publish.ps1" -InfoBaseServer "srv01" -InfoBaseRef "MyDB" -UserName "Admin" -Password "secret"
 
 # Ручной режим (только инструкция)
-powershell.exe -NoProfile -File .claude/skills/web-publish/scripts/web-publish.ps1 -InfoBasePath "C:\Bases\MyDB" -Manual
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/web-publish.ps1" -InfoBasePath "C:\Bases\MyDB" -Manual
 ```

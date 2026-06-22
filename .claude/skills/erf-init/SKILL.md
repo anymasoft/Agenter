@@ -31,7 +31,7 @@ allowed-tools:
 ## Команда
 
 ```powershell
-powershell.exe -NoProfile -File .claude/skills/erf-init/scripts/init.ps1 -Name "<Name>" [-Synonym "<Synonym>"] [-SrcDir "<SrcDir>"] [-WithSKD]
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/init.ps1" -Name "<Name>" [-Synonym "<Synonym>"] [-SrcDir "<SrcDir>"] [-WithSKD]
 ```
 
 ## Дальнейшие шаги

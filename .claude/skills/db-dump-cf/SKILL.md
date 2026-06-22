@@ -35,7 +35,7 @@ allowed-tools:
 ## Команда
 
 ```powershell
-powershell.exe -NoProfile -File .claude/skills/db-dump-cf/scripts/db-dump-cf.ps1 <параметры>
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-dump-cf.ps1" <параметры>
 ```
 
 ### Параметры скрипта
@@ -54,26 +54,15 @@ powershell.exe -NoProfile -File .claude/skills/db-dump-cf/scripts/db-dump-cf.ps1
 
 > `*` — нужен либо `-InfoBasePath`, либо пара `-InfoBaseServer` + `-InfoBaseRef`
 
-## Коды возврата
-
-| Код | Описание |
-|-----|----------|
-| 0 | Успешно |
-| 1 | Ошибка (см. лог) |
-
-## После выполнения
-
-Прочитай лог-файл и покажи результат. Если есть ошибки — покажи содержимое лога.
-
 ## Примеры
 
 ```powershell
 # Выгрузка конфигурации (файловая база)
-powershell.exe -NoProfile -File .claude/skills/db-dump-cf/scripts/db-dump-cf.ps1 -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -OutputFile "C:\backup\config.cf"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-dump-cf.ps1" -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -OutputFile "C:\backup\config.cf"
 
 # Серверная база
-powershell.exe -NoProfile -File .claude/skills/db-dump-cf/scripts/db-dump-cf.ps1 -InfoBaseServer "srv01" -InfoBaseRef "MyApp_Dev" -UserName "Admin" -Password "secret" -OutputFile "config.cf"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-dump-cf.ps1" -InfoBaseServer "srv01" -InfoBaseRef "MyApp_Dev" -UserName "Admin" -Password "secret" -OutputFile "config.cf"
 
 # Выгрузка расширения
-powershell.exe -NoProfile -File .claude/skills/db-dump-cf/scripts/db-dump-cf.ps1 -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -OutputFile "ext.cfe" -Extension "МоёРасширение"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-dump-cf.ps1" -InfoBasePath "C:\Bases\MyDB" -UserName "Admin" -OutputFile "ext.cfe" -Extension "МоёРасширение"
 ```

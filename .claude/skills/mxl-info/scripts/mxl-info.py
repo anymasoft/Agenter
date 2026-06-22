@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# mxl-info v1.0 — Analyze 1C spreadsheet structure
+# mxl-info v1.1 — Analyze 1C spreadsheet structure
 # Source: https://github.com/Nikolay-Shirokov/cc-1c-skills
 
 import argparse
@@ -308,10 +308,79 @@ if args.Format == "json":
     print(json.dumps(result, ensure_ascii=False, indent=2))
     sys.exit(0)
 
+def get_support_status_for_path(target_path):
+    try:
+        def root_uuid(xml_path):
+            if not os.path.isfile(xml_path):
+                return None
+            try:
+                mx = etree.parse(xml_path).getroot()
+                for child in mx:
+                    if isinstance(child.tag, str) and child.get("uuid"):
+                        return child.get("uuid")
+            except Exception:
+                pass
+            return None
+        rp = os.path.abspath(target_path)
+        # The target file itself may be the element meta-xml (e.g. Subsystems/X.xml).
+        elem_uuid = root_uuid(rp)
+        bin_path = None
+        d = os.path.dirname(rp)
+        for _ in range(12):
+            if not d:
+                break
+            if not elem_uuid:
+                elem_uuid = root_uuid(d + ".xml")
+            if not bin_path:
+                cand = os.path.join(d, "Ext", "ParentConfigurations.bin")
+                if os.path.exists(cand) or os.path.exists(os.path.join(d, "Configuration.xml")):
+                    bin_path = cand
+            if elem_uuid and bin_path:
+                break
+            parent = os.path.dirname(d)
+            if parent == d:
+                break
+            d = parent
+        if not bin_path or not os.path.exists(bin_path):
+            return "не на поддержке"
+        data = open(bin_path, "rb").read()
+        if len(data) <= 32:
+            return "снято с поддержки (правки свободны)"
+        if data[:3] == b"\xef\xbb\xbf":
+            data = data[3:]
+        text = data.decode("utf-8", "replace")
+        h = re.match(r"\{6,(\d+),(\d+),", text)
+        if not h:
+            return "не на поддержке"
+        g = int(h.group(1))
+        k = int(h.group(2))
+        if k == 0:
+            return "снято с поддержки (правки свободны)"
+        if g == 1:
+            return "конфигурация read-only (возможность изменения выключена) — правки невозможны без включения"
+        if not elem_uuid:
+            return "не на поддержке"
+        best = None
+        for m in re.finditer(r"([0-2]),0," + re.escape(elem_uuid.lower()), text):
+            f1 = int(m.group(1))
+            if best is None or f1 < best:
+                best = f1
+        if best is None:
+            return "не на поддержке"
+        return {
+            0: "на замке — прямая правка сломает обновления; дорабатывай через cfe-* либо включи редактирование объекта",
+            1: "редактируется с сохранением поддержки",
+            2: "снято с поддержки (правки свободны)",
+        }.get(best, "не на поддержке")
+    except Exception:
+        return "не на поддержке"
+
+
 # --- Text format output ---
 lines = []
 
 lines.append(f"=== {template_name} ===")
+lines.append(f"Поддержка: {get_support_status_for_path(template_path)}")
 lines.append(f"  Rows: {doc_height}, Columns: {default_col_count}")
 
 if len(column_sets) == 0:

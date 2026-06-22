@@ -24,6 +24,6 @@ allowed-tools:
 ## Команда
 
 ```powershell
-powershell.exe -NoProfile -File .claude/skills/cfe-validate/scripts/cfe-validate.ps1 -ExtensionPath "src"
-powershell.exe -NoProfile -File .claude/skills/cfe-validate/scripts/cfe-validate.ps1 -ExtensionPath "src/Configuration.xml"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/cfe-validate.ps1" -ExtensionPath "src"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/cfe-validate.ps1" -ExtensionPath "src/Configuration.xml"
 ```

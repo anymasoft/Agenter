@@ -38,7 +38,7 @@ allowed-tools:
 ## Команда
 
 ```powershell
-powershell.exe -NoProfile -File .claude/skills/db-load-git/scripts/db-load-git.ps1 <параметры>
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-load-git.ps1" <параметры>
 ```
 
 ### Параметры скрипта
@@ -64,15 +64,14 @@ powershell.exe -NoProfile -File .claude/skills/db-load-git/scripts/db-load-git.p
 
 ## После выполнения
 
-1. Показать список загруженных файлов и результат из лога
-2. Если `-UpdateDB` не был указан — **предложить `/db-update`** для применения изменений к БД
+Если `-UpdateDB` не был указан — **предложить `/db-update`** для применения изменений к БД
 
 ## Примеры
 
 ```powershell
 # Все незафиксированные изменения
-powershell.exe -NoProfile -File .claude/skills/db-load-git/scripts/db-load-git.ps1 -V8Path "C:\Program Files\1cv8\8.3.25.1257\bin" -InfoBasePath "C:\Bases\MyDB" -ConfigDir "C:\WS\cfsrc" -Source All -UpdateDB
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-load-git.ps1" -V8Path "C:\Program Files\1cv8\8.3.25.1257\bin" -InfoBasePath "C:\Bases\MyDB" -ConfigDir "C:\WS\cfsrc" -Source All -UpdateDB
 
 # Из диапазона коммитов
-powershell.exe -NoProfile -File .claude/skills/db-load-git/scripts/db-load-git.ps1 -InfoBasePath "C:\Bases\MyDB" -ConfigDir "C:\WS\cfsrc" -Source Commit -CommitRange "HEAD~3..HEAD"
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/db-load-git.ps1" -InfoBasePath "C:\Bases\MyDB" -ConfigDir "C:\WS\cfsrc" -Source Commit -CommitRange "HEAD~3..HEAD"
 ```

@@ -1,4 +1,4 @@
-# meta-info v1.1 — Compact summary of 1C metadata object (Python port)
+# meta-info v1.3 — Compact summary of 1C metadata object (Python port)
 # Source: https://github.com/Nikolay-Shirokov/cc-1c-skills
 import argparse
 import os
@@ -469,6 +469,59 @@ def get_ws_operations(child_objs):
     return result
 
 
+# ── Support status of this object (Ext/ParentConfigurations.bin) ──
+# See docs/1c-support-state-spec.md. Walks up to the config root, decodes the
+# object's support rule. Never throws — degrades to "не на поддержке".
+def get_object_support_status(obj_uuid):
+    try:
+        d = os.path.dirname(object_path)
+        bin_path = None
+        for _ in range(8):
+            if not d:
+                break
+            cand = os.path.join(d, "Ext", "ParentConfigurations.bin")
+            if os.path.exists(cand) or os.path.exists(os.path.join(d, "Configuration.xml")):
+                bin_path = cand
+                break
+            parent = os.path.dirname(d)
+            if parent == d:
+                break
+            d = parent
+        if not bin_path or not os.path.exists(bin_path):
+            return "не на поддержке"
+        data = open(bin_path, "rb").read()
+        if len(data) <= 32:
+            return "снято с поддержки (правки свободны)"
+        if data[:3] == b"\xef\xbb\xbf":
+            data = data[3:]
+        text = data.decode("utf-8", "replace")
+        h = re.match(r"\{6,(\d+),(\d+),", text)
+        if not h:
+            return "не на поддержке"
+        g = int(h.group(1))
+        k = int(h.group(2))
+        if k == 0:
+            return "снято с поддержки (правки свободны)"
+        if g == 1:
+            return "конфигурация read-only (возможность изменения выключена) — правки невозможны без включения"
+        if not obj_uuid:
+            return "не на поддержке"
+        best = None
+        for m in re.finditer(r"([0-2]),0," + re.escape(obj_uuid.lower()), text):
+            f1 = int(m.group(1))
+            if best is None or f1 < best:
+                best = f1
+        if best is None:
+            return "не на поддержке"
+        return {
+            0: "на замке — прямая правка сломает обновления; дорабатывай через cfe-* либо включи редактирование объекта",
+            1: "редактируется с сохранением поддержки",
+            2: "снято с поддержки (правки свободны)",
+        }.get(best, "не на поддержке")
+    except Exception:
+        return "не на поддержке"
+
+
 # ── Extract metadata ─────────────────────────────────────────
 
 props = find(type_node, "md:Properties")
@@ -476,6 +529,21 @@ child_objs = find(type_node, "md:ChildObjects")
 obj_name = inner_text(find(props, "md:Name"))
 syn_node = find(props, "md:Synonym")
 synonym = get_ml_text(syn_node)
+
+# Presentations (type-choice dialogs show "Представление объекта" as the ref type name)
+obj_presentation = get_ml_text(find(props, "md:ObjectPresentation"))
+ext_obj_presentation = get_ml_text(find(props, "md:ExtendedObjectPresentation"))
+list_presentation = get_ml_text(find(props, "md:ListPresentation"))
+ext_list_presentation = get_ml_text(find(props, "md:ExtendedListPresentation"))
+
+# Reference (ref-typed) metadata objects — those with a ...Ref type
+ref_md_types = {"Catalog", "Document", "Enum", "ChartOfAccounts",
+                "ChartOfCharacteristicTypes", "ChartOfCalculationTypes",
+                "ExchangePlan", "BusinessProcess", "Task"}
+is_ref_object = md_type in ref_md_types
+
+# Effective type presentation: ObjectPresentation -> Synonym -> Name
+type_presentation = obj_presentation or synonym or obj_name
 
 # ── Handle -Name drill-down ──────────────────────────────────
 
@@ -635,6 +703,20 @@ if not drill_done:
         header += f' \u2014 "{synonym}"'
     header += " ==="
     out(header)
+    out(f"Поддержка: {get_object_support_status(type_node.get('uuid', ''))}")
+
+    # Type presentation (ref objects)
+    if is_ref_object:
+        out(f"Представление типа: {type_presentation}")
+        if mode == "full":
+            if obj_presentation:
+                out(f"Представление объекта: {obj_presentation}")
+            if ext_obj_presentation:
+                out(f"Расширенное представление объекта: {ext_obj_presentation}")
+            if list_presentation:
+                out(f"Представление списка: {list_presentation}")
+            if ext_list_presentation:
+                out(f"Расширенное представление списка: {ext_list_presentation}")
 
     if mode == "brief":
         # Attributes

@@ -1,34 +1,67 @@
 #!/usr/bin/env python3
-# db-load-xml v1.3 — Load 1C configuration from XML files
+# db-load-xml v1.5 — Load 1C configuration from XML files
 # Source: https://github.com/Nikolay-Shirokov/cc-1c-skills
 
 import argparse
 import glob
+import json
 import os
 import random
+import re
 import shutil
 import subprocess
 import sys
 import tempfile
 
 
+def _find_project_v8path():
+    """Walk up from CWD to find .v8-project.json and read its v8path."""
+    d = os.getcwd()
+    while True:
+        pf = os.path.join(d, ".v8-project.json")
+        if os.path.isfile(pf):
+            try:
+                with open(pf, encoding="utf-8-sig") as f:
+                    data = json.load(f)
+                v = data.get("v8path")
+                if v:
+                    return v
+            except Exception:
+                pass
+            return None
+        parent = os.path.dirname(d)
+        if parent == d:
+            return None
+        d = parent
+
+
+def _version_key(p):
+    """Numeric sort key from version dir name (.../1cv8/<ver>/bin/1cv8.exe)."""
+    ver = os.path.basename(os.path.dirname(os.path.dirname(p)))
+    return [int(x) for x in re.findall(r"\d+", ver)]
+
+
 def resolve_v8path(v8path):
     """Resolve path to 1cv8.exe."""
     if not v8path:
-        candidates = glob.glob(r"C:\Program Files\1cv8\*\bin\1cv8.exe")
+        v8path = _find_project_v8path()
+    if not v8path:
+        candidates = (
+            glob.glob(r"C:\Program Files\1cv8\*\bin\1cv8.exe")
+            + glob.glob(r"C:\Program Files (x86)\1cv8\*\bin\1cv8.exe")
+        )
         if candidates:
-            candidates.sort()
-            return candidates[-1]
+            v8path = max(candidates, key=_version_key)
+            ver = os.path.basename(os.path.dirname(os.path.dirname(v8path)))
+            print(f"Auto-selected platform {ver}: {v8path}")
         else:
             print("Error: 1cv8.exe not found. Specify -V8Path", file=sys.stderr)
             sys.exit(1)
-    elif os.path.isdir(v8path):
+    if os.path.isdir(v8path):
         v8path = os.path.join(v8path, "1cv8.exe")
-
     if not os.path.isfile(v8path):
         print(f"Error: 1cv8.exe not found at {v8path}", file=sys.stderr)
         sys.exit(1)
-
     return v8path
 
 
@@ -114,23 +147,33 @@ def main():
             print("Executing partial configuration load...")
 
             # Build list file
-            generated_list_file = None
             if args.ListFile:
-                # Use provided list file
                 if not os.path.isfile(args.ListFile):
                     print(f"Error: list file not found: {args.ListFile}", file=sys.stderr)
                     sys.exit(1)
-                generated_list_file = args.ListFile
+                with open(args.ListFile, encoding="utf-8-sig") as f:
+                    raw_list = [ln.strip() for ln in f if ln.strip()]
             else:
-                # Generate from -Files parameter
-                file_list = [f.strip() for f in args.Files.split(",") if f.strip()]
-                generated_list_file = os.path.join(temp_dir, "load_list.txt")
-                with open(generated_list_file, "w", encoding="utf-8-sig") as f:
-                    f.write("\n".join(file_list))
+                raw_list = [f.strip() for f in args.Files.split(",") if f.strip()]
 
-                print(f"Files to load: {len(file_list)}")
-                for fl in file_list:
-                    print(f"  {fl}")
+            # Support-state service files are NOT partially loadable — exclude with a hint.
+            support_re = re.compile(r"ParentConfigurations\.bin$|(^|[\\/])ConfigDumpInfo\.xml$")
+            support_files = [x for x in raw_list if support_re.search(x)]
+            file_list = [x for x in raw_list if not support_re.search(x)]
+            if support_files:
+                print("[ВНИМАНИЕ] Служебные файлы состояния поддержки исключены из частичной загрузки (частично не грузятся):", file=sys.stderr)
+                for sf in support_files:
+                    print(f"  - {sf}", file=sys.stderr)
+                print("  Смена состояния поддержки применяется только полной загрузкой: -Mode Full.", file=sys.stderr)
+            if not file_list:
+                print("Error: после исключения служебных файлов поддержки загружать нечего. Для смены поддержки используйте -Mode Full.", file=sys.stderr)
+                sys.exit(1)
+            generated_list_file = os.path.join(temp_dir, "load_list.txt")
+            with open(generated_list_file, "w", encoding="utf-8-sig") as f:
+                f.write("\n".join(file_list))
+            print(f"Files to load: {len(file_list)}")
+            for fl in file_list:
+                print(f"  {fl}")
 
             arguments += ["-listFile", generated_list_file]
             arguments.append("-partial")

@@ -17,7 +17,7 @@ Automates user interactions with 1C:Enterprise web client via Playwright — nav
 ## Quick start
 
 ```bash
-RUN=".claude/skills/web-test/scripts/run.mjs"
+RUN="${CLAUDE_SKILL_DIR}/scripts/run.mjs"
 
 # One-shot: opens browser → runs script → closes browser → exits
 node $RUN run http://localhost:8081/bpdemo test-scenario.js
@@ -35,7 +35,7 @@ SCRIPT
 ## Setup (first time)
 
 ```bash
-cd .claude/skills/web-test/scripts && npm install
+cd "${CLAUDE_SKILL_DIR}/scripts" && npm install
 ```
 
 Requires Node.js 18+. `npm install` downloads Playwright and Chromium.
@@ -68,6 +68,12 @@ SCRIPT
 
 # 2b. Execute without video recording (for debugging/testing)
 cat script.js | node $RUN exec - --no-record
+
+# 2c. Override exec HTTP timeout (default 30 min). Use for long scripts
+#     such as multi-block recordings + addNarration.
+cat script.js | node $RUN exec - --timeout-min=120
+cat script.js | node $RUN exec - --timeout=7200000
+WEB_TEST_EXEC_TIMEOUT_MS=7200000 node $RUN exec script.js
 
 # 3. Screenshot
 node $RUN shot result.png
@@ -159,7 +165,7 @@ const form = await getFormState();
 
 ### Reading data
 
-#### `readTable({ maxRows?, offset?, table? })` → `{ columns, rows, total, shown, offset }`
+#### `readTable({ maxRows?, offset?, table? })` → `{ columns, rows, total, shown, offset, hasMore }`
 Read actual grid data with pagination. Each row is `{ columnName: value }`.
 
 | Option | Default | Description |
@@ -167,6 +173,12 @@ Read actual grid data with pagination. Each row is `{ columnName: value }`.
 | `maxRows` | 20 | Max rows to return per call |
 | `offset` | 0 | Skip first N rows |
 | `table` | — | Grid name from `tables[]` (for multi-grid forms) |
+
+**Picture columns.** Cells that render an icon (status/stage marks, the "ЭДО" mark, the attached-files paperclip) read as `'pic:<N>'` (`N` = icon frame/state) when shown, `''` when absent — so presence is truthy and icons differ by index. Icon-only columns (no header text) still appear, named by their tooltip or `'(picture)'`. These values are read-only — filter/select rows by a text column, not by `'pic:N'`.
+```js
+if (t.rows[0]['Присоединенные файлы']) { /* has an attached file */ }
+t.rows[0]['ЭДО'] === 'pic:1';   // connected to 1С-ЭДО ('pic:0' = not)
+```
 
 Special row fields:
 - `_kind: 'group'` — hierarchical group row
@@ -177,10 +189,22 @@ Special row fields:
 - `hierarchical: true` — list has groups (on result object)
 - `viewMode: 'tree'` — tree view active (on result object)
 
+**`total` is misleading for long lists.** 1С virtualizes both dynamic lists and form tabular sections — the DOM holds only a window of visible rows. `total` / `shown` count what's *loaded right now*, not the size of the underlying collection. Use **`hasMore`** to know if there's more data outside the window:
+
+```js
+const t = await readTable();
+// t.hasMore = { above: false, below: true }   ← form tabular section, scrollbar visible
+// t.hasMore = { below: true }                 ← dynamic list (catalog/journal/register)
+// t.hasMore = { below: false }                ← everything visible / end of list reached
+```
+
+- `hasMore.below` — always present. `true` ⇒ scrolling down (PageDown / `clickElement` with `scroll:true`) will reveal more rows.
+- `hasMore.above` — usually present too. Detected via the dynamic-list page-turn buttons (#vertButtonScroll) or the tabular-section scrollbar. Absent only for rare grids that have neither widget — treat absence as unknown.
+
 ```js
 const t = await readTable({ maxRows: 50 });
 console.log('Columns:', t.columns);
-console.log('Rows:', t.rows.length, 'of', t.total);
+console.log('Loaded:', t.shown, 'rows; more below:', t.hasMore.below);
 // Pagination:
 const page2 = await readTable({ maxRows: 50, offset: 50 });
 ```
@@ -211,7 +235,9 @@ Sections + all open tabs.
 
 ### Actions
 
-#### `clickElement(text, { dblclick?, table?, expand?, modifier? })` → form state
+**Return shape convention.** All action functions return a **flat form state** (same shape as `getFormState()`) with action-specific extras: `clicked`, `focused`, `selected`, `filled`, `notFilled`, `closed`, `opened`, `navigated`, `deleted`, `filtered`, `unfiltered`. Errors always sit at the top level under `.errors` (when present) — the exec-wrapper automatically throws on `.errors.modal` / `.errors.balloon`.
+
+#### `clickElement(text, { dblclick?, table?, expand?, modifier?, scroll? })` → form state
 Click button, hyperlink, tab, navigation panel link, or grid row (fuzzy match).
 
 - `table` — scope button search to a specific grid's command panel (by name from `tables[]`):
@@ -233,6 +259,11 @@ Click button, hyperlink, tab, navigation panel link, or grid row (fuzzy match).
   await clickElement('ИСУ ФХД');                      // select row
   await clickElement('ИСУ ФХД', { expand: true });    // expand/collapse
   ```
+- **Focus a field** (last resort, when no `table` given): if `text` matches no clickable control but matches a form field's name/label, clicks the input to focus it **without changing its value**. Returns `focused: { field, id, ok }` (`ok: false` if the field couldn't take focus). Use it to drive focus-dependent keys:
+  ```js
+  await clickElement('Контрагент');          // focus the reference field
+  await getPage().keyboard.press('F4');      // open its selection form
+  ```
 - **Multi-select rows** with `modifier: 'ctrl'` (add to selection) or `modifier: 'shift'` (select range):
   ```js
   await clickElement('Номенклатура 1');                          // select first row
@@ -242,26 +273,32 @@ Click button, hyperlink, tab, navigation panel link, or grid row (fuzzy match).
   const t = await readTable();
   t.rows.filter(r => r._selected);  // rows with _selected: true
   ```
-- **SpreadsheetDocument cells** (report drill-down): first argument can be `{ row, column }` object to click a cell in a rendered report. Coordinates match `readSpreadsheet()` output:
+- **Cell click by (row, column)** — first argument as `{ row, column }`. Routes: spreadsheet on form → spreadsheet drill-down; otherwise → grid cell. Pass `table: 'GridName'` to force a specific grid when both are present.
+
+  Spreadsheet report drill-down:
   ```js
   const report = await readSpreadsheet();
   // report.data[0] = { 'К1': 'Материалы строительные', 'К6': '150 000', ... }
-
-  // By data row index + column header name
-  await clickElement({ row: 0, column: 'К6' }, { dblclick: true });
-
-  // By cell value filter (fuzzy match)
-  await clickElement({ row: { 'К1': 'Материалы' }, column: 'К6' }, { dblclick: true });
-
-  // Totals row
-  await clickElement({ row: 'totals', column: 'К6' }, { dblclick: true });
+  await clickElement({ row: 0, column: 'К6' }, { dblclick: true });                      // by index
+  await clickElement({ row: { 'К1': 'Материалы' }, column: 'К6' }, { dblclick: true });  // by filter
+  await clickElement({ row: 'totals', column: 'К6' }, { dblclick: true });               // totals row
+  await clickElement('150 000', { dblclick: true });                                     // fallback: by text
   ```
-  Text search also works as fallback — searches inside spreadsheet iframes:
+
+  Form grid cell (catalog list, journal, table part). Off-viewport columns auto-scroll horizontally (works around frozen columns). Use `scroll: true | number` for filter-based rows outside the current DOM window:
   ```js
-  await clickElement('150 000', { dblclick: true }); // finds cell by text in report
+  await clickElement({ row: 0, column: 'Количество' }, { table: 'Товары', dblclick: true });
+  await clickElement({ row: { 'Номенклатура': 'Бумага' }, column: 'Цена' }, { table: 'Товары' });
+  await clickElement({ row: { 'Номер': '0000-000601' }, column: 'Сумма' },
+                     { table: 'Реализации', scroll: true });  // PageDown loop, max 50
   ```
 
-#### `fillFields({ name: value })` → `{ filled, form }`
+  Gotchas:
+  - `row: <number>` is the index in the **current DOM window**, not absolute — 1С virtualizes long lists. `row: 0` is the topmost loaded row after any prior scroll. For arbitrary rows in a long list use `row: { col: val }` + `scroll: true`.
+  - `scroll: true` walks **down only** (PageDown). For going up first press `Home` via `getPage().keyboard` or narrow with `filterList`.
+  - First matching row wins on duplicate filter matches — refine the filter to disambiguate.
+
+#### `fillFields({ name: value })` → form state with `filled`
 Fill form fields by label (fuzzy match). Auto-detects field type.
 
 | Value | Field type | Method |
@@ -280,8 +317,7 @@ await fillFields({
 });
 ```
 
-Returns `{ filled: [{ field, ok, value, method }], form: {...} }`.
-Method is one of: `'clear'` | `'toggle'` | `'radio'` | `'paste'` | `'dropdown'` | `'form'` | `'typeahead'`
+Returns form state with `filled: [{ field, ok: true, value, method }]` (method: `clear`|`toggle`|`radio`|`paste`|`dropdown`|`form`|`typeahead`). **Throws on any per-field failure** with a detailed message listing problematic fields and available options — if the call returned, all fields were filled, no per-item check needed.
 
 #### `selectValue(field, search, opts?)` → form state with `selected`
 Select a value from reference field via dropdown or selection form. More reliable than `fillFields` for reference fields that need exact selection from a catalog. Pass empty `search` (`''` or `null`) to clear the field (Shift+F4).
@@ -304,14 +340,19 @@ await selectValue('Документ', '0000-000601', { type: 'Реализаци
 
 Also supports DCS labels — auto-enables the paired checkbox.
 
-#### `fillTableRow(fields, opts)` → form state
+#### `fillTableRow(fields, opts)` → form state with `filled` (+ optional `notFilled`)
 Fill table row cells via Tab navigation. Value is a plain string, `{ value, type }` for composite-type cells, or `''`/`null` to clear (Shift+F4).
+
+Returns form state with `filled: [{ field, ok, ...}]`. Items are `{ field, ok: true, method, value }` on success (method: `direct`|`paste`|`dropdown`|`form`|`type-direct`|`skip`|`clear`|`toggle`) or `{ field, ok: false, error, message }` on per-field failure. Unmatched fields → `notFilled: [...]`.
+
+**Unlike `fillFields`, `fillTableRow` does NOT throw on per-field failures** — errors appear as `ok: false` items in `filled[]` so the caller can react selectively (e.g. retry one cell while the rest of the row stays filled). Check via `r.filled.filter(f => !f.ok)`. Error codes: `composite_type`/`type_required`/`type_dialog_failed` (retry with `{value, type}`); `column_not_found` (check column name via `readTable`); `no_selection_form`/`no_selection_after_type` (retry or fall back to `selectValue`); `not_found`/`no_match`/`ambiguous` (refine search text); `still_open` (picked a group — pick a leaf row). Soft validation errors from 1C (`balloon`, `modal`) still throw via the exec-wrapper.
 
 | Option | Description |
 |--------|-------------|
 | `tab` | Switch to tab before filling |
 | `add` | Add new row before filling |
-| `row` | Edit existing row by 0-based index |
+| `row` | Edit existing row: 0-based index, **or** a `{ col: value }` filter (one or more columns) to locate the row by its cell values |
+| `scroll` | With a `row` filter — scan beyond the current DOM window (`true` = up to 50 PageDowns, number = limit) |
 | `table` | Grid name from `tables[]` (for multi-grid forms) |
 
 ```js
@@ -320,11 +361,14 @@ await fillTableRow(
   { 'Номенклатура': 'Бумага', 'Количество': '10', 'Цена': '100' },
   { tab: 'Товары', add: true }
 );
-// Edit existing row:
+// Edit existing row by index:
 await fillTableRow(
   { 'Количество': '20' },
   { tab: 'Товары', row: 0 }
 );
+// Edit existing row located by cell values (одна или несколько колонок):
+await fillTableRow({ 'Цена': '120' }, { table: 'Товары', row: { 'Номенклатура': 'Бумага' } });
+await fillTableRow({ 'Сумма': '500' }, { row: { 'Номер': '0000-000601', 'Дата': '29.12.2016' }, scroll: true });
 // Multi-grid form — add row to specific table:
 await fillTableRow(
   { 'Объект': 'БДДС' },
@@ -525,7 +569,11 @@ On error (auto-screenshot taken):
 - **Headed mode** — 1C requires visible browser, no headless
 - **Startup time** — 1C loads 30-60s on initial connect (built into `start`)
 - **Fuzzy matching** — all name lookups: exact > startsWith > includes
-- **Clipboard paste** — all text fields filled via Ctrl+V (triggers 1C events properly)
+- **Clipboard paste** — all text fields filled via Ctrl+V (triggers 1C events properly). The OS clipboard is automatically saved before each action and restored after, so a local user's clipboard survives a test run. Opt out with `--no-preserve-clipboard` (any command), `WEB_TEST_PRESERVE_CLIPBOARD=0` env, or `preserveClipboard: false` in `webtest.config.mjs`
 - **Cyrillic in bash** — use `cat <<'SCRIPT' | node $RUN exec -` to avoid escaping issues
 - **Non-breaking spaces** — 1C uses `\u00a0` instead of regular spaces. All matching is normalized internally
 - **Section panel display** — `navigateSection()` works with any panel position (side, top) but requires "Picture and text" or "Text" display mode. Icon-only mode is not supported — API cannot read section names from icons alone
+
+## Regression suites
+
+When the user asks to cover a 1C solution with automated regression — multi-file test suites with assertions, hooks, tags, retries, Allure/JUnit reports, multi-user process tests — switch to the `test` mode. See [regress.md](regress.md) for authoring discipline, recon flow (metadata + live walkthrough via `exec`), per-application folder layout, ready-to-paste templates, and failure triage. Default to ad-hoc `run`/`exec` for single-script automation — `test` is the specialised mode for project-wide coverage.

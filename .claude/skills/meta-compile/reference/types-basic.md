@@ -18,7 +18,7 @@
 | `checkUnique` | `false` | CheckUnique |
 | `defaultPresentation` | `AsDescription` | DefaultPresentation |
 | `subordinationUse` | `ToItems` | SubordinationUse |
-| `quickChoice` | `true` | QuickChoice |
+| `quickChoice` | `false` | QuickChoice |
 | `choiceMode` | `BothWays` | ChoiceMode |
 | `owners` | `[]` | Owners |
 | `attributes` | `[]` | → Attribute в ChildObjects |

@@ -29,7 +29,7 @@ allowed-tools:
 ## Команда
 
 ```powershell
-powershell.exe -NoProfile -File .claude/skills/mxl-decompile/scripts/mxl-decompile.ps1 -TemplatePath "<путь>/Template.xml" [-OutputPath "<путь>.json"]
+powershell.exe -NoProfile -File "${CLAUDE_SKILL_DIR}/scripts/mxl-decompile.ps1" -TemplatePath "<путь>/Template.xml" [-OutputPath "<путь>.json"]
 ```
 
 ## Рабочий процесс

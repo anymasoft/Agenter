@@ -1,6 +1,7 @@
-# skd-edit v1.11 — Atomic 1C DCS editor (Python port)
+# skd-edit v1.27 — Atomic 1C DCS editor (Python port)
 # Source: https://github.com/Nikolay-Shirokov/cc-1c-skills
 import argparse
+import json
 import os
 import re
 import sys
@@ -11,6 +12,10 @@ from lxml import etree
 sys.stdout.reconfigure(encoding="utf-8")
 sys.stderr.reconfigure(encoding="utf-8")
 
+# Dirty flag — set to True by every successful mutation. If still False at save time,
+# the file is left untouched (NO-OP operations like [WARN] not found don't rewrite).
+dirty = False
+
 # ── arg parsing ──────────────────────────────────────────────
 
 VALID_OPS = [
@@ -18,9 +23,9 @@ VALID_OPS = [
     "add-dataParameter", "add-order", "add-selection", "add-dataSetLink",
     "add-dataSet", "add-variant", "add-conditionalAppearance", "add-drilldown",
     "set-query", "patch-query", "set-outputParameter", "set-structure",
-    "modify-field", "modify-filter", "modify-dataParameter", "modify-parameter",
+    "modify-field", "modify-filter", "modify-dataParameter", "modify-parameter", "modify-structure", "set-field-role",
     "rename-parameter", "reorder-parameters",
-    "clear-selection", "clear-order", "clear-filter",
+    "clear-selection", "clear-order", "clear-filter", "clear-conditionalAppearance",
     "remove-field", "remove-total", "remove-calculated-field", "remove-parameter", "remove-filter",
 ]
 
@@ -76,7 +81,7 @@ def local_name(node):
 # ── helpers ──────────────────────────────────────────────────
 
 def esc_xml(s):
-    return s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
+    return s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
 
 def resolve_query_value(val, base_dir):
@@ -114,6 +119,169 @@ if not os.path.exists(template_path):
     sys.exit(1)
 
 resolved_path = os.path.abspath(template_path)
+
+
+# ============================================================
+# Support guard (Ext/ParentConfigurations.bin) — see docs/1c-support-state-spec.md
+# Blocks edits of vendor objects "на замке" / read-only configs. Trigger = bin
+# present; reaction from .v8-project.json editingAllowedCheck (deny|warn|off,
+# default deny). Never throws (except sys.exit on deny) — errors degrade to allow.
+# ============================================================
+
+def _sg_root_uuid(xml_path):
+    if not os.path.isfile(xml_path):
+        return None
+    try:
+        mx = etree.parse(xml_path).getroot()
+        for child in mx:
+            if isinstance(child.tag, str) and child.get("uuid"):
+                return child.get("uuid")
+    except Exception:
+        return None
+    return None
+
+
+def _sg_find_v8project(start_dir):
+    d = start_dir
+    for _ in range(20):
+        if not d:
+            break
+        pj = os.path.join(d, ".v8-project.json")
+        if os.path.isfile(pj):
+            return pj
+        parent = os.path.dirname(d)
+        if parent == d:
+            break
+        d = parent
+    return None
+
+
+def _sg_get_edit_mode(cfg_dir):
+    try:
+        pj = _sg_find_v8project(os.getcwd()) or _sg_find_v8project(cfg_dir)
+        if not pj:
+            return "deny"
+        proj = json.loads(open(pj, encoding="utf-8-sig").read())
+        cfg_full = os.path.normcase(os.path.abspath(cfg_dir)).rstrip("\\/")
+        for db in proj.get("databases", []):
+            src = db.get("configSrc")
+            if src:
+                src_full = os.path.normcase(os.path.abspath(src)).rstrip("\\/")
+                if cfg_full == src_full or cfg_full.startswith(src_full + os.sep):
+                    if db.get("editingAllowedCheck"):
+                        return db["editingAllowedCheck"]
+        if proj.get("editingAllowedCheck"):
+            return proj["editingAllowedCheck"]
+        return "deny"
+    except Exception:
+        return "deny"
+
+
+def assert_edit_allowed(target_path, require):
+    try:
+        rp = os.path.abspath(target_path)
+        elem_uuid = _sg_root_uuid(rp)
+        cfg_dir = None
+        bin_path = None
+        d = rp if os.path.isdir(rp) else os.path.dirname(rp)
+        for _ in range(12):
+            if not d:
+                break
+            if not elem_uuid:
+                elem_uuid = _sg_root_uuid(d + ".xml")
+            if not cfg_dir:
+                cand = os.path.join(d, "Ext", "ParentConfigurations.bin")
+                if os.path.exists(cand) or os.path.exists(os.path.join(d, "Configuration.xml")):
+                    cfg_dir = d
+                    bin_path = cand
+            if elem_uuid and cfg_dir:
+                break
+            parent = os.path.dirname(d)
+            if parent == d:
+                break
+            d = parent
+        if not elem_uuid and cfg_dir:
+            elem_uuid = _sg_root_uuid(os.path.join(cfg_dir, "Configuration.xml"))
+        if not bin_path or not os.path.exists(bin_path):
+            return
+        data = open(bin_path, "rb").read()
+        if len(data) <= 32:
+            return
+        if data[:3] == b"\xef\xbb\xbf":
+            data = data[3:]
+        text = data.decode("utf-8", "replace")
+        h = re.match(r"\{6,(\d+),(\d+),", text)
+        if not h:
+            return
+        g = int(h.group(1))
+        k = int(h.group(2))
+        if k == 0:
+            return
+        best = None
+        if elem_uuid:
+            for m in re.finditer(r"([0-2]),0," + re.escape(elem_uuid.lower()), text):
+                f1 = int(m.group(1))
+                if best is None or f1 < best:
+                    best = f1
+        blocked = False
+        code = ""
+        reason = ""
+        if g == 1:
+            blocked = True
+            code = "capability-off"
+            reason = "возможность изменения конфигурации выключена (вся конфигурация read-only)"
+        elif require == "removed":
+            if best is not None and best != 2:
+                blocked = True
+                code = "not-removed"
+                reason = "объект не снят с поддержки — удаление сломает обновления"
+        else:
+            if best is not None and best == 0:
+                blocked = True
+                code = "locked"
+                reason = "объект на замке — редактирование сломает обновления"
+        if not blocked:
+            return
+        mode = _sg_get_edit_mode(cfg_dir)
+        if mode == "off":
+            return
+        if mode == "warn":
+            sys.stderr.write(f"[support-guard] ПРЕДУПРЕЖДЕНИЕ: {reason}. Цель: {rp}\n")
+            return
+        head = "[support-guard] Редактирование отклонено: это объект типовой конфигурации на поддержке поставщика, прямое редактирование молча сломает будущие обновления."
+        cfe = "Рекомендуемый путь: внести доработку в расширение (навыки cfe-borrow / cfe-patch-method) — состояние поддержки менять не нужно, обновления вендора сохраняются."
+        off_note = "Снять проверку для этой базы: editingAllowedCheck = warn|off в .v8-project.json."
+        if code == "capability-off":
+            state = f"Состояние: у всей конфигурации выключена возможность изменения (режим read-only «из коробки») — поэтому объект «{rp}» редактировать нельзя."
+            fix = (
+                "Либо снять защиту явно (навык support-edit, два шага):\n"
+                f'  1. support-edit -Path "{cfg_dir}" -Capability on — включить возможность изменения (объекты пока остаются на замке);\n'
+                f'  2. support-edit -Path "{rp}" -Set editable — открыть этот объект для редактирования.\n'
+                "  Изменение применяется в базу полной загрузкой выгрузки и обходит механизм обновлений вендора."
+            )
+        elif code == "not-removed":
+            state = f"Состояние: объект «{rp}» на поддержке (не снят с поддержки) — его удаление разорвёт обновления вендора."
+            fix = (
+                "Либо сначала снять объект с поддержки, затем удалять:\n"
+                f'  support-edit -Path "{rp}" -Set off-support — объект уходит из-под обновлений, после этого удаление безопасно.'
+            )
+        else:
+            state = f"Состояние: объект «{rp}» на замке (возможность изменения конфигурации включена, но сам объект не редактируется)."
+            fix = (
+                "Либо разрешить редактирование этого объекта (навык support-edit, выбрать одно):\n"
+                f'  support-edit -Path "{rp}" -Set editable — редактировать и дальше получать обновления вендора (возможны конфликты слияния);\n'
+                f'  support-edit -Path "{rp}" -Set off-support — снять с поддержки: обновления по объекту больше не приходят.'
+            )
+        sys.stderr.write(head + "\n" + state + "\n" + cfe + "\n" + fix + "\n" + off_note + "\n")
+        sys.exit(1)
+    except SystemExit:
+        raise
+    except Exception:
+        return
+
+
+assert_edit_allowed(resolved_path, "editable")
+
 query_base_dir = os.path.dirname(resolved_path)
 
 # ── 2. Type system ──────────────────────────────────────────
@@ -210,7 +378,8 @@ def parse_field_shorthand(s):
 
 
 def read_field_properties(field_el):
-    props = {"dataPath": "", "field": "", "title": "", "type": "", "roles": [], "restrict": [], "_rawTypeText": ""}
+    props = {"dataPath": "", "field": "", "title": "", "type": "", "roles": [], "restrict": [], "_rawTypeText": "",
+             "_rawTitle": None, "_unknownChildren": []}
 
     for ch in field_el:
         if not isinstance(ch.tag, str):
@@ -221,12 +390,29 @@ def read_field_properties(field_el):
         elif ln == "field":
             props["field"] = (ch.text or "").strip()
         elif ln == "title":
+            # Preserve full multi-lang title OuterXml; also extract ru content for compat.
+            raw = etree.tostring(ch, encoding="unicode", with_tail=False)
+            raw = re.sub(r' xmlns(?::\w+)?="[^"]*"', "", raw)
+            props["_rawTitle"] = raw
             for item in ch:
                 if isinstance(item.tag, str) and local_name(item) == "item":
+                    lang = None
+                    content = None
                     for gc in item:
+                        if isinstance(gc.tag, str) and local_name(gc) == "lang":
+                            lang = (gc.text or "").strip()
                         if isinstance(gc.tag, str) and local_name(gc) == "content":
-                            props["title"] = (gc.text or "").strip()
+                            content = (gc.text or "").strip()
+                    if lang == "ru" and content is not None:
+                        props["title"] = content
         elif ln == "valueType":
+            # Preserve full <valueType> serialization so rebuild can re-emit qualifiers
+            # (StringQualifiers, NumberQualifiers, DateQualifiers, …) that aren't
+            # expressible via shorthand. Strip xmlns declarations that lxml re-emits when
+            # serializing a sub-element (parent context already provides them).
+            raw = etree.tostring(ch, encoding="unicode", with_tail=False)
+            raw = re.sub(r' xmlns(?::\w+)?="[^"]*"', "", raw)
+            props["_rawValueType"] = raw
             for gc in ch:
                 if isinstance(gc.tag, str) and local_name(gc) == "Type":
                     props["_rawTypeText"] = (gc.text or "").strip()
@@ -246,17 +432,31 @@ def read_field_properties(field_el):
                     mapped = rev_map.get(local_name(gc))
                     if mapped:
                         props["restrict"].append(mapped)
+        else:
+            # Defense in depth: preserve OuterXml of unknown children so rebuild
+            # doesn't silently drop them (custom <editFormat>, <appearance>, etc.).
+            raw = etree.tostring(ch, encoding="unicode", with_tail=False)
+            raw = re.sub(r' xmlns(?::\w+)?="[^"]*"', "", raw)
+            props["_unknownChildren"].append(raw)
     return props
 
 
 def parse_total_shorthand(s):
+    # "DataPath: Func" or "DataPath: Func(expr)" or "DataPath: ИмяРесурса" (identity)
     parts = s.split(":", 1)
     data_path = parts[0].strip()
     func_part = parts[1].strip()
+
+    agg_funcs = {'Сумма', 'Количество', 'Минимум', 'Максимум', 'Среднее',
+                 'Sum', 'Count', 'Min', 'Max', 'Avg',
+                 'Minimum', 'Maximum', 'Average'}
+
     if re.match(r'^\w+\(', func_part):
         return {"dataPath": data_path, "expression": func_part}
-    else:
+    elif func_part in agg_funcs:
         return {"dataPath": data_path, "expression": f"{func_part}({data_path})"}
+    else:
+        return {"dataPath": data_path, "expression": func_part}
 
 
 def parse_calc_shorthand(s):
@@ -299,11 +499,29 @@ def parse_calc_shorthand(s):
 
 
 def parse_param_shorthand(s):
-    result = {"name": "", "type": "", "value": None, "autoDates": False, "title": None}
+    result = {"name": "", "type": "", "value": None, "autoDates": False, "title": None, "hidden": False, "always": False, "availableValues": [], "valueListAllowed": False}
+
+    # Extract availableValue=... (must be before main parse — captures to end of string)
+    m_av = re.search(r'\s*availableValue=(.+)$', s)
+    if m_av:
+        result["availableValues"] = parse_available_value_list(m_av.group(1).strip())
+        s = re.sub(r'\s*availableValue=.+$', '', s).strip()
 
     if re.search(r'@autoDates', s):
         result["autoDates"] = True
         s = re.sub(r'\s*@autoDates', '', s)
+
+    if re.search(r'@valueList\b', s):
+        result["valueListAllowed"] = True
+        s = re.sub(r'\s*@valueList\b', '', s)
+
+    if re.search(r'@hidden\b', s):
+        result["hidden"] = True
+        s = re.sub(r'\s*@hidden\b', '', s)
+
+    if re.search(r'@always\b', s):
+        result["always"] = True
+        s = re.sub(r'\s*@always\b', '', s)
 
     # Extract optional [Title] (mirrors parse_field_shorthand)
     m = re.search(r'\[([^\]]*)\]', s)
@@ -311,12 +529,24 @@ def parse_param_shorthand(s):
         result["title"] = m.group(1).strip()
         s = re.sub(r'\s*\[[^\]]*\]\s*', ' ', s).strip()
 
-    m = re.match(r'^([^:]+):\s*(\S+)(\s*=\s*(.+))?$', s)
+    # Allow empty RHS (`= ` / `=`) as empty-value sentinel
+    m = re.match(r'^([^:]+):\s*(\S+)(\s*=\s*(.*))?$', s)
     if m:
         result["name"] = m.group(1).strip()
         result["type"] = resolve_type_str(m.group(2).strip())
-        if m.group(4):
-            result["value"] = m.group(4).strip()
+        if m.group(3) is not None:
+            rhs = m.group(4)
+            if rhs and rhs.strip():
+                items = parse_value_list(rhs.strip())
+                if len(items) >= 2:
+                    # Multi-value default → list; valueListAllowed implied
+                    result["value"] = items
+                    result["valueListAllowed"] = True
+                else:
+                    # Scalar (single item, quotes stripped) or empty sentinel
+                    result["value"] = items[0] if len(items) == 1 else ""
+            else:
+                result["value"] = ""
     else:
         result["name"] = s.strip()
 
@@ -416,7 +646,7 @@ def parse_data_param_shorthand(s):
 
     s = s.strip()
 
-    m = re.match(r'^([^=]+)=\s*(.+)$', s)
+    m = re.match(r'^([^=]+)=\s*(.*)$', s)
     if m:
         result["parameter"] = m.group(1).strip()
         val_str = m.group(2).strip()
@@ -430,7 +660,10 @@ def parse_data_param_shorthand(s):
             "TillEndOfThisWeek", "TillEndOfThisTenDays", "TillEndOfThisMonth",
             "TillEndOfThisQuarter", "TillEndOfThisHalfYear", "TillEndOfThisYear",
         ]
-        if val_str in period_variants:
+        # Empty / sentinel — record as "" so caller emits xsi:nil
+        if val_str == "" or val_str == "_" or val_str.lower() == "null":
+            result["value"] = ""
+        elif val_str in period_variants:
             result["value"] = {"variant": val_str}
         else:
             result["value"] = val_str
@@ -545,15 +778,17 @@ def parse_structure_shorthand(s):
         seg = segments[i].strip()
         group = {"type": "group"}
 
-        name_m = re.search(r'\s*@name=(.+)', seg)
+        name_m = re.search(r'@name=(?:"([^"]+)"|\'([^\']+)\'|(\S+))', seg)
         if name_m:
-            group["name"] = name_m.group(1).strip()
-            seg = re.sub(r'\s*@name=.+', '', seg).strip()
+            raw_name = name_m.group(1) or name_m.group(2) or name_m.group(3)
+            group["name"] = raw_name.strip()
+            seg = re.sub(r'\s*@name=(?:"[^"]+"|\'[^\']+\'|\S+)', '', seg).strip()
 
         if re.match(r'^(details|\u0434\u0435\u0442\u0430\u043b\u0438)$', seg, re.IGNORECASE):
             group["groupBy"] = []
         else:
-            group["groupBy"] = [seg]
+            fields = [f.strip() for f in re.split(r'\s*,\s*', seg) if f.strip()]
+            group["groupBy"] = fields
 
         if innermost is not None:
             group["children"] = [innermost]
@@ -571,63 +806,229 @@ def parse_output_param_shorthand(s):
     return {"key": s.strip(), "value": ""}
 
 
+def split_quoted_csv(s):
+    """Split on top-level commas, respecting single/double quoted spans.
+    Returns raw (un-stripped) item spans. Shared by availableValue and value-list parsing."""
+    items = []
+    if s is None:
+        return items
+    buf = []
+    in_quote = None
+    for ch in s:
+        if in_quote:
+            buf.append(ch)
+            if ch == in_quote:
+                in_quote = None
+        elif ch in ("'", '"'):
+            in_quote = ch
+            buf.append(ch)
+        elif ch == ',':
+            items.append("".join(buf))
+            buf = []
+        else:
+            buf.append(ch)
+    if buf:
+        items.append("".join(buf))
+    return items
+
+
+def strip_quotes(t):
+    """Strip a single surrounding pair of matching quotes; trims first."""
+    t = t.strip()
+    if len(t) >= 2 and ((t[0] == "'" and t[-1] == "'") or (t[0] == '"' and t[-1] == '"')):
+        return t[1:-1]
+    return t
+
+
+def parse_value_list(s):
+    """Return list of value strings (quotes stripped) split by top-level commas.
+    No ':' handling — values may contain colons (e.g. dateTime 2024-01-01T12:30:00)."""
+    if s is None:
+        return []
+    result = []
+    for raw in split_quoted_csv(s):
+        v = strip_quotes(raw)
+        if v != "":
+            result.append(v)
+    return result
+
+
+def parse_available_value_list(s):
+    """Returns list of {value, presentation} from comma-separated list.
+    Items can use single/double quotes (stripped). Quoted spans preserve commas/colons."""
+    if not s:
+        return []
+
+    items = split_quoted_csv(s)
+
+    result = []
+    for raw in items:
+        item = raw.strip()
+        if not item:
+            continue
+        # Find first ':' outside quotes
+        colon_idx = -1
+        q = None
+        for j, c in enumerate(item):
+            if q:
+                if c == q:
+                    q = None
+            elif c in ("'", '"'):
+                q = c
+            elif c == ':':
+                colon_idx = j
+                break
+        if colon_idx >= 0:
+            val_part = item[:colon_idx]
+            pres_part = item[colon_idx + 1:]
+            result.append({"value": strip_quotes(val_part), "presentation": strip_quotes(pres_part)})
+        else:
+            result.append({"value": strip_quotes(item), "presentation": ""})
+    return result
+
+
+def build_available_value_fragment(item, declared_type, indent):
+    """Return XML lines for a single <availableValue> block."""
+    lines = [f"{indent}<availableValue>"]
+    if is_empty_value(item.get("value")):
+        empty_xml = build_empty_value_xml(declared_type, f"{indent}\t", "", "value", False)
+        if empty_xml:
+            lines.append(empty_xml)
+    else:
+        for vl in build_param_value_xml(declared_type, item["value"], f"{indent}\t"):
+            lines.append(vl)
+    if item.get("presentation"):
+        lines.append(f'{indent}\t<presentation xsi:type="v8:LocalStringType">')
+        lines.append(f"{indent}\t\t<v8:item>")
+        lines.append(f"{indent}\t\t\t<v8:lang>ru</v8:lang>")
+        lines.append(f"{indent}\t\t\t<v8:content>{esc_xml(item['presentation'])}</v8:content>")
+        lines.append(f"{indent}\t\t</v8:item>")
+        lines.append(f"{indent}\t</presentation>")
+    lines.append(f"{indent}</availableValue>")
+    return lines
+
+
 # ── 4. Build-* functions (XML fragment generators) ──────────
 
 def build_value_type_xml(type_str, indent):
     if not type_str:
         return ""
-    type_str = resolve_type_str(type_str)
+
+    # Composite: list/tuple → concatenate per-type fragments
+    if isinstance(type_str, (list, tuple)):
+        parts = []
+        for t in type_str:
+            p = build_value_type_xml(str(t), indent)
+            if p:
+                parts.append(p)
+        return "\n".join(parts)
+
+    type_str = resolve_type_str(str(type_str))
     lines = []
 
     if type_str == "boolean":
         lines.append(f"{indent}<v8:Type>xs:boolean</v8:Type>")
-        return "\r\n".join(lines)
+        return "\n".join(lines)
 
-    m = re.match(r'^string(\((\d+)\))?$', type_str)
+    # string, string(N), string(N,fix) — fix → AllowedLength=Fixed
+    m = re.match(r'^string(\((\d+)(,(fix|fixed))?\))?$', type_str)
     if m:
         length = m.group(2) if m.group(2) else "0"
+        al = "Fixed" if m.group(4) else "Variable"
         lines.append(f"{indent}<v8:Type>xs:string</v8:Type>")
         lines.append(f"{indent}<v8:StringQualifiers>")
         lines.append(f"{indent}\t<v8:Length>{length}</v8:Length>")
-        lines.append(f"{indent}\t<v8:AllowedLength>Variable</v8:AllowedLength>")
+        lines.append(f"{indent}\t<v8:AllowedLength>{al}</v8:AllowedLength>")
         lines.append(f"{indent}</v8:StringQualifiers>")
-        return "\r\n".join(lines)
+        return "\n".join(lines)
 
-    m = re.match(r'^decimal\((\d+),(\d+)(,nonneg)?\)$', type_str)
+    # decimal — bare = 10,2; decimal(N) = N,0
+    m = re.match(r'^decimal(\((\d+)(,(\d+))?(,nonneg)?\))?$', type_str)
     if m:
-        digits, fraction = m.group(1), m.group(2)
-        sign = "Nonnegative" if m.group(3) else "Any"
+        if not m.group(1):
+            digits, fraction, sign = "10", "2", "Any"
+        else:
+            digits = m.group(2)
+            fraction = m.group(4) if m.group(4) else "0"
+            sign = "Nonnegative" if m.group(5) else "Any"
         lines.append(f"{indent}<v8:Type>xs:decimal</v8:Type>")
         lines.append(f"{indent}<v8:NumberQualifiers>")
         lines.append(f"{indent}\t<v8:Digits>{digits}</v8:Digits>")
         lines.append(f"{indent}\t<v8:FractionDigits>{fraction}</v8:FractionDigits>")
         lines.append(f"{indent}\t<v8:AllowedSign>{sign}</v8:AllowedSign>")
         lines.append(f"{indent}</v8:NumberQualifiers>")
-        return "\r\n".join(lines)
+        return "\n".join(lines)
 
-    m = re.match(r'^(date|dateTime)$', type_str)
+    # date / dateTime / time — all xs:dateTime
+    m = re.match(r'^(date|dateTime|time)$', type_str)
     if m:
-        fractions = "Date" if type_str == "date" else "DateTime"
+        fractions = {"date": "Date", "dateTime": "DateTime", "time": "Time"}[type_str]
         lines.append(f"{indent}<v8:Type>xs:dateTime</v8:Type>")
         lines.append(f"{indent}<v8:DateQualifiers>")
         lines.append(f"{indent}\t<v8:DateFractions>{fractions}</v8:DateFractions>")
         lines.append(f"{indent}</v8:DateQualifiers>")
-        return "\r\n".join(lines)
+        return "\n".join(lines)
 
     if type_str == "StandardPeriod":
         lines.append(f"{indent}<v8:Type>v8:StandardPeriod</v8:Type>")
-        return "\r\n".join(lines)
+        return "\n".join(lines)
 
     if re.match(r'^(CatalogRef|DocumentRef|EnumRef|ChartOfAccountsRef|ChartOfCharacteristicTypesRef)\.', type_str):
         lines.append(f'{indent}<v8:Type xmlns:d5p1="http://v8.1c.ru/8.1/data/enterprise/current-config">d5p1:{esc_xml(type_str)}</v8:Type>')
-        return "\r\n".join(lines)
+        return "\n".join(lines)
 
     if "." in type_str:
         lines.append(f'{indent}<v8:Type xmlns:d5p1="http://v8.1c.ru/8.1/data/enterprise/current-config">d5p1:{esc_xml(type_str)}</v8:Type>')
-        return "\r\n".join(lines)
+        return "\n".join(lines)
 
     lines.append(f"{indent}<v8:Type>{esc_xml(type_str)}</v8:Type>")
-    return "\r\n".join(lines)
+    return "\n".join(lines)
+
+
+def is_empty_value(v):
+    """Empty sentinel — None / '' / '_' / 'null' (case-insensitive)."""
+    if v is None:
+        return True
+    s = str(v).strip()
+    if s == "":
+        return True
+    if s == "_":
+        return True
+    if s.lower() == "null":
+        return True
+    return False
+
+
+def build_empty_value_xml(type_str, indent, tag_prefix="", tag_name="value", value_list_allowed=False):
+    """Type-aware empty <value> fragment. Returns None when valueListAllowed (omit)."""
+    if value_list_allowed:
+        return None
+    t = "" if type_str is None else str(type_str)
+    # Strip well-known XML schema prefixes so callers can pass raw <v8:Type> text
+    t = re.sub(r'^xs:', '', t)
+    t = re.sub(r'^v8:', '', t)
+    t = re.sub(r'^d\d+p\d+:', '', t)
+    pf, tn = tag_prefix, tag_name
+    lines = []
+    if t == "":
+        lines.append(f'{indent}<{pf}{tn} xsi:nil="true"/>')
+    elif t == "StandardPeriod":
+        lines.append(f'{indent}<{pf}{tn} xsi:type="v8:StandardPeriod">')
+        lines.append(f'{indent}\t<v8:variant xsi:type="v8:StandardPeriodVariant">Custom</v8:variant>')
+        lines.append(f'{indent}\t<v8:startDate>0001-01-01T00:00:00</v8:startDate>')
+        lines.append(f'{indent}\t<v8:endDate>0001-01-01T00:00:00</v8:endDate>')
+        lines.append(f'{indent}</{pf}{tn}>')
+    elif re.match(r'^string', t):
+        lines.append(f'{indent}<{pf}{tn} xsi:type="xs:string"/>')
+    elif re.match(r'^(date|time)', t):
+        lines.append(f'{indent}<{pf}{tn} xsi:type="xs:dateTime">0001-01-01T00:00:00</{pf}{tn}>')
+    elif re.match(r'^decimal', t):
+        lines.append(f'{indent}<{pf}{tn} xsi:type="xs:decimal">0</{pf}{tn}>')
+    elif t == "boolean":
+        lines.append(f'{indent}<{pf}{tn} xsi:type="xs:boolean">false</{pf}{tn}>')
+    else:
+        lines.append(f'{indent}<{pf}{tn} xsi:nil="true"/>')
+    return "\n".join(lines)
 
 
 def build_mltext_xml(tag, text, indent):
@@ -639,7 +1040,20 @@ def build_mltext_xml(tag, text, indent):
         f"{indent}\t</v8:item>",
         f"{indent}</{tag}>",
     ]
-    return "\r\n".join(lines)
+    return "\n".join(lines)
+
+
+def patch_mltext_ru(raw_outer_xml, new_ru_text, indent):
+    """Patch the ru <v8:content> within an existing multi-lang title OuterXml,
+    preserving en/uk/etc. siblings. Mirrors PS Patch-MLTextRu."""
+    escaped = esc_xml(new_ru_text)
+    ru_item_pat = r"(<v8:item>\s*<v8:lang>ru</v8:lang>\s*<v8:content>)[^<]*(</v8:content>\s*</v8:item>)"
+    if re.search(ru_item_pat, raw_outer_xml):
+        return re.sub(ru_item_pat, lambda m: m.group(1) + escaped + m.group(2), raw_outer_xml)
+    prep = f"{indent}\t<v8:item>\n{indent}\t\t<v8:lang>ru</v8:lang>\n{indent}\t\t<v8:content>{escaped}</v8:content>\n{indent}\t</v8:item>"
+    if "<v8:item>" in raw_outer_xml:
+        return re.sub(r"(\s*)<v8:item>", lambda m: "\n" + prep + m.group(1) + "<v8:item>", raw_outer_xml, count=1)
+    return re.sub(r"(<(?:\w+:)?title[^>]*>)", lambda m: m.group(1) + "\n" + prep + "\n" + indent, raw_outer_xml, count=1)
 
 
 def build_role_xml(roles, indent):
@@ -653,7 +1067,7 @@ def build_role_xml(roles, indent):
         else:
             lines.append(f"{indent}\t<dcscom:{role}>true</dcscom:{role}>")
     lines.append(f"{indent}</role>")
-    return "\r\n".join(lines)
+    return "\n".join(lines)
 
 
 def build_restriction_xml(restrict, indent):
@@ -666,7 +1080,7 @@ def build_restriction_xml(restrict, indent):
         if xml_name:
             lines.append(f"{indent}\t<{xml_name}>true</{xml_name}>")
     lines.append(f"{indent}</useRestriction>")
-    return "\r\n".join(lines)
+    return "\n".join(lines)
 
 
 def build_field_fragment(parsed, indent):
@@ -675,7 +1089,15 @@ def build_field_fragment(parsed, indent):
     lines.append(f"{i}\t<dataPath>{esc_xml(parsed['dataPath'])}</dataPath>")
     lines.append(f"{i}\t<field>{esc_xml(parsed['field'])}</field>")
 
-    if parsed.get("title"):
+    # Title: prefer raw multi-lang OuterXml (preserves en/uk/etc.). When shorthand
+    # provides a new ru text different from existing, patch the ru content. Otherwise
+    # emit raw as-is or build ru-only from shorthand if there was no prior title.
+    if parsed.get("_rawTitle"):
+        if parsed.get("title") and parsed["title"] != parsed.get("_existingTitleRu"):
+            lines.append(f"{i}\t" + patch_mltext_ru(parsed["_rawTitle"], parsed["title"], f"{i}\t"))
+        else:
+            lines.append(f"{i}\t" + parsed["_rawTitle"])
+    elif parsed.get("title"):
         lines.append(build_mltext_xml("title", parsed["title"], f"{i}\t"))
 
     if parsed.get("restrict"):
@@ -685,13 +1107,21 @@ def build_field_fragment(parsed, indent):
     if role_xml:
         lines.append(role_xml)
 
-    if parsed.get("type"):
+    if parsed.get("rawValueType"):
+        # Preserve original <valueType> verbatim — keeps qualifiers (StringQualifiers,
+        # NumberQualifiers, DateQualifiers, …) that aren't expressible via shorthand.
+        lines.append(f"{i}\t" + parsed["rawValueType"])
+    elif parsed.get("type"):
         lines.append(f"{i}\t<valueType>")
         lines.append(build_value_type_xml(parsed["type"], f"{i}\t\t"))
         lines.append(f"{i}\t</valueType>")
 
+    # Defense in depth: re-emit OuterXml of unknown children captured by Read.
+    for raw in (parsed.get("_unknownChildren") or []):
+        lines.append(f"{i}\t" + raw)
+
     lines.append(f"{i}</field>")
-    return "\r\n".join(lines)
+    return "\n".join(lines)
 
 
 def build_total_fragment(parsed, indent):
@@ -702,7 +1132,7 @@ def build_total_fragment(parsed, indent):
         f"{i}\t<expression>{esc_xml(parsed['expression'])}</expression>",
         f"{i}</totalField>",
     ]
-    return "\r\n".join(lines)
+    return "\n".join(lines)
 
 
 def build_calc_field_fragment(parsed, indent):
@@ -721,7 +1151,48 @@ def build_calc_field_fragment(parsed, indent):
         lines.append(build_value_type_xml(parsed["type"], f"{i}\t\t"))
         lines.append(f"{i}\t</valueType>")
     lines.append(f"{i}</calculatedField>")
-    return "\r\n".join(lines)
+    return "\n".join(lines)
+
+
+def build_param_value_xml(type_str, value, indent, tag_name="value", tag_ns=""):
+    """Return list of XML lines for <value xsi:type=...>...</value>."""
+    val_str = "" if value is None else str(value)
+    open_tag = f"{tag_ns}:{tag_name}" if tag_ns else tag_name
+    lines = []
+
+    if type_str == "StandardPeriod":
+        lines.append(f'{indent}<{open_tag} xsi:type="v8:StandardPeriod">')
+        lines.append(f'{indent}\t<v8:variant xsi:type="v8:StandardPeriodVariant">{esc_xml(val_str)}</v8:variant>')
+        lines.append(f"{indent}\t<v8:startDate>0001-01-01T00:00:00</v8:startDate>")
+        lines.append(f"{indent}\t<v8:endDate>0001-01-01T00:00:00</v8:endDate>")
+        lines.append(f"{indent}</{open_tag}>")
+        return lines
+
+    t = type_str or ""
+    xsi = None
+    if t.startswith("date"):
+        xsi = "xs:dateTime"
+    elif t == "boolean":
+        xsi = "xs:boolean"
+    elif t.startswith("decimal"):
+        xsi = "xs:decimal"
+    elif t.startswith("string"):
+        xsi = "xs:string"
+    elif re.match(r'^(CatalogRef|DocumentRef|EnumRef|ChartOfAccountsRef|ChartOfCharacteristicTypesRef|ChartOfCalculationTypesRef|BusinessProcessRef|TaskRef|ExchangePlanRef)\.', t):
+        xsi = "dcscor:DesignTimeValue"
+    else:
+        if re.match(r'^\d{4}-\d{2}-\d{2}T', val_str):
+            xsi = "xs:dateTime"
+        elif val_str in ("true", "false"):
+            xsi = "xs:boolean"
+        elif re.match(r'^(Перечисление|Справочник|ПланСчетов|Документ|ПланВидовХарактеристик|ПланВидовРасчета|БизнесПроцесс|Задача|РегистрСведений|ПланОбмена)\.', val_str) or \
+             re.match(r'^(Catalog|Document|Enum|ChartOfAccounts|ChartOfCharacteristicTypes|ChartOfCalculationTypes|BusinessProcess|Task|InformationRegister|ExchangePlan)\.', val_str):
+            xsi = "dcscor:DesignTimeValue"
+        else:
+            xsi = "xs:string"
+
+    lines.append(f'{indent}<{open_tag} xsi:type="{xsi}">{esc_xml(val_str)}</{open_tag}>')
+    return lines
 
 
 def build_param_fragment(parsed, indent):
@@ -738,25 +1209,37 @@ def build_param_fragment(parsed, indent):
         lines.append(build_value_type_xml(parsed["type"], f"{i}\t\t"))
         lines.append(f"{i}\t</valueType>")
 
-    if parsed["value"] is not None:
-        val_str = str(parsed["value"])
-        if parsed.get("type") == "StandardPeriod":
-            lines.append(f'{i}\t<value xsi:type="v8:StandardPeriod">')
-            lines.append(f'{i}\t\t<v8:variant xsi:type="v8:StandardPeriodVariant">{esc_xml(val_str)}</v8:variant>')
-            lines.append(f"{i}\t\t<v8:startDate>0001-01-01T00:00:00</v8:startDate>")
-            lines.append(f"{i}\t\t<v8:endDate>0001-01-01T00:00:00</v8:endDate>")
-            lines.append(f"{i}\t</value>")
-        elif parsed.get("type", "").startswith("date"):
-            lines.append(f'{i}\t<value xsi:type="xs:dateTime">{esc_xml(val_str)}</value>')
-        elif parsed.get("type") == "boolean":
-            lines.append(f'{i}\t<value xsi:type="xs:boolean">{esc_xml(val_str)}</value>')
-        elif parsed.get("type", "").startswith("decimal"):
-            lines.append(f'{i}\t<value xsi:type="xs:decimal">{esc_xml(val_str)}</value>')
+    vla = bool(parsed.get("valueListAllowed"))
+    if isinstance(parsed["value"], list):
+        # Multi-value default (value-list): one <value> per item
+        for v in parsed["value"]:
+            for vl in build_param_value_xml(parsed.get("type", ""), v, f"{i}\t"):
+                lines.append(vl)
+    elif parsed["value"] is not None:
+        if is_empty_value(parsed["value"]):
+            empty_xml = build_empty_value_xml(parsed.get("type", ""), f"{i}\t", "", "value", vla)
+            if empty_xml:
+                lines.append(empty_xml)
         else:
-            lines.append(f'{i}\t<value xsi:type="xs:string">{esc_xml(val_str)}</value>')
+            for vl in build_param_value_xml(parsed.get("type", ""), parsed["value"], f"{i}\t"):
+                lines.append(vl)
+
+    if parsed.get("hidden"):
+        lines.append(f"{i}\t<useRestriction>true</useRestriction>")
+        lines.append(f"{i}\t<availableAsField>false</availableAsField>")
+
+    if vla:
+        lines.append(f"{i}\t<valueListAllowed>true</valueListAllowed>")
+
+    for av in parsed.get("availableValues", []) or []:
+        for l in build_available_value_fragment(av, parsed.get("type", ""), f"{i}\t"):
+            lines.append(l)
+
+    if parsed.get("always"):
+        lines.append(f"{i}\t<use>Always</use>")
 
     lines.append(f"{i}</parameter>")
-    fragments.append("\r\n".join(lines))
+    fragments.append("\n".join(lines))
 
     if parsed.get("autoDates"):
         param_name = parsed["name"]
@@ -773,7 +1256,7 @@ def build_param_fragment(parsed, indent):
             f"{i}\t<expression>{esc_xml('&' + param_name + '.\u0414\u0430\u0442\u0430\u041d\u0430\u0447\u0430\u043b\u0430')}</expression>",
             f"{i}</parameter>",
         ]
-        fragments.append("\r\n".join(b_lines))
+        fragments.append("\n".join(b_lines))
 
         e_lines = [
             f"{i}<parameter>",
@@ -787,7 +1270,7 @@ def build_param_fragment(parsed, indent):
             f"{i}\t<expression>{esc_xml('&' + param_name + '.\u0414\u0430\u0442\u0430\u041e\u043a\u043e\u043d\u0447\u0430\u043d\u0438\u044f')}</expression>",
             f"{i}</parameter>",
         ]
-        fragments.append("\r\n".join(e_lines))
+        fragments.append("\n".join(e_lines))
 
     return fragments
 
@@ -814,7 +1297,7 @@ def build_filter_item_fragment(parsed, indent):
         lines.append(f"{i}\t<dcsset:userSettingID>{esc_xml(uid)}</dcsset:userSettingID>")
 
     lines.append(f"{i}</dcsset:item>")
-    return "\r\n".join(lines)
+    return "\n".join(lines)
 
 
 def build_selection_item_fragment(field_name, indent):
@@ -845,13 +1328,13 @@ def build_selection_item_fragment(field_name, indent):
             lines.append(f"{i}\t</dcsset:item>")
         lines.append(f"{i}\t<dcsset:placement>Auto</dcsset:placement>")
         lines.append(f"{i}</dcsset:item>")
-        return "\r\n".join(lines)
+        return "\n".join(lines)
     lines = [
         f'{i}<dcsset:item xsi:type="dcsset:SelectedItemField">',
         f"{i}\t<dcsset:field>{esc_xml(field_name)}</dcsset:field>",
         f"{i}</dcsset:item>",
     ]
-    return "\r\n".join(lines)
+    return "\n".join(lines)
 
 
 def build_data_param_fragment(parsed, indent):
@@ -871,6 +1354,8 @@ def build_data_param_fragment(parsed, indent):
             lines.append(f"{i}\t\t<v8:startDate>0001-01-01T00:00:00</v8:startDate>")
             lines.append(f"{i}\t\t<v8:endDate>0001-01-01T00:00:00</v8:endDate>")
             lines.append(f"{i}\t</dcscor:value>")
+        elif is_empty_value(val):
+            lines.append(f'{i}\t<dcscor:value xsi:nil="true"/>')
         elif re.match(r'^\d{4}-\d{2}-\d{2}T', str(val)):
             lines.append(f'{i}\t<dcscor:value xsi:type="xs:dateTime">{esc_xml(str(val))}</dcscor:value>')
         elif str(val) in ("true", "false"):
@@ -886,7 +1371,7 @@ def build_data_param_fragment(parsed, indent):
         lines.append(f"{i}\t<dcsset:userSettingID>{esc_xml(uid)}</dcsset:userSettingID>")
 
     lines.append(f"{i}</dcscor:item>")
-    return "\r\n".join(lines)
+    return "\n".join(lines)
 
 
 def build_order_item_fragment(parsed, indent):
@@ -899,7 +1384,7 @@ def build_order_item_fragment(parsed, indent):
         f"{i}\t<dcsset:orderType>{parsed['direction']}</dcsset:orderType>",
         f"{i}</dcsset:item>",
     ]
-    return "\r\n".join(lines)
+    return "\n".join(lines)
 
 
 def build_data_set_link_fragment(parsed, indent):
@@ -914,7 +1399,7 @@ def build_data_set_link_fragment(parsed, indent):
     if parsed.get("parameter"):
         lines.append(f"{i}\t<parameter>{esc_xml(parsed['parameter'])}</parameter>")
     lines.append(f"{i}</dataSetLink>")
-    return "\r\n".join(lines)
+    return "\n".join(lines)
 
 
 def build_data_set_query_fragment(parsed, indent):
@@ -926,7 +1411,7 @@ def build_data_set_query_fragment(parsed, indent):
         f"{i}\t<query>{esc_xml(parsed['query'])}</query>",
         f"{i}</dataSet>",
     ]
-    return "\r\n".join(lines)
+    return "\n".join(lines)
 
 
 def build_variant_fragment(parsed, indent):
@@ -951,7 +1436,7 @@ def build_variant_fragment(parsed, indent):
         f"{i}\t</dcsset:settings>",
         f"{i}</settingsVariant>",
     ]
-    return "\r\n".join(lines)
+    return "\n".join(lines)
 
 
 def _emit_filter_comparison(lines, f, indent):
@@ -1018,7 +1503,7 @@ def build_conditional_appearance_item_fragment(parsed, indent):
     lines.append(f"{i}\t</dcsset:appearance>")
 
     lines.append(f"{i}</dcsset:item>")
-    return "\r\n".join(lines)
+    return "\n".join(lines)
 
 
 def build_structure_item_fragment(item, indent):
@@ -1055,7 +1540,7 @@ def build_structure_item_fragment(item, indent):
             lines.append(build_structure_item_fragment(child, f"{i}\t"))
 
     lines.append(f"{i}</dcsset:item>")
-    return "\r\n".join(lines)
+    return "\n".join(lines)
 
 
 def build_output_param_fragment(parsed, indent):
@@ -1078,7 +1563,7 @@ def build_output_param_fragment(parsed, indent):
         lines.append(f'{i}\t<dcscor:value xsi:type="{ptype}">{esc_xml(val)}</dcscor:value>')
 
     lines.append(f"{i}</dcscor:item>")
-    return "\r\n".join(lines)
+    return "\n".join(lines)
 
 
 # ── 5. XML helpers ──────────────────────────────────────────
@@ -1242,6 +1727,118 @@ def set_or_create_child_element_with_attr(parent, ln, ns_uri, value, xsi_type, i
             insert_before_element(parent, node, None, indent)
 
 
+def get_all_data_sets():
+    return [c for c in xml_doc
+            if isinstance(c.tag, str) and local_name(c) == "dataSet" and etree.QName(c.tag).namespace == SCH_NS]
+
+
+def normalize_line_endings(s):
+    if s is None:
+        return s
+    return s.replace("\r\n", "\n").replace("\r", "\n")
+
+
+def escape_whitespace(s):
+    out = []
+    for ch in s:
+        code = ord(ch)
+        if ch == "\n": out.append("\\n")
+        elif ch == "\r": out.append("\\r")
+        elif ch == "\t": out.append("\\t")
+        elif code < 32 or code == 0xA0 or (0x2000 <= code <= 0x200F) or code == 0xFEFF:
+            out.append(f"\\u{code:04X}")
+        else:
+            out.append(ch)
+    return "".join(out)
+
+
+def collapse_whitespace(s):
+    return re.sub(r"[\s ]+", " ", s).strip()
+
+
+def find_longest_prefix_match(haystack, needle):
+    """Binary search: largest L such that needle[:L] is a substring of haystack."""
+    if not needle or not haystack:
+        return (0, -1)
+    first_idx = haystack.find(needle[0])
+    if first_idx < 0:
+        return (0, -1)
+    lo, hi = 1, len(needle)
+    best_len, best_off = 1, first_idx
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        idx = haystack.find(needle[:mid])
+        if idx >= 0:
+            best_len, best_off = mid, idx
+            lo = mid + 1
+        else:
+            hi = mid - 1
+    return (best_len, best_off)
+
+
+def format_patch_query_not_found(old_str, query_text, current_ds_node, ds_name):
+    lines = [f"Substring not found in query of dataset '{ds_name}'."]
+
+    # Step 1 — cross-dataset probe
+    for ds in get_all_data_sets():
+        if ds is current_ds_node:
+            continue
+        q = find_first_element(ds, ["query"], SCH_NS)
+        if q is None:
+            continue
+        qt = normalize_line_endings(q.text or "")
+        if old_str in qt:
+            other = get_data_set_name(ds)
+            lines.append(f"Found in dataset '{other}' instead — wrong -DataSet?")
+            return "\n".join(lines)
+
+    # Step 2 — tolerant probe
+    norm_needle = collapse_whitespace(old_str)
+    norm_hay = collapse_whitespace(query_text)
+    tolerant = bool(norm_needle) and (norm_needle in norm_hay)
+
+    # Step 3 — divergence
+    matched, off = find_longest_prefix_match(query_text, old_str)
+    divergence = None
+    if 0 < matched < len(old_str):
+        query_pos = off + matched
+        before_len = min(20, matched)
+        divergence = {
+            "matched": matched,
+            "total": len(old_str),
+            "before": old_str[matched - before_len:matched],
+            "search_char": old_str[matched],
+            "query_char": query_text[query_pos] if query_pos < len(query_text) else None,
+        }
+
+    if tolerant:
+        lines.append("Not found exactly, but would match with whitespace normalized (tabs/spaces/NBSP).")
+        if divergence:
+            lines.append(f"Diverged at offset {divergence['matched']} of {divergence['total']}:")
+            lines.append(f"  before:    '{escape_whitespace(divergence['before'])}'")
+            sc = divergence['search_char']
+            lines.append(f"  in search: '{escape_whitespace(sc)}' (U+{ord(sc):04X})")
+            qc = divergence['query_char']
+            if qc is not None:
+                lines.append(f"  in query:  '{escape_whitespace(qc)}' (U+{ord(qc):04X})")
+        return "\n".join(lines)
+
+    if matched == 0:
+        lines.append(f"No common prefix with query. Check -DataSet (current: '{ds_name}').")
+        return "\n".join(lines)
+
+    lines.append(f"Matched first {divergence['matched']} of {divergence['total']} chars, then diverged:")
+    lines.append(f"  before:    '{escape_whitespace(divergence['before'])}'")
+    sc = divergence['search_char']
+    lines.append(f"  in search: '{escape_whitespace(sc)}' (U+{ord(sc):04X})")
+    qc = divergence['query_char']
+    if qc is not None:
+        lines.append(f"  in query:  '{escape_whitespace(qc)}' (U+{ord(qc):04X})")
+    else:
+        lines.append("  in query:  (end of query)")
+    return "\n".join(lines)
+
+
 def resolve_data_set():
     root_el = xml_doc
 
@@ -1355,16 +1952,28 @@ def get_container_child_indent(container):
 
 # ── 6. Load XML ─────────────────────────────────────────────
 
+# Capture raw original BEFORE parse — needed at save time to restore exact root
+# <DataCompositionSchema xmlns=...> opening tag (lxml's tostring() collapses multi-line
+# xmlns into one line) and to detect NO-OP via byte-equality as a safety net.
+with open(resolved_path, "rb") as _f:
+    raw_original_bytes = _f.read()
+raw_original_text = raw_original_bytes.lstrip(b"\xef\xbb\xbf").decode("utf-8")
+_root_open_m = re.search(r"<DataCompositionSchema\b[^>]*>", raw_original_text, re.DOTALL)
+raw_root_opening = _root_open_m.group(0) if _root_open_m else None
+
+# Detect line ending convention so save can normalize back to whatever the source used.
+line_ending = "\r\n" if "\r\n" in raw_original_text else "\n"
+
 xml_parser = etree.XMLParser(remove_blank_text=False)
 tree = etree.parse(resolved_path, xml_parser)
 xml_doc = tree.getroot()
 
 # ── 7. Batch value splitting ────────────────────────────────
 
-if operation in ("set-query", "set-structure", "add-dataSet"):
+if operation in ("set-query", "set-structure", "modify-structure", "add-dataSet"):
     values = [value_arg]
 elif operation == "patch-query":
-    values = [v for v in value_arg.split(";;") if v.strip()]
+    values = [v.strip() for v in value_arg.split(";;") if v.strip()]
 elif operation == "add-drilldown":
     if ";;" in value_arg:
         values = [v.strip() for v in value_arg.split(";;") if v.strip()]
@@ -1395,7 +2004,7 @@ if operation == "add-field":
         for node in nodes:
             insert_before_element(ds_node, node, ref_node, child_indent)
 
-        print(f'[OK] Field "{parsed["dataPath"]}" added to dataset "{ds_name}"')
+        dirty = True; print(f'[OK] Field "{parsed["dataPath"]}" added to dataset "{ds_name}"')
 
         if not no_selection:
             settings = resolve_variant_settings()
@@ -1410,7 +2019,7 @@ if operation == "add-field":
                 sel_nodes = import_fragment(xml_doc, sel_xml)
                 for node in sel_nodes:
                     insert_before_element(selection, node, None, sel_indent)
-                print(f'[OK] Field "{parsed["dataPath"]}" added to selection of variant "{var_name}"')
+                dirty = True; print(f'[OK] Field "{parsed["dataPath"]}" added to selection of variant "{var_name}"')
 
 elif operation == "add-total":
     for val in values:
@@ -1442,7 +2051,7 @@ elif operation == "add-total":
         for node in nodes:
             insert_before_element(xml_doc, node, ref_node, child_indent)
 
-        print(f'[OK] TotalField "{parsed["dataPath"]}" = {parsed["expression"]} added')
+        dirty = True; print(f'[OK] TotalField "{parsed["dataPath"]}" = {parsed["expression"]} added')
 
 elif operation == "add-calculated-field":
     for val in values:
@@ -1473,7 +2082,7 @@ elif operation == "add-calculated-field":
         for node in nodes:
             insert_before_element(xml_doc, node, ref_node, child_indent)
 
-        print(f'[OK] CalculatedField "{parsed["dataPath"]}" = {parsed["expression"]} added')
+        dirty = True; print(f'[OK] CalculatedField "{parsed["dataPath"]}" = {parsed["expression"]} added')
 
         if not no_selection:
             settings = resolve_variant_settings()
@@ -1488,7 +2097,7 @@ elif operation == "add-calculated-field":
                 sel_nodes = import_fragment(xml_doc, sel_xml)
                 for node in sel_nodes:
                     insert_before_element(selection, node, None, sel_indent)
-                print(f'[OK] Field "{parsed["dataPath"]}" added to selection of variant "{var_name}"')
+                dirty = True; print(f'[OK] Field "{parsed["dataPath"]}" added to selection of variant "{var_name}"')
 
 elif operation == "add-parameter":
     for val in values:
@@ -1520,9 +2129,9 @@ elif operation == "add-parameter":
             for node in nodes:
                 insert_before_element(xml_doc, node, ref_node, child_indent)
 
-        print(f'[OK] Parameter "{parsed["name"]}" added')
+        dirty = True; print(f'[OK] Parameter "{parsed["name"]}" added')
         if parsed.get("autoDates"):
-            print('[OK] Auto-parameters "\u0414\u0430\u0442\u0430\u041d\u0430\u0447\u0430\u043b\u0430", "\u0414\u0430\u0442\u0430\u041e\u043a\u043e\u043d\u0447\u0430\u043d\u0438\u044f" added')
+            dirty = True; print('[OK] Auto-parameters "\u0414\u0430\u0442\u0430\u041d\u0430\u0447\u0430\u043b\u0430", "\u0414\u0430\u0442\u0430\u041e\u043a\u043e\u043d\u0447\u0430\u043d\u0438\u044f" added')
 
 elif operation == "modify-parameter":
     for val in values:
@@ -1537,6 +2146,15 @@ elif operation == "modify-parameter":
         param_name = parts[0].strip()
         rest = parts[1].strip() if len(parts) > 1 else ""
 
+        flag_hidden = False
+        flag_always = False
+        if re.search(r'@hidden\b', rest):
+            flag_hidden = True
+            rest = re.sub(r'\s*@hidden\b', '', rest).strip()
+        if re.search(r'@always\b', rest):
+            flag_always = True
+            rest = re.sub(r'\s*@always\b', '', rest).strip()
+
         param_el = find_element_by_child_value(xml_doc, "parameter", "name", param_name, SCH_NS)
         if param_el is None:
             print(f'[WARN] Parameter "{param_name}" not found -- skipped')
@@ -1547,14 +2165,22 @@ elif operation == "modify-parameter":
         # Set/replace title (must come right after <name>, before <valueType>)
         if title_val is not None:
             existing_title = next((ch for ch in param_el if isinstance(ch.tag, str) and local_name(ch) == "title"), None)
+            # If existing title is multi-lang (has >1 <v8:item>), patch ru content
+            # while preserving other languages. Otherwise rebuild as ru-only.
+            title_frag = None
             if existing_title is not None:
+                raw_title = etree.tostring(existing_title, encoding="unicode", with_tail=False)
+                raw_title = re.sub(r' xmlns(?::\w+)?="[^"]*"', "", raw_title)
+                if raw_title.count("<v8:item>") > 1:
+                    title_frag = child_indent + patch_mltext_ru(raw_title, title_val, child_indent)
                 remove_node_with_whitespace(existing_title)
+            if title_frag is None:
+                title_frag = build_mltext_xml("title", title_val, child_indent)
             # Insert before the first child after <name>
             title_ref = next((ch for ch in param_el if isinstance(ch.tag, str) and local_name(ch) != "name"), None)
-            title_frag = build_mltext_xml("title", title_val, child_indent)
             for node in import_fragment(xml_doc, title_frag):
                 insert_before_element(param_el, node, title_ref, child_indent)
-            print(f'[OK] Parameter "{param_name}": title set to "{title_val}"')
+            dirty = True; print(f'[OK] Parameter "{param_name}": title set to "{title_val}"')
 
         # Separate availableValue=... from simple kv pairs
         simple_rest = rest
@@ -1564,14 +2190,62 @@ elif operation == "modify-parameter":
             simple_rest = rest[:av_idx].strip()
             av_part = rest[av_idx:]
 
+        # Separate a multi-value value=... (list) — kv-regex below grabs only a single
+        # \S+ token, so a comma-separated list (with spaces) wouldn't be captured.
+        value_list_items = None
+        vl_idx = simple_rest.find("value=")
+        if vl_idx >= 0:
+            vl_rhs = simple_rest[vl_idx + len("value="):]
+            cand = parse_value_list(vl_rhs)
+            if len(cand) >= 2:
+                value_list_items = cand
+                simple_rest = simple_rest[:vl_idx].strip()
+
         # Process simple key=value pairs (use, denyIncompleteValues, etc.)
         if simple_rest:
             for m in re.finditer(r'(\w+)=(\S+)', simple_rest):
                 key, value = m.group(1), m.group(2)
-                existing = next((ch for ch in param_el if isinstance(ch.tag, str) and local_name(ch) == key), None)
-                if existing is not None:
+                existing = next((ch for ch in param_el if isinstance(ch.tag, str) and local_name(ch) == key and etree.QName(ch.tag).namespace == SCH_NS), None)
+
+                if key == "value":
+                    # Rebuild <value> with correct xsi:type from <valueType>
+                    declared_type = ""
+                    vt_el = next((ch for ch in param_el if isinstance(ch.tag, str) and local_name(ch) == "valueType" and etree.QName(ch.tag).namespace == SCH_NS), None)
+                    if vt_el is not None:
+                        for tnode in vt_el:
+                            if isinstance(tnode.tag, str) and local_name(tnode) == "Type":
+                                declared_type = re.sub(r'^d\d+p\d+:', '', (tnode.text or "").strip())
+                                break
+                    # Detect valueListAllowed — empty value should be omitted when set
+                    vla_set = False
+                    vla_el = next((ch for ch in param_el if isinstance(ch.tag, str) and local_name(ch) == "valueListAllowed" and etree.QName(ch.tag).namespace == SCH_NS), None)
+                    if vla_el is not None and (vla_el.text or "").strip() == "true":
+                        vla_set = True
+                    if is_empty_value(value):
+                        frag_xml = build_empty_value_xml(declared_type, child_indent, "", "value", vla_set)
+                    else:
+                        value_lines = build_param_value_xml(declared_type, value, child_indent)
+                        frag_xml = "\n".join(value_lines)
+                    # Collect ALL existing <value> (a param may carry a value-list) — scalar
+                    # value= collapses them to one, so remove every <value>, not just the first.
+                    all_value_els = [ch for ch in param_el if isinstance(ch.tag, str) and local_name(ch) == "value" and etree.QName(ch.tag).namespace == SCH_NS]
+                    was_existing = len(all_value_els) > 0
+                    if was_existing:
+                        last_idx = list(param_el).index(all_value_els[-1])
+                        ref_node = param_el[last_idx + 1] if last_idx + 1 < len(param_el) else None
+                        for ve in all_value_els:
+                            remove_node_with_whitespace(ve)
+                    else:
+                        ref_node = next((ch for ch in param_el if isinstance(ch.tag, str) and local_name(ch) in ("useRestriction", "availableValue", "denyIncompleteValues", "use")), None)
+                    if frag_xml:
+                        nodes = import_fragment(xml_doc, frag_xml)
+                        for node in nodes:
+                            insert_before_element(param_el, node, ref_node, child_indent)
+                    verb = "updated" if was_existing else "added"
+                    dirty = True; print(f'[OK] Parameter "{param_name}": value {verb} to {value}')
+                elif existing is not None:
                     existing.text = value
-                    print(f'[OK] Parameter "{param_name}": {key} updated to {value}')
+                    dirty = True; print(f'[OK] Parameter "{param_name}": {key} updated to {value}')
                 else:
                     # Schema order: ...value, useRestriction, availableValue*, denyIncompleteValues, use
                     ref_node = None
@@ -1581,42 +2255,108 @@ elif operation == "modify-parameter":
                     nodes = import_fragment(xml_doc, frag_xml)
                     for node in nodes:
                         insert_before_element(param_el, node, ref_node, child_indent)
-                    print(f'[OK] Parameter "{param_name}": {key}={value} added')
+                    dirty = True; print(f'[OK] Parameter "{param_name}": {key}={value} added')
+
+        # Process multi-value list (value=v1, v2, ...) — replace ALL <value>, ensure valueListAllowed=true
+        if value_list_items:
+            declared_type = ""
+            vt_el = next((ch for ch in param_el if isinstance(ch.tag, str) and local_name(ch) == "valueType" and etree.QName(ch.tag).namespace == SCH_NS), None)
+            if vt_el is not None:
+                for tnode in vt_el:
+                    if isinstance(tnode.tag, str) and local_name(tnode) == "Type":
+                        declared_type = re.sub(r'^d\d+p\d+:', '', (tnode.text or "").strip())
+                        break
+            # Remove ALL existing <value>; capture insertion ref after the last one
+            value_els = [ch for ch in param_el if isinstance(ch.tag, str) and local_name(ch) == "value" and etree.QName(ch.tag).namespace == SCH_NS]
+            if value_els:
+                last_idx = list(param_el).index(value_els[-1])
+                ref_node = param_el[last_idx + 1] if last_idx + 1 < len(param_el) else None
+                for ve in value_els:
+                    remove_node_with_whitespace(ve)
+            else:
+                ref_node = next((ch for ch in param_el if isinstance(ch.tag, str) and local_name(ch) in ("useRestriction", "availableValue", "denyIncompleteValues", "use")), None)
+            for v in value_list_items:
+                frag_xml = "\n".join(build_param_value_xml(declared_type, v, child_indent))
+                for node in import_fragment(xml_doc, frag_xml):
+                    insert_before_element(param_el, node, ref_node, child_indent)
+            # Ensure <valueListAllowed>true</valueListAllowed> (schema order: after useRestriction, before availableValue/use)
+            vla_el = next((ch for ch in param_el if isinstance(ch.tag, str) and local_name(ch) == "valueListAllowed" and etree.QName(ch.tag).namespace == SCH_NS), None)
+            if vla_el is not None:
+                if (vla_el.text or "").strip() != "true":
+                    vla_el.text = "true"
+            else:
+                ref_vla = next((ch for ch in param_el if isinstance(ch.tag, str) and local_name(ch) in ("availableValue", "denyIncompleteValues", "use")), None)
+                for node in import_fragment(xml_doc, f"{child_indent}<valueListAllowed>true</valueListAllowed>"):
+                    insert_before_element(param_el, node, ref_vla, child_indent)
+            dirty = True; print(f'[OK] Parameter "{param_name}": value set to list of {len(value_list_items)} item(s)')
 
         # Process availableValue
         if av_part:
-            av_rest = av_part[len("availableValue="):]
-            # Parse: "Перечисление...X presentation=текст с пробелами"
-            av_parts = re.split(r'\s+presentation=', av_rest, 1)
-            av_value = av_parts[0].strip()
-            av_presentation = av_parts[1].strip() if len(av_parts) > 1 else ""
+            av_rest = av_part[len("availableValue="):].strip()
+            av_items = parse_available_value_list(av_rest)
 
-            av_type = "xs:string"
-            if re.match(r'^(Перечисление|Справочник|ПланСчетов|Документ|ПланВидовХарактеристик|ПланВидовРасчета)\.', av_value):
-                av_type = "dcscor:DesignTimeValue"
+            # Prefer declared <valueType> of the parameter; fall back to value pattern
+            declared_type = ""
+            vt_el = None
+            for ch in param_el:
+                if isinstance(ch.tag, str) and local_name(ch) == "valueType" and etree.QName(ch.tag).namespace == SCH_NS:
+                    vt_el = ch
+                    break
+            if vt_el is not None:
+                for tnode in vt_el:
+                    if isinstance(tnode.tag, str) and local_name(tnode) == "Type":
+                        declared_type = re.sub(r'^d\d+p\d+:', '', (tnode.text or "").strip())
+                        break
 
-            av_lines = [f"{child_indent}<availableValue>"]
-            av_lines.append(f'{child_indent}\t<value xsi:type="{av_type}">{esc_xml(av_value)}</value>')
-            if av_presentation:
-                av_lines.append(f'{child_indent}\t<presentation xsi:type="v8:LocalStringType">')
-                av_lines.append(f"{child_indent}\t\t<v8:item>")
-                av_lines.append(f"{child_indent}\t\t\t<v8:lang>ru</v8:lang>")
-                av_lines.append(f"{child_indent}\t\t\t<v8:content>{esc_xml(av_presentation)}</v8:content>")
-                av_lines.append(f"{child_indent}\t\t</v8:item>")
-                av_lines.append(f"{child_indent}\t</presentation>")
-            av_lines.append(f"{child_indent}</availableValue>")
-            frag_xml = "\r\n".join(av_lines)
+            # Remove all existing <availableValue>
+            to_remove = [ch for ch in param_el if isinstance(ch.tag, str) and local_name(ch) == "availableValue" and etree.QName(ch.tag).namespace == SCH_NS]
+            for el in to_remove:
+                remove_node_with_whitespace(el)
 
-            # Insert before first of (denyIncompleteValues, use) in document order
+            # Insert each new <availableValue> before (denyIncompleteValues, use)
             ref_node = None
             for child in param_el:
                 if isinstance(child.tag, str) and local_name(child) in ("denyIncompleteValues", "use"):
                     ref_node = child
                     break
-            nodes = import_fragment(xml_doc, frag_xml)
-            for node in nodes:
-                insert_before_element(param_el, node, ref_node, child_indent)
-            print(f'[OK] Parameter "{param_name}": availableValue added')
+            for av in av_items:
+                av_lines = build_available_value_fragment(av, declared_type, child_indent)
+                frag_xml = "\n".join(av_lines)
+                nodes = import_fragment(xml_doc, frag_xml)
+                for node in nodes:
+                    insert_before_element(param_el, node, ref_node, child_indent)
+            dirty = True; print(f'[OK] Parameter "{param_name}": availableValue set to {len(av_items)} item(s)')
+
+        if flag_hidden:
+            ur_el = next((ch for ch in param_el if isinstance(ch.tag, str) and local_name(ch) == "useRestriction" and etree.QName(ch.tag).namespace == SCH_NS), None)
+            if ur_el is not None:
+                if (ur_el.text or "").strip() != "true":
+                    ur_el.text = "true"
+            else:
+                ref_node = next((ch for ch in param_el if isinstance(ch.tag, str) and local_name(ch) in ("expression", "availableAsField", "availableValue", "denyIncompleteValues", "use")), None)
+                for node in import_fragment(xml_doc, f"{child_indent}<useRestriction>true</useRestriction>"):
+                    insert_before_element(param_el, node, ref_node, child_indent)
+
+            af_el = next((ch for ch in param_el if isinstance(ch.tag, str) and local_name(ch) == "availableAsField" and etree.QName(ch.tag).namespace == SCH_NS), None)
+            if af_el is not None:
+                if (af_el.text or "").strip() != "false":
+                    af_el.text = "false"
+            else:
+                ref_node = next((ch for ch in param_el if isinstance(ch.tag, str) and local_name(ch) in ("availableValue", "denyIncompleteValues", "use")), None)
+                for node in import_fragment(xml_doc, f"{child_indent}<availableAsField>false</availableAsField>"):
+                    insert_before_element(param_el, node, ref_node, child_indent)
+
+            dirty = True; print(f'[OK] Parameter "{param_name}": @hidden applied')
+
+        if flag_always:
+            use_el = next((ch for ch in param_el if isinstance(ch.tag, str) and local_name(ch) == "use" and etree.QName(ch.tag).namespace == SCH_NS), None)
+            if use_el is not None:
+                if (use_el.text or "").strip() != "Always":
+                    use_el.text = "Always"
+            else:
+                for node in import_fragment(xml_doc, f"{child_indent}<use>Always</use>"):
+                    insert_before_element(param_el, node, None, child_indent)
+            dirty = True; print(f'[OK] Parameter "{param_name}": @always applied')
 
 elif operation == "rename-parameter":
     root = xml_doc
@@ -1679,7 +2419,7 @@ elif operation == "rename-parameter":
                             gc.text = new_name
                             dp_updated += 1
 
-        print(f'[OK] Parameter renamed: "{old_name}" => "{new_name}" (expressions updated: {expr_updated}, dataParameters updated: {dp_updated})')
+        dirty = True; print(f'[OK] Parameter renamed: "{old_name}" => "{new_name}" (expressions updated: {expr_updated}, dataParameters updated: {dp_updated})')
 
 elif operation == "reorder-parameters":
     root = xml_doc
@@ -1736,7 +2476,7 @@ elif operation == "reorder-parameters":
         for pe in new_order:
             insert_before_element(root, pe, anchor, child_indent)
 
-        print(f'[OK] Parameters reordered ({len(all_params)} total, {len(order)} explicit)')
+        dirty = True; print(f'[OK] Parameters reordered ({len(all_params)} total, {len(order)} explicit)')
 
 elif operation == "add-filter":
     settings = resolve_variant_settings()
@@ -1749,7 +2489,7 @@ elif operation == "add-filter":
         nodes = import_fragment(xml_doc, frag_xml)
         for node in nodes:
             insert_before_element(filter_el, node, None, filter_indent)
-        print(f'[OK] Filter "{parsed["field"]} {parsed["op"]}" added to variant "{var_name}"')
+        dirty = True; print(f'[OK] Filter "{parsed["field"]} {parsed["op"]}" added to variant "{var_name}"')
 
 elif operation == "add-dataParameter":
     settings = resolve_variant_settings()
@@ -1762,7 +2502,7 @@ elif operation == "add-dataParameter":
         nodes = import_fragment(xml_doc, frag_xml)
         for node in nodes:
             insert_before_element(dp_el, node, None, dp_indent)
-        print(f'[OK] DataParameter "{parsed["parameter"]}" added to variant "{var_name}"')
+        dirty = True; print(f'[OK] DataParameter "{parsed["parameter"]}" added to variant "{var_name}"')
 
 elif operation == "add-order":
     settings = resolve_variant_settings()
@@ -1795,7 +2535,7 @@ elif operation == "add-order":
             insert_before_element(order_el, node, None, order_indent)
 
         desc = "Auto" if parsed["field"] == "Auto" else f"{parsed['field']} {parsed['direction']}"
-        print(f'[OK] Order "{desc}" added to variant "{var_name}"')
+        dirty = True; print(f'[OK] Order "{desc}" added to variant "{var_name}"')
 
 elif operation == "add-selection":
     settings = resolve_variant_settings()
@@ -1848,7 +2588,7 @@ elif operation == "add-selection":
         for node in sel_nodes:
             insert_before_element(selection, node, None, sel_indent)
         target = f'group "{group_name}"' if group_name else f'variant "{var_name}"'
-        print(f'[OK] Selection "{field_name}" added to {target}')
+        dirty = True; print(f'[OK] Selection "{field_name}" added to {target}')
 
 elif operation == "set-query":
     ds_node = resolve_data_set()
@@ -1858,7 +2598,7 @@ elif operation == "set-query":
         print(f"No <query> element found in dataset '{ds_name}'", file=sys.stderr)
         sys.exit(1)
     query_el.text = resolve_query_value(value_arg, query_base_dir)
-    print(f'[OK] Query replaced in dataset "{ds_name}"')
+    dirty = True; print(f'[OK] Query replaced in dataset "{ds_name}"')
 
 elif operation == "patch-query":
     ds_node = resolve_data_set()
@@ -1868,18 +2608,30 @@ elif operation == "patch-query":
         print(f"No <query> element found in dataset '{ds_name}'", file=sys.stderr)
         sys.exit(1)
     for val in values:
+        once = False
+        if re.search(r'@once\b', val):
+            once = True
+            val = re.sub(r'\s*@once\b', '', val).strip()
+
         sep_idx = val.find(" => ")
         if sep_idx < 0:
             print("patch-query value must contain ' => ' separator: old => new", file=sys.stderr)
             sys.exit(1)
-        old_str = val[:sep_idx]
-        new_str = val[sep_idx + 4:]
-        query_text = query_el.text or ""
-        if old_str not in query_text:
-            print(f"Substring not found in query of dataset '{ds_name}': {old_str}", file=sys.stderr)
+        old_str = normalize_line_endings(val[:sep_idx])
+        new_str = normalize_line_endings(val[sep_idx + 4:])
+        query_text = normalize_line_endings(query_el.text or "")
+
+        count = query_text.count(old_str)
+        if count == 0:
+            print(format_patch_query_not_found(old_str, query_text, ds_node, ds_name), file=sys.stderr)
             sys.exit(1)
+        if once and count != 1:
+            print(f"@once: expected 1 occurrence of '{old_str}' in dataset '{ds_name}', found {count}", file=sys.stderr)
+            sys.exit(1)
+
         query_el.text = query_text.replace(old_str, new_str)
-        print(f'[OK] Query patched in dataset "{ds_name}": replaced \'{old_str}\'')
+        suffix = " (1 occurrence)" if once else f" ({count} occurrence(s))"
+        dirty = True; print(f'[OK] Query patched in dataset "{ds_name}": replaced \'{old_str}\'{suffix}')
 
 elif operation == "set-outputParameter":
     settings = resolve_variant_settings()
@@ -1892,9 +2644,9 @@ elif operation == "set-outputParameter":
         existing_param = find_element_by_child_value(output_el, "item", "parameter", parsed["key"], COR_NS)
         if existing_param is not None:
             remove_node_with_whitespace(existing_param)
-            print(f'[OK] Replaced outputParameter "{parsed["key"]}" in variant "{var_name}"')
+            dirty = True; print(f'[OK] Replaced outputParameter "{parsed["key"]}" in variant "{var_name}"')
         else:
-            print(f'[OK] OutputParameter "{parsed["key"]}" added to variant "{var_name}"')
+            dirty = True; print(f'[OK] OutputParameter "{parsed["key"]}" added to variant "{var_name}"')
 
         frag_xml = build_output_param_fragment(parsed, output_indent)
         nodes = import_fragment(xml_doc, frag_xml)
@@ -1920,7 +2672,86 @@ elif operation == "set-structure":
         for node in nodes:
             insert_before_element(settings, node, ref_node, settings_indent)
 
-    print(f'[OK] Structure set in variant "{var_name}": {value_arg}')
+    dirty = True; print(f'[OK] Structure set in variant "{var_name}": {value_arg}')
+
+elif operation == "modify-structure":
+    settings = resolve_variant_settings()
+    var_name = get_variant_name()
+
+    struct_items = parse_structure_shorthand(value_arg)
+
+    # Flatten parsed tree into (name, groupBy) targets
+    targets = []
+    stack = list(struct_items)
+    while stack:
+        it = stack.pop()
+        if it.get("name"):
+            targets.append({"name": it["name"], "groupBy": it.get("groupBy", [])})
+        for ch in it.get("children", []) or []:
+            stack.append(ch)
+
+    if not targets:
+        print(f"modify-structure requires @name= for at least one group: {value_arg}", file=sys.stderr)
+        sys.exit(1)
+
+    ns = {"dcsset": SET_NS, "xsi": XSI_NS}
+
+    for t in targets:
+        xpath = f".//dcsset:item[@xsi:type='dcsset:StructureItemGroup'][dcsset:name='{t['name']}']"
+        group_el = settings.find(xpath, ns)
+        if group_el is None:
+            print(f'[WARN] Group with @name="{t["name"]}" not found — skipped')
+            continue
+
+        gi_el = None
+        for ch in group_el:
+            if isinstance(ch.tag, str) and local_name(ch) == "groupItems" and etree.QName(ch.tag).namespace == SET_NS:
+                gi_el = ch
+                break
+
+        group_indent = get_child_indent(group_el)
+        if gi_el is None:
+            # Insert <groupItems> after <name>, before first non-name sibling
+            ref_after_name = None
+            saw_name = False
+            for ch in group_el:
+                if not isinstance(ch.tag, str):
+                    continue
+                if local_name(ch) == "name" and etree.QName(ch.tag).namespace == SET_NS:
+                    saw_name = True
+                elif saw_name:
+                    ref_after_name = ch
+                    break
+            gi_frag = f"{group_indent}<dcsset:groupItems></dcsset:groupItems>"
+            for node in import_fragment(xml_doc, gi_frag):
+                insert_before_element(group_el, node, ref_after_name, group_indent)
+            for ch in group_el:
+                if isinstance(ch.tag, str) and local_name(ch) == "groupItems" and etree.QName(ch.tag).namespace == SET_NS:
+                    gi_el = ch
+                    break
+
+        to_remove = [ch for ch in gi_el if isinstance(ch.tag, str)]
+        for el in to_remove:
+            remove_node_with_whitespace(el)
+
+        item_indent = group_indent + "\t"
+
+        for field in t["groupBy"]:
+            lines = [
+                f'{item_indent}<dcsset:item xsi:type="dcsset:GroupItemField">',
+                f'{item_indent}\t<dcsset:field>{esc_xml(field)}</dcsset:field>',
+                f'{item_indent}\t<dcsset:groupType>Items</dcsset:groupType>',
+                f'{item_indent}\t<dcsset:periodAdditionType>None</dcsset:periodAdditionType>',
+                f'{item_indent}\t<dcsset:periodAdditionBegin xsi:type="xs:dateTime">0001-01-01T00:00:00</dcsset:periodAdditionBegin>',
+                f'{item_indent}\t<dcsset:periodAdditionEnd xsi:type="xs:dateTime">0001-01-01T00:00:00</dcsset:periodAdditionEnd>',
+                f'{item_indent}</dcsset:item>',
+            ]
+            frag_xml = "\n".join(lines)
+            for node in import_fragment(xml_doc, frag_xml):
+                insert_before_element(gi_el, node, None, item_indent)
+
+        desc = "details" if not t["groupBy"] else ", ".join(t["groupBy"])
+        dirty = True; print(f'[OK] Group "{t["name"]}" groupItems updated: {desc}')
 
 elif operation == "add-dataSetLink":
     for val in values:
@@ -1949,7 +2780,7 @@ elif operation == "add-dataSetLink":
         desc = f"{parsed['source']} > {parsed['dest']} on {parsed['sourceExpr']} = {parsed['destExpr']}"
         if parsed.get("parameter"):
             desc += f" [param {parsed['parameter']}]"
-        print(f'[OK] DataSetLink "{desc}" added')
+        dirty = True; print(f'[OK] DataSetLink "{desc}" added')
 
 elif operation == "add-dataSet":
     child_indent = get_child_indent(xml_doc)
@@ -1991,7 +2822,7 @@ elif operation == "add-dataSet":
         for node in nodes:
             insert_before_element(xml_doc, node, ref_node, child_indent)
 
-        print(f'[OK] DataSet "{parsed["name"]}" added (dataSource={ds_source_name})')
+        dirty = True; print(f'[OK] DataSet "{parsed["name"]}" added (dataSource={ds_source_name})')
 
 elif operation == "add-variant":
     child_indent = get_child_indent(xml_doc)
@@ -2030,7 +2861,7 @@ elif operation == "add-variant":
         for node in nodes:
             insert_before_element(xml_doc, node, ref_node, child_indent)
 
-        print(f'[OK] Variant "{parsed["name"]}" ["{parsed["presentation"]}"] added')
+        dirty = True; print(f'[OK] Variant "{parsed["name"]}" ["{parsed["presentation"]}"] added')
 
 elif operation == "add-conditionalAppearance":
     settings = resolve_variant_settings()
@@ -2053,7 +2884,7 @@ elif operation == "add-conditionalAppearance":
                 desc += f" when {flt['field']} {flt['op']}"
         if parsed.get("fields"):
             desc += f" for {', '.join(parsed['fields'])}"
-        print(f'[OK] ConditionalAppearance "{desc}" added to variant "{var_name}"')
+        dirty = True; print(f'[OK] ConditionalAppearance "{desc}" added to variant "{var_name}"')
 
 elif operation == "clear-selection":
     settings = resolve_variant_settings()
@@ -2061,7 +2892,7 @@ elif operation == "clear-selection":
     selection = find_first_element(settings, ["selection"], SET_NS)
     if selection is not None:
         clear_container_children(selection)
-        print(f'[OK] Selection cleared in variant "{var_name}"')
+        dirty = True; print(f'[OK] Selection cleared in variant "{var_name}"')
     else:
         print(f'[INFO] No selection section in variant "{var_name}"')
 
@@ -2071,7 +2902,7 @@ elif operation == "clear-order":
     order_el = find_first_element(settings, ["order"], SET_NS)
     if order_el is not None:
         clear_container_children(order_el)
-        print(f'[OK] Order cleared in variant "{var_name}"')
+        dirty = True; print(f'[OK] Order cleared in variant "{var_name}"')
     else:
         print(f'[INFO] No order section in variant "{var_name}"')
 
@@ -2081,9 +2912,19 @@ elif operation == "clear-filter":
     filter_el = find_first_element(settings, ["filter"], SET_NS)
     if filter_el is not None:
         clear_container_children(filter_el)
-        print(f'[OK] Filter cleared in variant "{var_name}"')
+        dirty = True; print(f'[OK] Filter cleared in variant "{var_name}"')
     else:
         print(f'[INFO] No filter section in variant "{var_name}"')
+
+elif operation == "clear-conditionalAppearance":
+    settings = resolve_variant_settings()
+    var_name = get_variant_name()
+    ca_el = find_first_element(settings, ["conditionalAppearance"], SET_NS)
+    if ca_el is not None:
+        clear_container_children(ca_el)
+        dirty = True; print(f'[OK] ConditionalAppearance cleared in variant "{var_name}"')
+    else:
+        print(f'[INFO] No conditionalAppearance section in variant "{var_name}"')
 
 elif operation == "modify-filter":
     settings = resolve_variant_settings()
@@ -2125,7 +2966,7 @@ elif operation == "modify-filter":
             uid = new_uuid() if parsed["userSettingID"] == "auto" else parsed["userSettingID"]
             set_or_create_child_element(filter_item, "userSettingID", SET_NS, uid, item_indent)
 
-        print(f'[OK] Filter "{parsed["field"]}" modified in variant "{var_name}"')
+        dirty = True; print(f'[OK] Filter "{parsed["field"]}" modified in variant "{var_name}"')
 
 elif operation == "modify-dataParameter":
     settings = resolve_variant_settings()
@@ -2161,6 +3002,8 @@ elif operation == "modify-dataParameter":
                 val_lines.append(f"{item_indent}\t<v8:startDate>0001-01-01T00:00:00</v8:startDate>")
                 val_lines.append(f"{item_indent}\t<v8:endDate>0001-01-01T00:00:00</v8:endDate>")
                 val_lines.append(f"{item_indent}</dcscor:value>")
+            elif is_empty_value(pv):
+                val_lines.append(f'{item_indent}<dcscor:value xsi:nil="true"/>')
             elif re.match(r'^\d{4}-\d{2}-\d{2}T', str(pv)):
                 val_lines.append(f'{item_indent}<dcscor:value xsi:type="xs:dateTime">{esc_xml(str(pv))}</dcscor:value>')
             elif str(pv) in ("true", "false"):
@@ -2168,7 +3011,7 @@ elif operation == "modify-dataParameter":
             else:
                 val_lines.append(f'{item_indent}<dcscor:value xsi:type="xs:string">{esc_xml(str(pv))}</dcscor:value>')
 
-            val_xml = "\r\n".join(val_lines)
+            val_xml = "\n".join(val_lines)
             val_nodes = import_fragment(xml_doc, val_xml)
             for node in val_nodes:
                 insert_before_element(dp_item, node, None, item_indent)
@@ -2191,7 +3034,7 @@ elif operation == "modify-dataParameter":
             uid = new_uuid() if parsed["userSettingID"] == "auto" else parsed["userSettingID"]
             set_or_create_child_element(dp_item, "userSettingID", SET_NS, uid, item_indent)
 
-        print(f'[OK] DataParameter "{parsed["parameter"]}" modified in variant "{var_name}"')
+        dirty = True; print(f'[OK] DataParameter "{parsed["parameter"]}" modified in variant "{var_name}"')
 
 elif operation == "modify-field":
     ds_node = resolve_data_set()
@@ -2214,6 +3057,13 @@ elif operation == "modify-field":
             "type": parsed["type"] if parsed.get("type") else existing["type"],
             "roles": parsed["roles"] if parsed.get("roles") else existing["roles"],
             "restrict": parsed["restrict"] if parsed.get("restrict") else existing["restrict"],
+            # Preserve raw <valueType> only when user did NOT override type via shorthand.
+            "rawValueType": None if parsed.get("type") else existing.get("_rawValueType"),
+            # Preserve raw multi-lang title; pass existing ru content for change detection.
+            "_rawTitle": existing.get("_rawTitle"),
+            "_existingTitleRu": existing.get("title"),
+            # Pass-through unknown children (e.g. <editFormat>, <appearance>, custom extensions).
+            "_unknownChildren": existing.get("_unknownChildren"),
         }
 
         # Find next element sibling for position
@@ -2235,7 +3085,88 @@ elif operation == "modify-field":
         for node in nodes:
             insert_before_element(ds_node, node, next_sib, child_indent)
 
-        print(f'[OK] Field "{field_name}" modified in dataset "{ds_name}"')
+        dirty = True; print(f'[OK] Field "{field_name}" modified in dataset "{ds_name}"')
+
+elif operation == "set-field-role":
+    ds_node = resolve_data_set()
+    ds_name = get_data_set_name(ds_node)
+
+    for val in values:
+        s = val.strip()
+
+        flags = []
+        for m in re.finditer(r'@(\w+)', s):
+            flags.append(m.group(1))
+        s = re.sub(r'\s*@\w+', '', s).strip()
+
+        kv = []
+        for m in re.finditer(r'(\w+)=(\S+)', s):
+            kv.append((m.group(1), m.group(2)))
+        s = re.sub(r'\s*\w+=\S+', '', s).strip()
+
+        data_path = s
+        if not data_path:
+            print(f'[WARN] set-field-role: empty dataPath in "{val}"')
+            continue
+
+        field_el = find_element_by_child_value(ds_node, "field", "dataPath", data_path, SCH_NS)
+        if field_el is None:
+            print(f'[WARN] Field "{data_path}" not found in dataset "{ds_name}"')
+            continue
+
+        field_indent = get_child_indent(field_el)
+
+        # Remove existing <role> — but first capture OuterXml of sub-children that the
+        # rebuild won't re-emit (custom <dcscom:groupFields>, <dcscom:addition>, etc.).
+        old_role = next((ch for ch in field_el if isinstance(ch.tag, str) and local_name(ch) == "role" and etree.QName(ch.tag).namespace == SCH_NS), None)
+        known_role_children = {"periodNumber", "periodType", "dimension", "ignoreNullsInGroups",
+                               "balance", "account", "accountTypeExpression", "additionType", "addition"}
+        kv_keys = {k for k, _ in kv}
+        preserved_role_children = []
+        if old_role is not None:
+            for gc in old_role:
+                if not isinstance(gc.tag, str):
+                    continue
+                ln = local_name(gc)
+                if ln in known_role_children:
+                    continue
+                if ln in kv_keys:
+                    continue
+                raw = etree.tostring(gc, encoding="unicode", with_tail=False)
+                raw = re.sub(r' xmlns(?::\w+)?="[^"]*"', "", raw)
+                preserved_role_children.append(raw)
+            remove_node_with_whitespace(old_role)
+
+        # Empty spec — remove only
+        if not flags and not kv:
+            dirty = True; print(f'[OK] Field "{data_path}" role cleared')
+            continue
+
+        # Build new <role>
+        lines = [f"{field_indent}<role>"]
+        for flag in flags:
+            if flag == "period":
+                lines.append(f"{field_indent}\t<dcscom:periodNumber>1</dcscom:periodNumber>")
+                lines.append(f"{field_indent}\t<dcscom:periodType>Main</dcscom:periodType>")
+            else:
+                lines.append(f"{field_indent}\t<dcscom:{flag}>true</dcscom:{flag}>")
+        for k, v in kv:
+            lines.append(f"{field_indent}\t<dcscom:{k}>{esc_xml(v)}</dcscom:{k}>")
+        for raw in preserved_role_children:
+            lines.append(f"{field_indent}\t" + raw)
+        lines.append(f"{field_indent}</role>")
+        frag_xml = "\n".join(lines)
+
+        ref_node = next((ch for ch in field_el if isinstance(ch.tag, str) and local_name(ch) in ("valueType", "inputParameters") and etree.QName(ch.tag).namespace == SCH_NS), None)
+        for node in import_fragment(xml_doc, frag_xml):
+            insert_before_element(field_el, node, ref_node, field_indent)
+
+        parts = []
+        if flags:
+            parts.append(" ".join(f"@{f}" for f in flags))
+        if kv:
+            parts.append(" ".join(f"{k}={v}" for k, v in kv))
+        dirty = True; print(f'[OK] Field "{data_path}" role set: {" ".join(parts)}')
 
 elif operation == "remove-field":
     ds_node = resolve_data_set()
@@ -2247,7 +3178,7 @@ elif operation == "remove-field":
             print(f'[WARN] Field "{field_name}" not found in dataset "{ds_name}"')
             continue
         remove_node_with_whitespace(field_el)
-        print(f'[OK] Field "{field_name}" removed from dataset "{ds_name}"')
+        dirty = True; print(f'[OK] Field "{field_name}" removed from dataset "{ds_name}"')
 
         try:
             settings = resolve_variant_settings()
@@ -2257,7 +3188,7 @@ elif operation == "remove-field":
                 sel_item = find_element_by_child_value(selection, "item", "field", field_name, SET_NS)
                 if sel_item is not None:
                     remove_node_with_whitespace(sel_item)
-                    print(f'[OK] Field "{field_name}" removed from selection of variant "{var_name}"')
+                    dirty = True; print(f'[OK] Field "{field_name}" removed from selection of variant "{var_name}"')
         except SystemExit:
             pass
 
@@ -2269,7 +3200,7 @@ elif operation == "remove-total":
             print(f'[WARN] TotalField "{data_path}" not found')
             continue
         remove_node_with_whitespace(total_el)
-        print(f'[OK] TotalField "{data_path}" removed')
+        dirty = True; print(f'[OK] TotalField "{data_path}" removed')
 
 elif operation == "remove-calculated-field":
     for val in values:
@@ -2279,7 +3210,7 @@ elif operation == "remove-calculated-field":
             print(f'[WARN] CalculatedField "{data_path}" not found')
             continue
         remove_node_with_whitespace(calc_el)
-        print(f'[OK] CalculatedField "{data_path}" removed')
+        dirty = True; print(f'[OK] CalculatedField "{data_path}" removed')
 
         try:
             settings = resolve_variant_settings()
@@ -2289,7 +3220,7 @@ elif operation == "remove-calculated-field":
                 sel_item = find_element_by_child_value(selection, "item", "field", data_path, SET_NS)
                 if sel_item is not None:
                     remove_node_with_whitespace(sel_item)
-                    print(f'[OK] Field "{data_path}" removed from selection of variant "{var_name}"')
+                    dirty = True; print(f'[OK] Field "{data_path}" removed from selection of variant "{var_name}"')
         except SystemExit:
             pass
 
@@ -2301,7 +3232,7 @@ elif operation == "remove-parameter":
             print(f'[WARN] Parameter "{param_name}" not found')
             continue
         remove_node_with_whitespace(param_el)
-        print(f'[OK] Parameter "{param_name}" removed')
+        dirty = True; print(f'[OK] Parameter "{param_name}" removed')
 
 elif operation == "remove-filter":
     settings = resolve_variant_settings()
@@ -2317,7 +3248,7 @@ elif operation == "remove-filter":
             print(f'[WARN] Filter for "{field_name}" not found in variant "{var_name}"')
             continue
         remove_node_with_whitespace(filter_item)
-        print(f'[OK] Filter for "{field_name}" removed from variant "{var_name}"')
+        dirty = True; print(f'[OK] Filter for "{field_name}" removed from variant "{var_name}"')
 
 elif operation == "add-drilldown":
     # String-based manipulation — templates use dcsat namespace with inline xmlns
@@ -2448,7 +3379,7 @@ elif operation == "add-drilldown":
                 cell_count += 1
                 search_start = cell_end + 1
 
-            print(f"[OK] {drill_name} \u2192 {tpl_name} (param + {cell_count} cell(s))")
+            dirty = True; print(f"[OK] {drill_name} \u2192 {tpl_name} (param + {cell_count} cell(s))")
 
     # Apply insertions in reverse order to preserve offsets.
     # For same position: reverse insertion order so first resource ends up first in file.
@@ -2461,13 +3392,35 @@ elif operation == "add-drilldown":
     with open(resolved_path, "wb") as f:
         f.write(b'\xef\xbb\xbf')
         f.write(raw_text.encode("utf-8"))
-    print(f"[OK] Saved {resolved_path}")
+    dirty = True; print(f"[OK] Saved {resolved_path}")
     sys.exit(0)
 
 # ── 9. Save ─────────────────────────────────────────────────
 
+if not dirty:
+    print("[INFO] No changes -- file untouched")
+    sys.exit(0)
+
 xml_bytes = etree.tostring(tree, xml_declaration=True, encoding="UTF-8")
 xml_bytes = xml_bytes.replace(b"<?xml version='1.0' encoding='UTF-8'?>", b'<?xml version="1.0" encoding="utf-8"?>')
+
+# Format-preserve post-processing (mirrors PS path):
+#   (1) restore the original raw <DataCompositionSchema ...> opening tag — lxml collapses
+#       multi-line xmlns into one line.
+xml_text = xml_bytes.decode("utf-8")
+if raw_root_opening:
+    xml_text = re.sub(r"<DataCompositionSchema\b[^>]*>", lambda m: raw_root_opening, xml_text, count=1, flags=re.DOTALL)
+# Normalize self-closing tags: lxml writes `<foo bar="x"/>` already (no space), but be
+# defensive — strip any space before `/>` so PS and PY ports stay byte-equivalent.
+xml_text = re.sub(r"(?<=\S) />", "/>", xml_text)
+
+# Normalize line endings to match source.
+if line_ending == "\r\n":
+    xml_text = re.sub(r"(?<!\r)\n", "\r\n", xml_text)
+else:
+    xml_text = xml_text.replace("\r\n", "\n")
+xml_bytes = xml_text.encode("utf-8")
+
 if not xml_bytes.endswith(b"\n"):
     xml_bytes += b"\n"
 with open(resolved_path, "wb") as f:
