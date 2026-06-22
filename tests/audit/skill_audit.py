@@ -26,8 +26,9 @@ from pathlib import Path
 
 TESTS_DIR = Path(__file__).resolve().parent.parent
 AGENTER_ROOT = TESTS_DIR.parent
-PROJECT_ROOT = AGENTER_ROOT.parent
-SKILLS_DIR = PROJECT_ROOT / ".claude" / "skills"
+# .claude/skills лежит в корне проекта (AGENTER_ROOT) после схлопывания структуры.
+PROJECT_ROOT = AGENTER_ROOT
+SKILLS_DIR = AGENTER_ROOT / ".claude" / "skills"
 SKILL_TESTS_DIR = TESTS_DIR / "skills"
 OUTPUT = TESTS_DIR / "audit" / "COVERAGE.md"
 

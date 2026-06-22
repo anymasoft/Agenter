@@ -12,7 +12,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$python = "D:\CURSORIC\agenter\agenter\backend\.venv\Scripts\python.exe"
+$python = "D:\CURSORIC\agenter\backend\.venv\Scripts\python.exe"
 
 if (-not (Test-Path $python)) {
     Write-Host "Python venv not found: $python" -ForegroundColor Red

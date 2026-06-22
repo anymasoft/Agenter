@@ -16,7 +16,7 @@ from pathlib import Path
 
 # Пути по умолчанию
 SOURCE_TS = Path(r"D:\CURSORIC\agenter\_vendor\MetadataViewer1C\src\Metadata\field-values.ts")
-TARGET_JSON = Path(r"D:\CURSORIC\agenter\agenter\app\data\field_values.json")
+TARGET_JSON = Path(r"D:\CURSORIC\agenter\app\data\field_values.json")
 
 
 # Регекс заголовков объявления объектов

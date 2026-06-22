@@ -48,7 +48,7 @@ coverage is non-trivial. Skill tests come first.
 ## Setup (once)
 
 ```powershell
-cd D:\CURSORIC\agenter\agenter
+cd D:\CURSORIC\agenter
 .\backend\.venv\Scripts\python.exe -m pip install -r tests\requirements.txt
 ```
 

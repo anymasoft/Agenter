@@ -196,7 +196,7 @@ if (-not $ranAny) {
 Write-Host @"
 
 Готово. Следующие шаги:
-1) Открой config.json: D:\CURSORIC\agenter\agenter\config\config.json
+1) Открой config.json: D:\CURSORIC\agenter\config\config.json
    У запущенных серверов поставь "enabled": true
 2) Перезапусти Agenter (Python-бэкенд)
 3) В чате попробуй: 'Проверь синтаксис BSL-кода функции X' (Syntax)

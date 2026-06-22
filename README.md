@@ -66,7 +66,7 @@
 
 ```powershell
 git clone https://github.com/anymasoft/ERP.git D:\CURSORIC\agenter
-cd D:\CURSORIC\agenter\agenter\backend
+cd D:\CURSORIC\agenter\backend
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
@@ -74,14 +74,14 @@ python -m venv .venv
 ### Настройка
 
 ```powershell
-cd D:\CURSORIC\agenter\agenter\config
+cd D:\CURSORIC\agenter\config
 copy config.example.json config.json
 notepad config.json
 ```
 
 Заполните пути к 1С-платформе, базе, расширению (см. `config.example.json`).
 
-API ключ — в файле `D:\CURSORIC\agenter\agenter\.env`:
+API ключ — в файле `D:\CURSORIC\agenter\.env`:
 ```
 ANTHROPIC_API_KEY=sk-ant-...
 ```
@@ -89,7 +89,7 @@ ANTHROPIC_API_KEY=sk-ant-...
 ### Старт
 
 ```powershell
-cd D:\CURSORIC\agenter\agenter
+cd D:\CURSORIC\agenter
 .\start.bat
 ```
 
@@ -98,7 +98,7 @@ cd D:\CURSORIC\agenter\agenter
 ### Тесты
 
 ```powershell
-cd D:\CURSORIC\agenter\agenter
+cd D:\CURSORIC\agenter
 .\run-tests.bat
 ```
 

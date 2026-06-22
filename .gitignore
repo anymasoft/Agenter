@@ -97,3 +97,16 @@ dist/
 build/
 *.exe
 *.msi
+
+# from inner agenter/.gitignore (flatten)
+*.pyc
+backend/agenter.db
+config/config.json
+tests/audit/COVERAGE.md
+
+# runtime data/index — регенерируемое, не в git (после схлопывания структуры)
+/data/platform_docs_raw/
+/data/platform_docs_chroma/
+/data/platform_docs_chroma_test/
+/data/erp/
+/tools/models/

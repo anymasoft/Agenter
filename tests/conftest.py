@@ -14,8 +14,10 @@ import pytest
 
 TESTS_DIR = Path(__file__).resolve().parent
 AGENTER_ROOT = TESTS_DIR.parent
-PROJECT_ROOT = AGENTER_ROOT.parent
-SKILLS_DIR = PROJECT_ROOT / ".claude" / "skills"
+# После схлопывания структуры .claude/skills лежит в корне проекта (AGENTER_ROOT),
+# на одном уровне с приложением. PROJECT_ROOT сохранён для обратной совместимости.
+PROJECT_ROOT = AGENTER_ROOT
+SKILLS_DIR = AGENTER_ROOT / ".claude" / "skills"
 FIXTURES_DIR = TESTS_DIR / "fixtures"
 
 
