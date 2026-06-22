@@ -293,116 +293,53 @@ async def reindex_bsl_atlas(cfg: dict, on_log: LogFn) -> dict[str, Any]:
 
     await on_log(f"Подключаюсь к BSL Atlas: {url}", "")
 
+    import asyncio as _asyncio
+    summary = "переиндексация запущена"
+    detail = ""
+    stats: dict[str, Any] = {}
+
     timeout_total = _aiohttp.ClientTimeout(total=1800)  # 30 минут
     async with _aiohttp.ClientSession(timeout=timeout_total) as session:
-        # ── Шаг 1: initialize, получить session-id ──
-        init_payload = {
-            "jsonrpc": "2.0", "id": 0,
-            "method": "initialize",
-            "params": {
-                "protocolVersion": "2025-03-26",
-                "capabilities": {},
-                "clientInfo": {"name": "agenter-ops-reindex", "version": "1.0"},
-            },
-        }
+        # BSL Atlas v2.0.0: прямой HTTP-эндпоинт POST /reindex (фоновая задача).
+        # force=false → инкрементальная пересборка только изменённых файлов.
+        await on_log("Запускаю reindex (POST /reindex)…", "")
         try:
             async with session.post(
-                f"{url}/mcp",
-                json=init_payload,
-                headers={"Accept": "application/json, text/event-stream"},
-                timeout=_aiohttp.ClientTimeout(total=15),
+                f"{url}/reindex",
+                json={"force": False},
+                timeout=_aiohttp.ClientTimeout(total=30),
             ) as resp:
-                session_id = resp.headers.get("mcp-session-id")
-                if not session_id:
+                body = await resp.text()
+                if resp.status >= 400:
                     raise RuntimeError(
-                        f"BSL Atlas вернул HTTP {resp.status} без session-id. "
-                        "Проверь что сервер запущен (start.bat)."
+                        f"BSL Atlas /reindex вернул HTTP {resp.status}: {body[:200]}"
                     )
+                try:
+                    started = _json.loads(body)
+                except _json.JSONDecodeError:
+                    started = {"message": body[:200]}
         except _aiohttp.ClientError as e:
             raise RuntimeError(f"Не удалось подключиться к BSL Atlas ({url}): {e}")
 
-        await on_log("Подключено. Запускаю reindex…", "")
-        await on_log("ВНИМАНИЕ: переиндексация крупной конфигурации — обычно 5–15 мин", "")
+        detail = str(started.get("message", "")).strip()
+        await on_log(f"BSL Atlas: {detail or 'reindex запущен'}", "")
 
-        # ── Шаг 2: вызвать tool reindex ──
-        reindex_payload = {
-            "jsonrpc": "2.0", "id": 1,
-            "method": "tools/call",
-            "params": {"name": "reindex", "arguments": {}},
-        }
-        try:
-            async with session.post(
-                f"{url}/mcp",
-                json=reindex_payload,
-                headers={
-                    "Accept": "application/json, text/event-stream",
-                    "mcp-session-id": session_id,
-                },
-            ) as resp:
-                text = await resp.text()
-        except _aiohttp.ClientError as e:
-            raise RuntimeError(f"BSL Atlas reindex упал по сети: {e}")
-
-    # Парсим SSE-ответ: ищем строку data:{...}
-    parsed = None
-    for line in text.split("\n"):
-        if not line.startswith("data:"):
-            continue
-        raw = line[5:].strip()
-        if not raw:
-            continue
-        try:
-            parsed = _json.loads(raw)
-            break
-        except _json.JSONDecodeError:
-            continue
-
-    if parsed is None:
-        raise RuntimeError(f"BSL Atlas reindex: не удалось распарсить ответ. Первые 300 символов:\n{text[:300]}")
-
-    if "error" in parsed:
-        err = parsed["error"].get("message", "неизвестная ошибка")
-        raise RuntimeError(f"BSL Atlas reindex упал: {err}")
-
-    result = parsed.get("result", {})
-
-    # Формат result у MCP-tool может быть либо {"content": [{"type":"text","text":"..."}]},
-    # либо плоский dict. Попробуем извлечь полезное.
-    summary = "OK"
-    detail = ""
-    stats: dict[str, Any] = {}
-    if isinstance(result, dict):
-        if "content" in result and isinstance(result["content"], list):
-            text_parts = [c.get("text", "") for c in result["content"] if c.get("type") == "text"]
-            detail = "\n".join(text_parts).strip()
-            # Из текста попробуем выдернуть основные счётчики
-            m = re.search(r"(\d+)\s+symbols?.*?(\d+)\s+objects?", detail, re.IGNORECASE | re.DOTALL)
-            if m:
-                summary = f"{m.group(1)} символов, {m.group(2)} объектов"
-                stats["symbols_count"] = int(m.group(1))
-                stats["objects_count"] = int(m.group(2))
-            elif detail:
-                summary = detail.splitlines()[0][:120]
-            # Дополнительно — ищем число файлов / модулей если упомянуты
-            for key, pattern in (
-                ("files_count",   r"(\d+)\s+files?"),
-                ("modules_count", r"(\d+)\s+modules?"),
-            ):
-                m2 = re.search(pattern, detail, re.IGNORECASE)
-                if m2 and key not in stats:
-                    stats[key] = int(m2.group(1))
-        else:
-            parts = []
-            for k in ("symbols", "objects", "files", "modules"):
-                if k in result:
-                    parts.append(f"{result[k]} {k}")
-                    try:
-                        stats[f"{k}_count"] = int(result[k])
-                    except (TypeError, ValueError):
-                        pass
-            if parts:
-                summary = ", ".join(parts)
-            detail = _json.dumps(result, ensure_ascii=False, indent=2)
+        # Переиндексация идёт в фоне; снимем итоговые счётчики через /health.
+        for _ in range(15):
+            await _asyncio.sleep(1.0)
+            try:
+                async with session.get(
+                    f"{url}/health", timeout=_aiohttp.ClientTimeout(total=5)
+                ) as h:
+                    hd = await h.json()
+            except Exception:
+                continue
+            sq = (hd or {}).get("sqlite") or {}
+            if sq.get("symbols") is not None:
+                stats["symbols_count"] = sq.get("symbols")
+                stats["objects_count"] = sq.get("objects")
+                summary = f"{sq.get('symbols')} символов, {sq.get('objects')} объектов"
+                break
 
     # Размер SQLite-индекса BSL Atlas (если доступен по умолчанию)
     db_candidates = [
