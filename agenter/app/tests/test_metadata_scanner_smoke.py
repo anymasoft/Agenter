@@ -50,7 +50,10 @@ def main() -> int:
         for e in result.errors[:5]:
             print(f"    {e}")
 
-    assert total > 1000, f"expected >1000 objects, got {total}"
+    # Порог не привязан к размеру конкретной конфигурации: любая реальная
+    # SCHEME даёт десятки+ объектов без ошибок сканирования.
+    assert total > 50, f"expected >50 objects from a real SCHEME, got {total}"
+    assert not result.errors, f"scanner reported {len(result.errors)} errors"
     print("[OK] smoke test passed")
     return 0
 
