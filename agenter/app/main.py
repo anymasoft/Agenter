@@ -196,7 +196,20 @@ def _ensure_claude_memory_file(cwd: str) -> None:
 
 # .env лежит в agenter/.env
 load_dotenv(_AGENTER_ROOT / ".env")
-ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+
+# ── Переключатель провайдера модели (model-agnostic ядро) ──────────────────
+# AGENT_PROVIDER=deepseek → ходим в DeepSeek через его родной Anthropic-эндпоинт
+# (Claude Agent SDK уважает ANTHROPIC_BASE_URL из окружения). По умолчанию Claude.
+# Ключи берём из .env (gitignored): DEEPSEEK_API_KEY / ANTHROPIC_API_KEY.
+AGENT_PROVIDER = os.environ.get("AGENT_PROVIDER", "claude").strip().lower()
+if AGENT_PROVIDER == "deepseek":
+    os.environ["ANTHROPIC_BASE_URL"] = os.environ.get(
+        "DEEPSEEK_ANTHROPIC_BASE_URL", "https://api.deepseek.com/anthropic")
+    ANTHROPIC_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
+    # дефолтная модель для этого провайдера (если в запросе/конфиге не указана иная)
+    os.environ.setdefault("AGENT_DEFAULT_MODEL", os.environ.get("DEEPSEEK_MODEL", "deepseek-v4-flash"))
+else:
+    ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 
 # Импорты под уникальными именами — см. _imports.py
 from _imports import ToolExecutor, BslAtlasClient, load_config  # noqa: E402
@@ -1307,12 +1320,16 @@ MODEL_PRICING = {
 def _resolve_model(req_model: str | None, cfg: dict) -> str:
     """API-имя модели для SDK. Принимает короткий ключ из UI (sonnet-4-6)
     или полный alias (claude-sonnet-4-6). None → дефолт из cfg или DEFAULT_MODEL_KEY."""
-    raw = (req_model or cfg.get("model") or DEFAULT_MODEL_KEY).strip()
+    raw = (req_model or cfg.get("model")
+           or os.environ.get("AGENT_DEFAULT_MODEL") or DEFAULT_MODEL_KEY).strip()
     # Короткий ключ из UI
     if raw in ALLOWED_MODELS:
         return ALLOWED_MODELS[raw]
     # Полный alias — оставляем как есть если он в нашем списке-значений
     if raw in ALLOWED_MODELS.values():
+        return raw
+    # Не-Claude провайдер (напр. DeepSeek через ANTHROPIC_BASE_URL) — pass-through.
+    if AGENT_PROVIDER != "claude" or raw.startswith(("deepseek", "deepseek-")):
         return raw
     raise ValueError(f"Неизвестная модель: '{raw}'. Допустимые: {list(ALLOWED_MODELS.keys())}")
 
