@@ -3,7 +3,7 @@ from pathlib import Path
 
 
 def main() -> int:
-    f = Path(r"C:\BUFFER\ERP\agenter\frontend\chat-screen.jsx").read_text(encoding="utf-8")
+    f = Path(r"D:\CURSORIC\agenter\agenter\frontend\chat-screen.jsx").read_text(encoding="utf-8")
 
     checks = [
         ("Sidebar has Metadata section", "Метаданные конфигурации" in f and "side-section" in f),

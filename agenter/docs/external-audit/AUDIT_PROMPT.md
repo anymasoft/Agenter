@@ -100,7 +100,7 @@
 | `recent_digest.md` | **Главное** — фокус последних 24 часов диалога (test-first pivot + оба прод-инцидента + архитектурные дискуссии) | ~765 КБ |
 | `transcript_digest.md` | Полный текст всей истории Agenter (несколько недель, многократные компакшны) | ~9.7 МБ |
 | `transcript.md` | Полный JSONL-транскрипт включая tool-вызовы и их результаты (труничено) | ~15 МБ |
-| Файлы проекта `C:\BUFFER\ERP\agenter\` если есть доступ к ФС: `CLAUDE.md`, `agenter/README.md`, `agenter/docs/`, `agenter/tests/audit/COVERAGE.md`, `agenter/app/task_planner.py` | Архитектура и текущий код | – |
+| Файлы проекта `D:\CURSORIC\agenter\agenter\` если есть доступ к ФС: `CLAUDE.md`, `agenter/README.md`, `agenter/docs/`, `agenter/tests/audit/COVERAGE.md`, `agenter/app/task_planner.py` | Архитектура и текущий код | – |
 
 **Начни с `recent_digest.md`** — там самые свежие архитектурные решения
 и видна реакция пользователя.

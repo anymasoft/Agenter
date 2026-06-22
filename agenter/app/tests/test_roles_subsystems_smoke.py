@@ -24,7 +24,7 @@ from metadata_utils.subsystem_membership import (  # noqa: E402
 
 
 def main() -> int:
-    scheme = Path(r"C:\BUFFER\ERP\SCHEME")
+    scheme = Path(r"D:\CURSORIC\agenter\SCHEME")
     if not scheme.exists():
         print("[smoke] SCHEME not found - skipping")
         return 0

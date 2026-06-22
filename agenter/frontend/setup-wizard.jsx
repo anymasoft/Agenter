@@ -289,7 +289,7 @@ const SetupWizard = ({ initialConfig, onSave, onClose, canClose }) => {
             hint="Сюда агент будет выгружать и редактировать XML расширения"
             value={cfg.ext_src_path}
             onChange={update("ext_src_path")}
-            placeholder="C:\BUFFER\ERP\ext_src"
+            placeholder="D:\CURSORIC\agenter\ext_src"
             check={checks.ext_src_path}
             required
           />
@@ -299,7 +299,7 @@ const SetupWizard = ({ initialConfig, onSave, onClose, canClose }) => {
             hint="Опционально. Нужна если планируете брать образцы объектов из основной конфы"
             value={cfg.scheme_path}
             onChange={update("scheme_path")}
-            placeholder="C:\BUFFER\ERP\SCHEME"
+            placeholder="D:\CURSORIC\agenter\SCHEME"
             check={checks.scheme_path}
           />
 

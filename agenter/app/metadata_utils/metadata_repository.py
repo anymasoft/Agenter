@@ -111,7 +111,7 @@ class MetadataRepository:
 
     Использование:
         repo = MetadataRepository(ttl_seconds=300)
-        result = await repo.load(r"C:\\BUFFER\\ERP\\SCHEME")
+        result = await repo.load(r"D:\\CURSORIC\\agenter\\SCHEME")
         # или с прогрессивной загрузкой:
         async def on_type(node):
             print(node.label, len(node.children))

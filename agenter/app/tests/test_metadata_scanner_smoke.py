@@ -19,7 +19,7 @@ def main() -> int:
     print(f"[unicode] {sample!r} -> {decoded!r}")
     assert decoded == "Пример", f"expected 'Пример', got {decoded!r}"
 
-    scheme_root = Path(r"C:\BUFFER\ERP\SCHEME")
+    scheme_root = Path(r"D:\CURSORIC\agenter\SCHEME")
     if not scheme_root.exists():
         print(f"[scanner] SCHEME not found at {scheme_root} — skipping")
         return 0

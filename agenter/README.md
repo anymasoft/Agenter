@@ -67,7 +67,7 @@ LLM-цикл. Один процесс — никаких отдельных се
 ### Один раз — установка зависимостей
 
 ```powershell
-cd C:\BUFFER\ERP\agenter\backend
+cd D:\CURSORIC\agenter\agenter\backend
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
@@ -78,7 +78,7 @@ python -m venv .venv
 ### Один раз — настройка конфига
 
 ```powershell
-cd C:\BUFFER\ERP\agenter\config
+cd D:\CURSORIC\agenter\agenter\config
 copy config.example.json config.json
 notepad config.json
 ```
@@ -87,13 +87,13 @@ notepad config.json
 
 | Поле | Описание | Пример |
 |---|---|---|
-| `ext_src_path` | Папка `ext_src/` вашего расширения | `C:\BUFFER\ERP\ext_src` |
-| `scheme_path` | XML-выгрузка основной конфигурации | `C:\BUFFER\ERP\SCHEME` |
+| `ext_src_path` | Папка `ext_src/` вашего расширения | `D:\CURSORIC\agenter\ext_src` |
+| `scheme_path` | XML-выгрузка основной конфигурации | `D:\CURSORIC\agenter\SCHEME` |
 | `v8_path` | `bin/` платформы 1С | `C:\Program Files\1cv8\8.3.27.1859\bin` |
 | `base_path` | Папка базы или строка `Srvr=...` | `C:\Users\User\Documents\1C\MyDB` |
 | `username` / `password` | Логин/пароль 1С | `Администратор` / *(пусто или ваш пароль)* |
 | `extension` | Имя расширения | `МоеРасширение` |
-| `skills_dir` | Корень с папками скиллов | `C:\BUFFER\ERP\.claude\skills` |
+| `skills_dir` | Корень с папками скиллов | `D:\CURSORIC\agenter\.claude\skills` |
 
 `ANTHROPIC_API_KEY` — в `agenter/.env` (берётся через `python-dotenv`):
 ```
@@ -105,14 +105,14 @@ ANTHROPIC_API_KEY=sk-ant-...
 **Самый короткий путь** — `start.bat` в корне `agenter/`:
 
 ```powershell
-cd C:\BUFFER\ERP\agenter
+cd D:\CURSORIC\agenter\agenter
 .\start.bat
 ```
 
 **Эквивалентная команда вручную:**
 
 ```powershell
-cd C:\BUFFER\ERP\agenter\app
+cd D:\CURSORIC\agenter\agenter\app
 ..\backend\.venv\Scripts\python.exe main.py
 ```
 

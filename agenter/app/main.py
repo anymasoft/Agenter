@@ -171,7 +171,7 @@ def _ensure_claude_memory_file(cwd: str) -> None:
     Code выводит из cwd. Слаг Claude Code: drive ``:`` → ``-``, разделители
     путей ``\\`` / ``/`` → ``-``.
 
-    Пример: ``C:\\BUFFER\\ERP\\ext_src`` → ``C--BUFFER-ERP-ext_src``.
+    Пример: ``D:\\CURSORIC\\agenter\\ext_src`` → ``C--BUFFER-ERP-ext_src``.
 
     Файл — пустая заглушка; если уже существует — не трогаем.
     """

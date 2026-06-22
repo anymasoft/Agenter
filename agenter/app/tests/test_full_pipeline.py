@@ -85,7 +85,7 @@ def main() -> int:
         from cfe_validate_xml import _check_xdto_structure, validate_extension_xml
 
         # Smoke-вызов на ext_src
-        ext_src = Path(r"C:\BUFFER\ERP\ext_src")
+        ext_src = Path(r"D:\CURSORIC\agenter\ext_src")
         if ext_src.exists():
             res = validate_extension_xml(str(ext_src))
             print(f"  [OK] validate_extension_xml: errors={res['errors']}, warnings={res['warnings']}, checks={res['checks']}")

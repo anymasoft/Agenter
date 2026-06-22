@@ -2,7 +2,7 @@
 import chromadb
 from pathlib import Path
 
-chroma_path = Path(r"C:\BUFFER\ERP\agenter\data\platform_docs_chroma")
+chroma_path = Path(r"D:\CURSORIC\agenter\agenter\data\platform_docs_chroma")
 client = chromadb.PersistentClient(path=str(chroma_path))
 try:
     col = client.get_collection("platform_docs")

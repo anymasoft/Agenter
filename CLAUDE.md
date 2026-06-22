@@ -2,16 +2,16 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## КРИТИЧЕСКОЕ ПРАВИЛО: Рабочая папка — только C:\BUFFER\ERP
+## КРИТИЧЕСКОЕ ПРАВИЛО: Рабочая папка — только D:\CURSORIC\agenter
 
-**Абсолютный запрет на создание, перемещение или изменение файлов за пределами `C:\BUFFER\ERP` и её подпапок.**
+**Абсолютный запрет на создание, перемещение или изменение файлов за пределами `D:\CURSORIC\agenter` и её подпапок.**
 
-- Все файлы проекта — строго внутри `C:\BUFFER\ERP\`
+- Все файлы проекта — строго внутри `D:\CURSORIC\agenter\`
 - Запрещено создавать папки на уровне `C:\BUFFER\` или выше
-- Эмулятор ТСД находится в `C:\BUFFER\ERP\tsd-emulator\`
+- Эмулятор ТСД находится в `D:\CURSORIC\agenter\tsd-emulator\`
 - При любом сомнении в расположении файла — спросить пользователя, не создавать самостоятельно
 
-Нарушение этого правила в прошлом: эмулятор был создан в `C:\BUFFER\tsd-emulator\` вместо `C:\BUFFER\ERP\tsd-emulator\`.
+Нарушение этого правила в прошлом: эмулятор был создан в `C:\BUFFER\tsd-emulator\` вместо `D:\CURSORIC\agenter\tsd-emulator\`.
 
 ---
 
@@ -24,12 +24,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Команда синхронизации (выполнять первой, до любого чтения или правки файлов):**
 
 ```powershell
-& "C:\BUFFER\ERP\.claude\skills\db-dump-xml\scripts\db-dump-xml.ps1" `
+& "D:\CURSORIC\agenter\.claude\skills\db-dump-xml\scripts\db-dump-xml.ps1" `
     -V8Path "C:\Program Files\1cv8\8.3.27.1859\bin" `
     -InfoBasePath "C:\Users\User\Documents\1C\ERP ProgressTech (демо) 2.5.25.96" `
     -UserName "Администратор (ФедоровБМ)" `
     -Password "" `
-    -ConfigDir "C:\BUFFER\ERP\ext_src" `
+    -ConfigDir "D:\CURSORIC\agenter\ext_src" `
     -Extension "ИнвентаризацияПГТЕХ" `
     -Mode Full
 ```
@@ -48,7 +48,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **`Documents/ПересчетТоваров/Ext/ObjectModule.bsl` — абсолютный запрет** на любые изменения без явного разрешения. Этот модуль ведётся пользователем самостоятельно.
 - Никаких «фоновых» или «заодно» правок — даже очевидных. Каждое изменение = отдельный запрос.
 
-**Rollback-baseline**: `C:\BUFFER\ERP\ext_src_baseline_2026-05-03` — зафиксированное состояние расширения на 2026-05-03. При откате — копировать оттуда в `ext_src`.
+**Rollback-baseline**: `D:\CURSORIC\agenter\ext_src_baseline_2026-05-03` — зафиксированное состояние расширения на 2026-05-03. При откате — копировать оттуда в `ext_src`.
 
 ---
 
@@ -76,12 +76,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Эта команда используется после каждого изменения в `ext_src/`:
 
 ```powershell
-& "C:\BUFFER\ERP\.claude\skills\db-load-xml\scripts\db-load-xml.ps1" `
+& "D:\CURSORIC\agenter\.claude\skills\db-load-xml\scripts\db-load-xml.ps1" `
     -V8Path "C:\Program Files\1cv8\8.3.27.1859\bin" `
     -InfoBasePath "C:\Users\User\Documents\1C\ERP ProgressTech (демо) 2.5.25.96" `
     -UserName "Администратор (ФедоровБМ)" `
     -Password "" `
-    -ConfigDir "C:\BUFFER\ERP\ext_src" `
+    -ConfigDir "D:\CURSORIC\agenter\ext_src" `
     -Extension "ИнвентаризацияПГТЕХ" `
     -UpdateDB `
     -StrictLog

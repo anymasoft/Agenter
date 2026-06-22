@@ -10,7 +10,7 @@
       "password": "",
       "aliases": ["erp", "main"],
       "branches": ["main"],
-      "configSrc": "C:\\BUFFER\\ERP\\SCHEME"
+      "configSrc": "D:\\CURSORIC\\agenter\\SCHEME"
     }
   ],
   "default": "erp"

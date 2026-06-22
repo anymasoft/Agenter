@@ -24,10 +24,10 @@ def main() -> int:
     assert "dcs" in schemas
 
     # 2. Один объект из ext_src
-    ext_root = Path(r"C:\BUFFER\ERP\ext_src")
+    ext_root = Path(r"D:\CURSORIC\agenter\ext_src")
     if not ext_root.exists():
         print(f"[ext_src] not found at {ext_root}, falling back to SCHEME")
-        ext_root = Path(r"C:\BUFFER\ERP\SCHEME")
+        ext_root = Path(r"D:\CURSORIC\agenter\SCHEME")
         if not ext_root.exists():
             return 0
 

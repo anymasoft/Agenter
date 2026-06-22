@@ -37,7 +37,7 @@ log = logging.getLogger(__name__)
 
 # Где Agenter ищет BSL LS executable. mcp-servers/ — папка, куда положены
 # инструкции по установке (см. docs/SETUP-BSL-LS.md).
-_DEFAULT_BSL_LS_DIR = Path(r"C:\BUFFER\ERP\mcp-servers\bsl-ls")
+_DEFAULT_BSL_LS_DIR = Path(r"D:\CURSORIC\agenter\mcp-servers\bsl-ls")
 
 
 @dataclass(slots=True)

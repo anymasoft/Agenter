@@ -52,7 +52,7 @@ agenter/docs/external-audit/transcript_digest.md
 agenter/docs/external-audit/recent_digest.md
 
 # --- 1C user content (separate projects / vendor IP / user's domain) -----
-# These live in C:\BUFFER\ERP\ but are NOT part of the Agenter project.
+# These live in D:\CURSORIC\agenter\ but are NOT part of the Agenter project.
 # Excluded because: vendor IP (SCHEME), user's business code (ext_src),
 # separate project subtrees, large size, or pre-existing backups,
 # or user-specific business specs (root /docs/ — ТЗ конкретного расширения).

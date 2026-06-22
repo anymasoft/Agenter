@@ -791,7 +791,7 @@ def make_agenter_tools(
         "ловятся локально, без обращения к 1С. Если BSL LS не установлен на "
         "машине — fallback на легковесную Python-проверку (только баланс "
         "Процедура/КонецПроцедуры и т.п.). Setup BSL LS: положи "
-        "bsl-language-server.exe в C:\\BUFFER\\ERP\\mcp-servers\\bsl-ls\\ "
+        "bsl-language-server.exe в D:\\CURSORIC\\agenter\\mcp-servers\\bsl-ls\\ "
         "(скачай с github.com/1c-syntax/bsl-language-server/releases).",
         {
             "type": "object",

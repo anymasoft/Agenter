@@ -13,7 +13,7 @@ from metadata_utils.metadata_repository import MetadataRepository, MetadataTreeN
 
 
 async def main() -> int:
-    scheme_root = Path(r"C:\BUFFER\ERP\SCHEME")
+    scheme_root = Path(r"D:\CURSORIC\agenter\SCHEME")
     if not scheme_root.exists():
         print("[repo] SCHEME not found - skipping")
         return 0

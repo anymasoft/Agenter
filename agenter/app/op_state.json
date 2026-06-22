@@ -9,7 +9,7 @@
       "files_count": 1678,
       "size_mb": 34.2,
       "object_types": 32,
-      "path": "C:\\BUFFER\\ERP\\SCHEME"
+      "path": "D:\\CURSORIC\\agenter\\SCHEME"
     }
   },
   "dump-extension": {
@@ -22,7 +22,7 @@
       "xml_count": 4,
       "files_count": 6,
       "size_mb": 0.0,
-      "path": "C:\\BUFFER\\ERP\\ext_src"
+      "path": "D:\\CURSORIC\\agenter\\ext_src"
     }
   },
   "reindex": {
@@ -52,7 +52,7 @@
       "model": "deepvk/USER-bge-m3",
       "dim": 1024,
       "chroma_size_mb": 217.9,
-      "chroma_path": "C:\\BUFFER\\ERP\\agenter\\data\\platform_docs_chroma",
+      "chroma_path": "D:\\CURSORIC\\agenter\\agenter\\data\\platform_docs_chroma",
       "elapsed_sec": 1222.8
     }
   }

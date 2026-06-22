@@ -15,7 +15,7 @@
 | **ssl-search** | `comol/mcp_ssl_server` | 8008 | Справка по БСП (Библиотека Стандартных Подсистем) |
 
 Все по транспорту HTTP `/mcp`. Лицензионные ключи зашиты в `start-mcp-servers.ps1`
-(взяты из `C:\BUFFER\ERP\mcp-servers\*.txt`).
+(взяты из `D:\CURSORIC\agenter\mcp-servers\*.txt`).
 
 ## Установка
 
@@ -27,7 +27,7 @@
 ### 2. Запустить контейнеры
 
 ```powershell
-cd C:\BUFFER\ERP\agenter\scripts
+cd D:\CURSORIC\agenter\agenter\scripts
 
 # Начни с легковесного — sanity check
 .\start-mcp-servers.ps1 -Syntax
@@ -61,7 +61,7 @@ cd C:\BUFFER\ERP\agenter\scripts
 
 ```powershell
 # В терминале где запущен agenter — Ctrl+C, потом:
-cd C:\BUFFER\ERP\agenter\app
+cd D:\CURSORIC\agenter\agenter\app
 ..\backend\.venv\Scripts\python.exe main.py
 ```
 
@@ -104,7 +104,7 @@ MCP registry started: ['bsl-atlas', 'syntax-check', 'help-platform', 'ssl-search
 Для полного сброса:
 ```powershell
 .\start-mcp-servers.ps1 -Stop
-Remove-Item -Recurse -Force C:\BUFFER\ERP\agenter\data\mcp
+Remove-Item -Recurse -Force D:\CURSORIC\agenter\agenter\data\mcp
 ```
 
 ## Graceful degradation
@@ -128,7 +128,7 @@ Remove-Item -Recurse -Force C:\BUFFER\ERP\agenter\data\mcp
 
 **`Lic key invalid`:**
 - Ключ в скрипте устарел или версия серверов сменилась.
-  Открой `C:\BUFFER\ERP\mcp-servers\*.txt` — там актуальные ключи.
+  Открой `D:\CURSORIC\agenter\mcp-servers\*.txt` — там актуальные ключи.
 
 **Хочу сменить порт:**
 - Поправь и в `start-mcp-servers.ps1` (переменная `Port` в `$CONTAINERS`),

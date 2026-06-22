@@ -28,7 +28,7 @@ Agenter сторонней LLM (Claude Opus 4.7 Adaptive).
 
 ### Вариант 2 — через Claude Code (если Opus там доступен)
 
-1. Открой новую сессию Claude Code в `C:\BUFFER\ERP\`.
+1. Открой новую сессию Claude Code в `D:\CURSORIC\agenter\`.
 2. Переключи модель на Opus 4.7 если она доступна.
 3. Скопируй содержимое `AUDIT_PROMPT.md` в первое сообщение.
 4. Opus сможет читать `recent_digest.md` и другие файлы напрямую через
@@ -66,7 +66,7 @@ Agenter сторонней LLM (Claude Opus 4.7 Adaptive).
 читает JSONL-файл Claude Code и производит транскрипт + дайджест:
 
 ```powershell
-cd C:\BUFFER\ERP\agenter
+cd D:\CURSORIC\agenter\agenter
 .\backend\.venv\Scripts\python.exe `
     docs\external-audit\_export_jsonl.py `
     "C:\Users\User\.claude\projects\C--BUFFER-ERP\<session-uuid>.jsonl" `

@@ -29,7 +29,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-# Лицензионные ключи зашиты автором (из инструкций в C:\BUFFER\ERP\mcp-servers\)
+# Лицензионные ключи зашиты автором (из инструкций в D:\CURSORIC\agenter\mcp-servers\)
 $SYNTAX_KEY = "a3c617a9-11c2-4e92-8854-3e911c750176"
 $HELP_KEY   = "fad9f22d-6242-4543-b311-e1973e46cb6b"
 $SSL_KEY    = "fad9f22d-6242-4543-b311-e1973e46cb6b"
@@ -196,7 +196,7 @@ if (-not $ranAny) {
 Write-Host @"
 
 Готово. Следующие шаги:
-1) Открой config.json: C:\BUFFER\ERP\agenter\config\config.json
+1) Открой config.json: D:\CURSORIC\agenter\agenter\config\config.json
    У запущенных серверов поставь "enabled": true
 2) Перезапусти Agenter (Python-бэкенд)
 3) В чате попробуй: 'Проверь синтаксис BSL-кода функции X' (Syntax)

@@ -41,7 +41,7 @@ from main import (
 
 log = logging.getLogger(__name__)
 
-_ERP_ROOT = Path(__file__).parent.parent.parent            # C:\BUFFER\ERP
+_ERP_ROOT = Path(__file__).parent.parent.parent            # D:\CURSORIC\agenter
 
 # Конфиг — тот же файл что читает desktop/main.py (config.json)
 # В frozen (PyInstaller) режиме — рядом с EXE, в dev — в agenter/config/

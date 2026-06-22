@@ -19,7 +19,7 @@ from metadata_utils.predefined_parser import parse_predefined_xml  # noqa: E402
 
 
 def main() -> int:
-    scheme_root = Path(r"C:\BUFFER\ERP\SCHEME")
+    scheme_root = Path(r"D:\CURSORIC\agenter\SCHEME")
     if not scheme_root.exists():
         print("[parser] SCHEME not found — skipping")
         return 0

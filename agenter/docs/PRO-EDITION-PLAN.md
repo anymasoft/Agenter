@@ -227,7 +227,7 @@ async def bsl_lint(args: dict) -> dict:
 - `agenter/tools/bsl-ls/` — новая папка с JAR + JRE (~200 MB, не в git)
 
 ### Smoke-критерии завершения
-- [ ] `.\bsl-lint.ps1 -SourcePath "C:\BUFFER\ERP\ext_src\Catalogs\Банки\Ext\ManagerModule.bsl"` возвращает JSON
+- [ ] `.\bsl-lint.ps1 -SourcePath "D:\CURSORIC\agenter\ext_src\Catalogs\Банки\Ext\ManagerModule.bsl"` возвращает JSON
 - [ ] `_bsl_lint()` корректно вызывается из ToolExecutor
 - [ ] LLM-агент видит `mcp__agenter__bsl_lint` в tools list
 - [ ] Намеренная ошибка в .bsl (например `Если Это` без `Тогда`) ловится линтером
