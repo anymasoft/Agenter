@@ -21,7 +21,7 @@ def main():
     parser.add_argument(
         "-InterceptorType",
         required=True,
-        choices=["Before", "After", "ModificationAndControl"],
+        choices=["Before", "After", "Instead", "ModificationAndControl"],
     )
     parser.add_argument("-Context", default="\u041d\u0430\u0421\u0435\u0440\u0432\u0435\u0440\u0435")  # НаСервере
     parser.add_argument("-IsFunction", action="store_true")
@@ -151,6 +151,7 @@ def main():
 
     # --- Map InterceptorType to decorator ---
     decorator_map = {
+        "Instead": "&Вместо",  # [PATCH agenter] канонический перехват без копии оригинала
         "Before": "&\u041f\u0435\u0440\u0435\u0434",                    # &Перед
         "After": "&\u041f\u043e\u0441\u043b\u0435",                     # &После
         "ModificationAndControl": "&\u0418\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u0435\u0418\u041a\u043e\u043d\u0442\u0440\u043e\u043b\u044c",  # &ИзменениеИКонтроль
@@ -177,6 +178,13 @@ def main():
         body_lines.append("\t// TODO: \u043a\u043e\u0434 \u043f\u0435\u0440\u0435\u0434 \u0432\u044b\u0437\u043e\u0432\u043e\u043c \u043e\u0440\u0438\u0433\u0438\u043d\u0430\u043b\u044c\u043d\u043e\u0433\u043e \u043c\u0435\u0442\u043e\u0434\u0430")  # код перед вызовом оригинального метода
     elif interceptor_type == "After":
         body_lines.append("\t// TODO: \u043a\u043e\u0434 \u043f\u043e\u0441\u043b\u0435 \u0432\u044b\u0437\u043e\u0432\u0430 \u043e\u0440\u0438\u0433\u0438\u043d\u0430\u043b\u044c\u043d\u043e\u0433\u043e \u043c\u0435\u0442\u043e\u0434\u0430")  # код после вызова оригинального метода
+    elif interceptor_type == "Instead":
+        # [PATCH agenter] &Вместо + ПродолжитьВызов — без копии оригинала
+        body_lines.append("\t// ВАЖНО: в сигнатуре укажите параметры оригинала и передайте их в ПродолжитьВызов")
+        body_lines.append("\t// (тело оригинала НЕ копируется).")
+        body_lines.append("\t// TODO: код «перед» (при необходимости установить Отказ и Возврат)")
+        body_lines.append("\tПродолжитьВызов(); // TODO: передать параметры оригинала")
+        body_lines.append("\t// TODO: код «после»")
     elif interceptor_type == "ModificationAndControl":
         body_lines.append("\t// \u0421\u043a\u043e\u043f\u0438\u0440\u0443\u0439\u0442\u0435 \u0442\u0435\u043b\u043e \u043e\u0440\u0438\u0433\u0438\u043d\u0430\u043b\u044c\u043d\u043e\u0433\u043e \u043c\u0435\u0442\u043e\u0434\u0430 \u0438 \u0432\u043d\u0435\u0441\u0438\u0442\u0435 \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u044f,")  # Скопируйте тело оригинального метода и внесите изменения,
         body_lines.append("\t// \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u044f \u043c\u0430\u0440\u043a\u0435\u0440\u044b #\u0423\u0434\u0430\u043b\u0435\u043d\u0438\u0435 / #\u041a\u043e\u043d\u0435\u0446\u0423\u0434\u0430\u043b\u0435\u043d\u0438\u044f \u0438 #\u0412\u0441\u0442\u0430\u0432\u043a\u0430 / #\u041a\u043e\u043d\u0435\u0446\u0412\u0441\u0442\u0430\u0432\u043a\u0438")  # используя маркеры #Удаление / #КонецУдаления и #Вставка / #КонецВставки

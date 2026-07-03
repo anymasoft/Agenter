@@ -493,13 +493,21 @@ def validate_extension_xml(ext_src_path: str, max_errors: int = 30) -> dict:
     rep = _Report(max_errors=max_errors)
 
     # Порядок: сначала самые частые/критичные, потом мягкие.
+    #
+    # R20 (_check_xdto_structure) УБРАН из обязательного пути валидации.
+    # Причина: самодельная XDTO-валидация по портированным схемам (data/xsd/)
+    # беднее платформы и даёт ложные срабатывания на штатных платформенных тегах
+    # (доказано: InternalInfo/PropertyState — конфигуратор пишет сам, а схема его
+    # не знает; db_load принимает блок без ошибок — airtight c2). Финальный арбитр
+    # структуры — db_load самой 1С, не наша схема. Остаются лёгкие эвристики
+    # R14–R19 на ИЗВЕСТНЫЕ грабли загрузки. XDTO-проверка доступна отдельным
+    # on-demand op (ops_runner.validate_xdto). См. _inventory/validation-provenance-part2.md.
     checks = [
         _check_help_files,
         _check_dcs_templates,
         _check_forbidden_props,
         _check_xml_comments,
         _check_subsystems,
-        _check_xdto_structure,  # R20: XDTO-валидация через JSON-схемы
     ]
     for check_fn in checks:
         if rep.stopped:

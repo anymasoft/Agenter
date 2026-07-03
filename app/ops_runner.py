@@ -63,6 +63,25 @@ def _bytes_to_mb(n: int) -> float:
     return round(n / 1024 / 1024, 1)
 
 
+def _chroma_total(chroma) -> int | None:
+    """Суммарное число документов в коллекциях ChromaDB из /health.
+
+    Нужно фолбэку ожидания reindex (старый BSL Atlas без флага in_progress):
+    во время векторной индексации это число растёт, а по завершении замирает.
+    """
+    if not isinstance(chroma, dict):
+        return None
+    total = 0
+    for v in chroma.values():
+        if isinstance(v, (int, float)):
+            total += int(v)
+        elif isinstance(v, dict):
+            for vv in v.values():
+                if isinstance(vv, (int, float)):
+                    total += int(vv)
+    return total
+
+
 # Стандартные папки в корне XML-выгрузки конфигурации/расширения 1С.
 # Используется в safety-check перед очисткой целевой папки.
 _KNOWN_1C_DIRS: set[str] = {
@@ -273,16 +292,33 @@ async def _run_ps_humanized(cfg: dict, *args, **kwargs) -> str:
         raise RuntimeError(humanize_1c_error(str(e), cfg)) from e
 
 
+def _is_extension_absent(err_text: str) -> bool:
+    """True, если ошибка означает «такого расширения нет в базе» (а не реальный
+    сбой). Ловит и сырой текст 1С, и уже humanize'нутое сообщение."""
+    t = (err_text or "").lower()
+    if "не найдено в этой базе" in t:          # humanize'нутая формулировка
+        return True
+    if re.search(r"расширени\w*\s+конфигурации\s+.+?\s+не\s+(найден|существ)", t):
+        return True
+    return False
+
+
 # ──────────────────────────────────────────────────────────────────────────
 # Проверка авторизации в 1С (используется в POST /config)
 # ──────────────────────────────────────────────────────────────────────────
 
-async def reindex_bsl_atlas(cfg: dict, on_log: LogFn) -> dict[str, Any]:
-    """Триггерит переиндексацию BSL Atlas через MCP JSON-RPC.
+async def reindex_bsl_atlas(cfg: dict, on_log: LogFn, *, force: bool = False) -> dict[str, Any]:
+    """Триггерит переиндексацию BSL Atlas через HTTP /reindex.
 
-    Важно: BSL Atlas индексирует свою конфигурированную папку (из его .env),
-    а не наш scheme_path. Эта функция просто говорит ему «переиндексируй то
-    что у тебя настроено». Управление путём BSL Atlas — отдельная фича.
+    force=False → инкрементально (только изменённые файлы) — для лёгкой
+    авто-сверки. force=True → ПОЛНАЯ пересборка индекса с нуля — обязательно
+    при СМЕНЕ базы 1С: инкрементальная сверка не распознаёт оптом подменённую
+    конфигурацию и индекс остаётся от старой базы.
+
+    Важно: BSL Atlas индексирует свою конфигурированную папку (SOURCE_PATH из
+    его .env), а не наш scheme_path напрямую. Эта функция говорит ему
+    «переиндексируй то, что у тебя настроено». Если SOURCE_PATH ≠ scheme_path
+    (например после смены базы пути разошлись) — предупреждаем в логе.
     """
     import json as _json
     import aiohttp as _aiohttp
@@ -301,12 +337,14 @@ async def reindex_bsl_atlas(cfg: dict, on_log: LogFn) -> dict[str, Any]:
     timeout_total = _aiohttp.ClientTimeout(total=1800)  # 30 минут
     async with _aiohttp.ClientSession(timeout=timeout_total) as session:
         # BSL Atlas v2.0.0: прямой HTTP-эндпоинт POST /reindex (фоновая задача).
-        # force=false → инкрементальная пересборка только изменённых файлов.
-        await on_log("Запускаю reindex (POST /reindex)…", "")
+        # force=false → инкрементально (только изменённые файлы);
+        # force=true  → полная пересборка с нуля (нужно при смене базы).
+        mode = "полная пересборка" if force else "инкрементально"
+        await on_log(f"Запускаю reindex (POST /reindex, {mode})…", f"force={force}")
         try:
             async with session.post(
                 f"{url}/reindex",
-                json={"force": False},
+                json={"force": force},
                 timeout=_aiohttp.ClientTimeout(total=30),
             ) as resp:
                 body = await resp.text()
@@ -324,9 +362,23 @@ async def reindex_bsl_atlas(cfg: dict, on_log: LogFn) -> dict[str, Any]:
         detail = str(started.get("message", "")).strip()
         await on_log(f"BSL Atlas: {detail or 'reindex запущен'}", "")
 
-        # Переиндексация идёт в фоне; снимем итоговые счётчики через /health.
-        for _ in range(15):
-            await _asyncio.sleep(1.0)
+        # Переиндексация идёт ФОНОМ внутри BSL Atlas (Starlette BackgroundTask),
+        # ответ POST /reindex приходит мгновенно. Раньше мы выходили по первому
+        # же /health, где sqlite.symbols != None — но это поле непустое ВСЕГДА
+        # (отдаёт старый/частичный индекс), поэтому операция рапортовала
+        # «готово» уже через ~1 сек: спиннер в UI гас, а индексация реально шла
+        # ещё минуты (видно в Диспетчере задач). Теперь ждём, пока BSL Atlas сам
+        # не сообщит reindex.in_progress == False — честный спиннер на всё время.
+        import time as _time
+        deadline = _time.monotonic() + 1700  # < session total(1800) с запасом на хвост
+        saw_in_progress = False
+        last_report = 0.0
+        last_counts = None
+        stable_polls = 0
+        poll = 0
+        while _time.monotonic() < deadline:
+            poll += 1
+            await _asyncio.sleep(2.0)
             try:
                 async with session.get(
                     f"{url}/health", timeout=_aiohttp.ClientTimeout(total=5)
@@ -334,12 +386,47 @@ async def reindex_bsl_atlas(cfg: dict, on_log: LogFn) -> dict[str, Any]:
                     hd = await h.json()
             except Exception:
                 continue
+
             sq = (hd or {}).get("sqlite") or {}
             if sq.get("symbols") is not None:
                 stats["symbols_count"] = sq.get("symbols")
                 stats["objects_count"] = sq.get("objects")
                 summary = f"{sq.get('symbols')} символов, {sq.get('objects')} объектов"
-                break
+
+            rx = (hd or {}).get("reindex")
+            if isinstance(rx, dict) and "in_progress" in rx:
+                # Новый BSL Atlas: точный сигнал о фоновой индексации.
+                if rx.get("in_progress"):
+                    saw_in_progress = True
+                    now = _time.monotonic()
+                    if now - last_report >= 4.0:
+                        last_report = now
+                        phase = rx.get("phase") or rx.get("mode") or ""
+                        cnt = sq.get("symbols")
+                        await on_log(
+                            "Индексация идёт…" + (f" ({phase})" if phase else ""),
+                            (f"{cnt} символов" if cnt is not None else ""),
+                        )
+                    continue
+                # in_progress == False
+                if saw_in_progress or poll >= 2:
+                    break  # завершилось (или быстрый инкрементальный reindex)
+            else:
+                # Старый BSL Atlas без флага: эвристика стабилизации счётчиков,
+                # чтобы не рапортовать «готово» мгновенно и не зависнуть навсегда.
+                cur = (sq.get("symbols"), sq.get("objects"),
+                       _chroma_total((hd or {}).get("chromadb")))
+                stable_polls = stable_polls + 1 if cur == last_counts else 0
+                last_counts = cur
+                now = _time.monotonic()
+                if now - last_report >= 4.0:
+                    last_report = now
+                    await on_log("Индексация идёт…", f"{sq.get('symbols')} символов")
+                # счётчики не меняются ~6 сек и индекс непустой → считаем готовым
+                if stable_polls >= 3 and sq.get("symbols") is not None:
+                    break
+        else:
+            await on_log("Истёк лимит ожидания reindex (30 мин) — проверь BSL Atlas", "")
 
     # Размер SQLite-индекса BSL Atlas (если доступен по умолчанию)
     db_candidates = [
@@ -442,18 +529,42 @@ async def dump_extension(cfg: dict, on_log: LogFn) -> dict[str, Any]:
 
     await on_log(f"db-dump-xml -Extension «{ext_name}»", f"→ {ext_src}")
 
-    out = await _run_ps_humanized(
-        cfg,
-        script,
-        "-V8Path",       v8_path,
-        "-InfoBasePath", base,
-        "-UserName",     cfg.get("username", ""),
-        "-Password",     cfg.get("password", ""),
-        "-ConfigDir",    ext_src,
-        "-Extension",    ext_name,
-        "-Mode",         "Full",
-        timeout=600,  # 10 минут — расширения обычно небольшие
-    )
+    try:
+        out = await _run_ps_humanized(
+            cfg,
+            script,
+            "-V8Path",       v8_path,
+            "-InfoBasePath", base,
+            "-UserName",     cfg.get("username", ""),
+            "-Password",     cfg.get("password", ""),
+            "-ConfigDir",    ext_src,
+            "-Extension",    ext_name,
+            "-Mode",         "Full",
+            timeout=600,  # 10 минут — расширения обычно небольшие
+        )
+    except RuntimeError as e:
+        # База без этого расширения — это НЕ сбой пайплайна (частый случай для
+        # свежей/типовой базы). Не валим операцию красной ошибкой, а мягко
+        # пропускаем: с основной конфигурацией работать всё равно можно.
+        if _is_extension_absent(str(e)):
+            await on_log(
+                f"Расширение «{ext_name}» не найдено в базе — пропускаю",
+                "норма для базы без расширений; работа с конфигурацией доступна",
+            )
+            return {
+                "info": f"расширение «{ext_name}» отсутствует в базе — пропущено",
+                "skipped": True,
+                "tail": "",
+                "stats": {
+                    "ext_name":    ext_name,
+                    "xml_count":   0,
+                    "files_count": 0,
+                    "size_mb":     0,
+                    "absent":      True,
+                    "path":        str(Path(ext_src).resolve()),
+                },
+            }
+        raise
 
     xml_count = _count_files(ext_src, "*.xml")
     files_count = _count_files(ext_src, "*")

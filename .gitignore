@@ -110,3 +110,14 @@ tests/audit/COVERAGE.md
 /data/platform_docs_chroma_test/
 /data/erp/
 /tools/models/
+op_state.json
+
+# --- Сторонние дистрибутивы / скретч-рабочие папки (не source) -----------
+/MCP-RSV-Server-*/
+/_work/
+/_skd_sample-*.sql
+*.erf
+# конкретное расширение разработчика (бизнес-код) — как ext_src/, не в репо
+app/src/
+# baseline-снапшот метаданных конкретной клиентской базы (auto_sync), не source
+app/base_sync/

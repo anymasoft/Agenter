@@ -55,6 +55,14 @@ _EXTENSION_SPECIFIC_TAGS = frozenset(
     }
 )
 
+# Платформенные служебные блоки: их содержимое конфигуратор 1С пишет и
+# поддерживает сам (напр. <InternalInfo><xr:PropertyState>…). Портированные
+# XSD→JSON-схемы (data/xsd/) их состав не описывают, поэтому "недопустимый
+# дочерний элемент" внутри них — ЛОЖНОЕ срабатывание: валидатор метит ошибкой
+# то, что платформа выгружает сама. Решающий арбитр для этих блоков — db_load
+# самой 1С, не наша схема. См. _inventory/validation-provenance-part1.md.
+_PLATFORM_INTERNAL_PARENTS = frozenset({"InternalInfo"})
+
 # Объекты метаданных, для которых root=MetaDataObject
 _METADATA_OBJECT_TYPES = frozenset(
     {
@@ -258,7 +266,14 @@ def validate_xml_file(
                 or "ожидается минимум" in err
                 or "обязательный элемент" in err
             )
-            if is_ext_tag or is_min_occurs:
+            # Неизвестный дочерний элемент внутри платформенного служебного блока
+            # (InternalInfo/PropertyState и пр.) — не ошибка структуры расширения,
+            # а штатная выгрузка платформы, которой нет в портированной схеме.
+            is_platform_internal = "недопустимый дочерний элемент" in err and any(
+                f"{parent}: недопустимый дочерний элемент" in err
+                for parent in _PLATFORM_INTERNAL_PARENTS
+            )
+            if is_ext_tag or is_min_occurs or is_platform_internal:
                 warnings.append(f"[ext] {err}")
             else:
                 filtered.append(err)

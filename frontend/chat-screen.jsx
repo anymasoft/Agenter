@@ -1549,6 +1549,12 @@ const RightPanel = ({ desktopOnline = true, config = {} }) => {
 
   const handleRunOp = async (opName) => {
     if (running[opName]) return;
+    // Оптимистично включаем спиннер сразу по клику — не ждём op_started по
+    // WebSocket. Снимут спиннер op_done/op_error (или catch ниже). Для долгих
+    // операций (reindex ERP — минуты) это критично: кнопка не должна выглядеть
+    // «мгновенно готовой», пока бэкенд реально ждёт завершения индексации.
+    setRunning(r => ({ ...r, [opName]: true }));
+    setOpLog(l => ({ ...l, [opName]: "Запуск…" }));
     try {
       await AgenterAPI.runOperation(opName);
     } catch (e) {
@@ -1591,6 +1597,33 @@ const RightPanel = ({ desktopOnline = true, config = {} }) => {
           <div className="rb-title">Состояние базы</div>
         </div>
         <div className="assistant-card" style={{ padding: "14px 14px 4px" }}>
+          {/* Фаза 2 / Шаг 2.3 — Уровень 1: ручная синхронизация одной кнопкой.
+              db_dump + reindex + обновление baseline авто-сверки. Страховка,
+              если авто-сверка выключена/не сработала или базу правили вручную. */}
+          <OpRow
+            title="Синхронизировать с базой"
+            subtitle="Выгрузка + переиндексация: индекс отразит реальное состояние базы"
+            subtitleWithStats={(s) => {
+              const parts = [];
+              if (s.xml_count)    parts.push(`${fmtNum(s.xml_count)} XML`);
+              if (s.files_count && s.files_count !== s.xml_count) {
+                parts.push(`${fmtNum(s.files_count)} файлов`);
+              }
+              return parts.length ? parts.join(" · ") : null;
+            }}
+            opName="sync-base"
+            ops={ops} running={running} opLog={opLog}
+            onRun={handleRunOp}
+            runLabel="Синхронизировать"
+            runIcon="refresh"
+            disabledHint={!config.extension ? "Не задано имя расширения" : null}
+          />
+
+          <div style={{
+            height: 1, background: "var(--border)",
+            margin: "4px -14px 14px", opacity: 0.6,
+          }} />
+
           <OpRow
             title="Конфигурация (SCHEME)"
             subtitle="Основная конфигурация 1С"

@@ -34,6 +34,117 @@ _DEPRECATED_REPLACEMENTS = {
 _FORBIDDEN_WRITE_EXTS = {".xml"}
 
 
+# ── §0 ГЛАВНЫЙ ИНВАРИАНТ: запрет сырой ЗАПИСИ в XML метаданных ──────────────
+#
+# Любое ИЗМЕНЕНИЕ метаданных 1С — только через санкционированные tools/скиллы.
+# Сырая запись в .xml метаданных (Edit/Write уже закрыты ниже; здесь — Bash,
+# который раньше проходил мимо: агент правил Subsystems/Продажи.xml через
+# `sed -i`, что и запустило петлю Задачи-2). ЧТЕНИЕ сырыми инструментами
+# (cat/grep/head) — разрешено (research). Запрещена только ЗАПИСЬ.
+#
+# Детектор намеренно консервативен (§0: «не сделал лучше, чем испортил»),
+# но срабатывает ТОЛЬКО если в команде фигурирует .xml или ext_src — чтобы
+# не мешать обычным diagnostic-командам.
+
+import re as _re0
+
+# In-place редакторы / write-cmdlet'ы: pattern → человекочитаемая метка.
+_BASH_INPLACE_WRITE = (
+    (r"sed\s+(?:-[a-z]*\s+)*-i\b",   "sed -i"),
+    (r"sed\s+--in-place",            "sed --in-place"),
+    (r"perl\s+(?:-[a-z]*\s*)*-i\b",  "perl -i"),
+    (r"\btee\b",                     "tee"),
+    (r"\btruncate\b",                "truncate"),
+    (r"\bdd\b[^|]*\bof=",            "dd of="),
+    (r"\bset-content\b",             "Set-Content"),
+    (r"\badd-content\b",             "Add-Content"),
+    (r"\bclear-content\b",           "Clear-Content"),
+    (r"\bout-file\b",                "Out-File"),
+)
+
+
+def _bash_raw_write_to_metadata(command: str) -> str | None:
+    """Возвращает человекочитаемую метку write-операции, если Bash-команда
+    ПИШЕТ в XML метаданных расширения (или в ext_src), иначе None.
+
+    Чтение (cat/grep/head/`sed -n`/find) не матчится — у него нет write-маркера.
+    """
+    if not command:
+        return None
+    c = command
+    cl = c.lower()
+    # Быстрый фильтр области: интересует только запись в метаданные.
+    if ".xml" not in cl and "ext_src" not in cl:
+        return None
+    # 1) in-place редакторы / write-cmdlet'ы
+    for pat, label in _BASH_INPLACE_WRITE:
+        if _re0.search(pat, cl):
+            return label
+    # 2) редиректы > / >> с целью .xml или ext_src
+    for m in _re0.finditer(r">>?\s*([^\s;|&]+)", c):
+        tgt = m.group(1).strip("'\"").lower()
+        if tgt.endswith(".xml") or "ext_src" in tgt:
+            return f"редирект в {m.group(1).strip(chr(39) + chr(34))}"
+    # 3) cp/mv/copy/move — если команда вообще касается .xml/ext_src (быстрый
+    #    фильтр выше уже это гарантирует), это копирование/перенос в метаданные.
+    if _re0.search(r"\b(cp|mv|copy-item|move-item|copy|move)\b", cl):
+        return "cp/mv в метаданные"
+    return None
+
+
+# ── Защёлка записи в БД (Фаза 3 разворота) ──────────────────────────────────
+# Verb-флаги конфигуратора 1С, которые ЗАГРУЖАЮТ конфигурацию/расширение в БД
+# (применяют изменения к реальной базе). Любой из них = запись в БД.
+_DB_LOAD_VERBS = (
+    "/loadconfigfromfiles",   # загрузка конфигурации/расширения из XML-файлов
+    "/loadcfg",               # загрузка .cf/.cfe
+    "/updatedbcfg",           # применение конфигурации к БД
+    "/updatecfg",             # обновление из .cfu
+)
+
+
+def _bash_db_write_to_base(command: str) -> str | None:
+    """Возвращает метку, если Bash/PowerShell-команда ПИШЕТ в БД 1С в обход
+    канала db_load, иначе None.
+
+    Две семантики записи:
+      1) прямой конфигуратор: бинарник 1cv8* + DESIGNER + verb загрузки
+         (/LoadConfigFromFiles | /LoadCfg | /UpdateDBCfg | /UpdateCfg);
+      2) исполнение кода в режиме предприятия (db-run): 1cv8* + ENTERPRISE +
+         /Execute | /C — оно может менять данные/код в БД.
+
+    Матчим по СЕМАНТИКЕ команды (бинарник + verb), не по имени .ps1 — устойчиво
+    к переименованию скрипта и прямому вызову 1cv8. Чтение/выгрузка
+    (/DumpConfigToFiles, /DumpIB) write-маркеров не содержат и не матчатся.
+    """
+    if not command:
+        return None
+    cl = " ".join(command.lower().split())
+    # Без бинарника платформы 1С это не вызов платформы — не блокируем
+    # (страховка от ложных срабатываний на произвольном тексте).
+    if _re0.search(r"\b1cv8[cs]?\b", cl) is None:
+        return None
+    # 1) Загрузка конфигурации/расширения в БД через конфигуратор.
+    if "designer" in cl or "конфигуратор" in cl:
+        for verb in _DB_LOAD_VERBS:
+            if verb in cl:
+                return f"конфигуратор {verb}"
+    # 2) Исполнение кода в режиме предприятия (db-run).
+    if "enterprise" in cl or "предприятие" in cl:
+        if _re0.search(r"/execute\b", cl) or _re0.search(r"/c[\s\"']", cl):
+            return "запуск кода в режиме предприятия (/Execute|/C)"
+    return None
+
+
+# Модифицирующие tools (пишут в ext_src или БД 1С). Для single-shot sync
+# guard'а (2A/2B): после любого из них повторный db_dump запрещён, иначе он
+# сотрёт несохранённую работу. Зеркалит _MODIFYING_TOOLS в orchestrator_sdk.
+_MODIFYING_TOOLS_GUARD = frozenset({
+    "meta_compile", "meta_edit", "cfe_borrow", "cfe_patch_method",
+    "subsystem_edit", "form_compile", "form_edit", "db_update", "db_load",
+})
+
+
 def _xml_path_hint(path_lower: str) -> str:
     """Sprint 2 hotfix-5: по пути XML возвращает рекомендацию какой именно
     специализированный tool/skill использовать. path_lower — путь в формате
@@ -494,8 +605,6 @@ def check_tool_call(
     history: list[dict],
     *,
     known_objects: dict[str, set[str]] | None = None,
-    stage_dispatch_required: bool = False,
-    current_stage: dict | None = None,
 ) -> str | None:
     """
     Проверяет вызов tool ДО его выполнения.
@@ -507,34 +616,18 @@ def check_tool_call(
     — все tool calls текущей задачи. Используется для проверки последовательности
     (например db_load требует cfe_validate в истории).
 
-    Sprint 4 S4.5:
-      stage_dispatch_required: bool — True для L2+ задач. Если план ещё
-        не построен (current_stage = None) — все модифицирующие tools
-        блокируются с подсказкой вызвать plan_task.
-      current_stage: dict | None — текущая активная стадия задачи. Если
-        задана — разрешены только expected_tool этой стадии + always-allowed.
+    Клетки больше нет (разворот завершён): stage-dispatch снят в Фазе 3,
+    стадийная машина и её параметры — в Фазе 4. Движок свободно вызывает
+    любой инструмент в любом порядке. Границы держит ПЕРИМЕТР ниже:
+    §0 (сырая запись XML) / R7 (db_load↔cfe_validate) / db_load-gate /
+    защёлка записи в БД, а застой/повтор — детектор циклов (Фаза 1).
     """
-    # Sprint 4 S4.5: Stage dispatch — ПЕРВЫЙ приоритет, до всех остальных правил.
-    # Это самое сильное ограничение, оно заворачивает агента в правильный маршрут
-    # ещё до того, как сработают остальные guard'ы (которые ловят ошибки post-hoc).
-    if stage_dispatch_required:
-        try:
-            from task_planner import is_tool_allowed_for_stage
-            allowed, reason = is_tool_allowed_for_stage(
-                tool_name, current_stage, tool_input=tool_input,
-            )
-            if not allowed:
-                stage_info = ""
-                if current_stage:
-                    stage_info = (
-                        f"\n\nТекущая стадия #{current_stage.get('index')}: "
-                        f"[{current_stage.get('kind')}] {current_stage.get('description', '')[:80]}\n"
-                        f"Ожидаемый tool: {current_stage.get('expected_tool', '?')}"
-                    )
-                return f"GUARD BLOCKED (stage-dispatch): {reason}{stage_info}"
-        except ImportError:
-            # task_planner не доступен — пропускаем эту проверку, остальные guard'ы сработают
-            pass
+    # ── Разворот завершён (СНЯТО): stage-dispatch (Ф3) + стадийная машина (Ф4) ─
+    # Здесь стоял самый сильный прут клетки: блок любого tool, не совпавшего с
+    # expected_tool стадии (task_planner.is_tool_allowed_for_stage), и
+    # принуждение plan_task-первым. Плодил livelock. Снят целиком — свобода
+    # ВНУТРИ, периметр СНАРУЖИ. Параметры stage_dispatch_required/current_stage
+    # тоже убраны из сигнатуры (Фаза 4): вызыватель их больше не передаёт.
 
     # ── R3/R4: deprecated tools → подсказка на современный аналог ──────
     if tool_name in _DEPRECATED_REPLACEMENTS:
@@ -608,6 +701,84 @@ def check_tool_call(
                     f"meta_remove). Если нужно изменить состав расширения — "
                     f"используй их, не Edit вручную."
                 )
+
+    # ── §0: запрет сырой ЗАПИСИ в XML метаданных через Bash ──────────────
+    # Edit/Write на .xml уже закрыты выше; Bash (sed -i / редиректы / cp/mv)
+    # раньше проходил мимо — именно через него агент в Задаче-2 правил
+    # Subsystems/Продажи.xml и зациклился. Чтение (cat/grep/head) — разрешено.
+    if tool_name == "Bash":
+        command = str((tool_input or {}).get("command", "") or "")
+        bad = _bash_raw_write_to_metadata(command)
+        if bad:
+            return (
+                f"GUARD BLOCKED (§0, сырая запись): команда выполняет '{bad}' "
+                f"по XML метаданных расширения. Прямая правка XML метаданных "
+                f"ЗАПРЕЩЕНА — namespace/UUID/ChildObjects/InternalInfo ломаются "
+                f"regex'ом, и платформа 1С отвергает результат на db_load.\n\n"
+                f"Правильный путь — санкционированный инструмент: meta_edit "
+                f"(реквизиты/свойства объекта), subsystem_edit (состав/свойства "
+                f"подсистемы), cfe_borrow (заимствование), form_edit (формы). "
+                f"Не помнишь нужный — skill_search('<что нужно сделать>').\n\n"
+                f"ЧТЕНИЕ файлов (cat/grep/head/sed -n) разрешено — запрещена "
+                f"только ЗАПИСЬ.\n\n"
+                f"Если санкционированного инструмента для этой операции НЕТ — "
+                f"не обходи сырой правкой. Вызови ask_user и опиши, что нужно "
+                f"(«операция пока не поддерживается инструментами»). "
+                f"«Не сделал» лучше, чем «испортил базу»."
+            )
+
+    # ── Защёлка записи в БД (Фаза 3 разворота): прямая загрузка мимо db_load ─
+    # Запись в реальную БД 1С — ТОЛЬКО через tool db_load (снапшот сессии +
+    # apply-gate R7). Прямой конфигуратор (DESIGNER + Load*/Update*) или
+    # исполнение кода в режиме предприятия (ENTERPRISE + /Execute|/C) через
+    # Bash/PowerShell минует снапшот и проверки. Раньше этот путь СЛУЧАЙНО
+    # прикрывал stage-dispatch (Bash был разрешён лишь на части стадий); после
+    # его снятия защёлка стоит САМОСТОЯТЕЛЬНЫМ правилом периметра — иначе
+    # «запись в БД = один канал db_load» перестала бы быть истиной.
+    if tool_name == "Bash":
+        command = str((tool_input or {}).get("command", "") or "")
+        db_write = _bash_db_write_to_base(command)
+        if db_write:
+            return (
+                f"GUARD BLOCKED (запись в БД мимо db_load): команда выполняет "
+                f"'{db_write}' — прямую запись в базу 1С в обход единственного "
+                f"санкционированного канала. Загрузка в реальную БД идёт ТОЛЬКО "
+                f"через db_load: он снимает снапшот сессии и проходит apply-gate "
+                f"(R7: db_load требует cfe_validate без errors). Прямой "
+                f"конфигуратор/предприятие минует снапшот и проверки — запрещён."
+                f"\n\nПравильный путь: доведи правки до cfe_validate (0 errors), "
+                f"затем вызови db_load — он безопасно применит конфигурацию к БД."
+                f"\n\nЧТЕНИЕ/выгрузка (/DumpConfigToFiles, /DumpIB) — это не "
+                f"запись, они не блокируются."
+            )
+
+    # ── 2A/2B: single-shot sync — повторный db_dump запрещён ─────────────
+    # db_dump чистит ext_src и заново тянет из БД. Повторный вызов в том же
+    # прогоне СТИРАЕТ несохранённую работу (правки meta_edit/subsystem_edit)
+    # и возвращает мусор от round-trip конфигуратора — корень петли Задачи-2.
+    # Разрешён только ОДИН db_dump за прогон, и только ДО модификаций.
+    if tool_name == "db_dump":
+        prior_dump = any(
+            e.get("tool") == "db_dump" and e.get("ok", True) for e in history
+        )
+        modified = any(
+            e.get("tool") in _MODIFYING_TOOLS_GUARD and e.get("ok", True)
+            for e in history
+        )
+        if prior_dump or modified:
+            why = "db_dump уже выполнялся в этом прогоне" if prior_dump \
+                else "в этом прогоне уже были модифицирующие операции"
+            return (
+                f"GUARD BLOCKED (single-shot sync): {why}. Повторный db_dump "
+                f"ЗАПРЕЩЁН — он очищает ext_src и заново выгружает из БД, "
+                f"СТИРАЯ твою несохранённую работу (правки реквизитов/синонимов/"
+                f"состава) и возвращая round-trip мусор конфигуратора. Это была "
+                f"корневая причина зацикливания.\n\n"
+                f"ext_src уже синхронизирован — продолжай с текущими файлами. "
+                f"Если стадия зависла на 'sync-from-db' — она уже удовлетворена, "
+                f"переходи к следующей (повторный plan_task без 'sync-from-db' "
+                f"первой стадией). Финал — cfe_validate → db_load."
+            )
 
     # ── R7: db_load требует cfe_validate без errors в истории ────────────
     if tool_name == "db_load":

@@ -11,7 +11,7 @@ param(
 	[string]$MethodName,
 
 	[Parameter(Mandatory)]
-	[ValidateSet("Before","After","ModificationAndControl")]
+	[ValidateSet("Before","After","Instead","ModificationAndControl")]
 	[string]$InterceptorType,
 
 	[string]$Context = "НаСервере",
@@ -119,6 +119,7 @@ if ($objType -eq "CommonModule") {
 $decorator = switch ($InterceptorType) {
 	"Before"                  { "&Перед" }
 	"After"                   { "&После" }
+	"Instead"                 { "&Вместо" }   # [PATCH agenter] канонический перехват без копии оригинала
 	"ModificationAndControl"  { "&ИзменениеИКонтроль" }
 }
 
@@ -144,6 +145,15 @@ switch ($InterceptorType) {
 	}
 	"After" {
 		$bodyLines += "`t// TODO: код после вызова оригинального метода"
+	}
+	"Instead" {
+		# [PATCH agenter] &Вместо + ПродолжитьВызов — канонический механизм перехвата.
+		# Копия тела оригинала НЕ нужна → ошибка «текст модуля изменился» невозможна.
+		$bodyLines += "`t// ВАЖНО: в сигнатуре процедуры укажите те же параметры, что у оригинала,"
+		$bodyLines += "`t// и передайте их в ПродолжитьВызов (тело оригинала НЕ копируется)."
+		$bodyLines += "`t// TODO: код «перед» (при необходимости установить Отказ и Возврат)"
+		$bodyLines += "`tПродолжитьВызов(); // TODO: передать параметры оригинала"
+		$bodyLines += "`t// TODO: код «после»"
 	}
 	"ModificationAndControl" {
 		$bodyLines += "`t// Скопируйте тело оригинального метода и внесите изменения,"

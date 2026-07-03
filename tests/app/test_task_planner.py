@@ -1,10 +1,15 @@
 """Tests for `app/task_planner.py` — plan validation invariants.
 
-Covers the SYNC-FIRST invariant introduced 2026-05-17: any plan with
-modifying stages must start with `sync-from-db`. This prevents the
-class of prod failures where orphan files from a previously failed
-task pollute the next modification (e.g. a borrowed but never-loaded
-Subsystem XML stays on disk and breaks subsequent db_load attempts).
+ФАЗА 2 разворота: инвариант SYNC-FIRST СНЯТ. Раньше любой план с
+модифицирующей стадией обязан был начинаться с `sync-from-db`; теперь
+синхронизация условная и внешняя по отношению к плану (ConfigDumpInfo-детектор
+сверяет базу перед задачей и выгружает только при реальных изменениях; см.
+`base_change_detector` + кнопка «Синхронизировать»). Эти тесты фиксируют новое
+поведение: модифицирующий план БЕЗ sync-from-db теперь ПРОХОДИТ валидацию.
+
+Защита от прод-инцидента 2026-05-17 (orphan-файлы) сохраняется другими
+средствами: db_load-gate (сохраняемое ядро) + single-shot db_dump guard
+(tool_guards 2A/2B). Сам план их больше не дублирует.
 
 These tests are FAST — no PowerShell, no 1C, no agent. They directly
 exercise the pure-Python planner functions.
@@ -63,8 +68,9 @@ def test_research_plus_ask_user_passes():
     assert validate_plan_invariants(plan) == []
 
 
-def test_plan_with_sync_first_passes():
-    """Canonical happy path: sync-from-db is stage 1."""
+def test_plan_with_sync_first_still_passes():
+    """sync-from-db as stage 1 is still a perfectly valid plan — the agent
+    may include it voluntarily (e.g. it knows the base changed manually)."""
     plan = [
         _stage(1, "sync-from-db"),
         _stage(2, "borrow-object"),
@@ -74,63 +80,42 @@ def test_plan_with_sync_first_passes():
     assert validate_plan_invariants(plan) == []
 
 
-def test_prod_failure_pattern_rejected():
-    """Exact plan shape that bit us 2026-05-17:
-    [research, include-in-subsystem]. The orphan Финансы.xml from the
-    previous failed task stayed on disk and broke db_load.
-    """
+# ── Фаза 2: SYNC-FIRST снят — модифицирующий план без sync теперь проходит ──
+
+def test_modifying_plan_without_sync_now_passes():
+    """Шаг 2.1: ранее этот план отвергался инвариантом SYNC-FIRST.
+    Теперь он валиден — синхронизация условная и вне плана."""
     plan = [
         _stage(1, "research", "find Финансы"),
         _stage(2, "include-in-subsystem", "add Posuda to Финансы"),
     ]
-    errors = validate_plan_invariants(plan)
-    assert errors, "This is the prod regression — must be rejected"
-    assert "SYNC-FIRST" in errors[0]
+    assert validate_plan_invariants(plan) == []
 
 
-def test_sync_present_but_not_first_rejected():
-    """sync-from-db must be FIRST, not just somewhere."""
+def test_sync_not_first_now_passes():
+    """sync-from-db в середине плана больше не ошибка — инвариант снят."""
     plan = [
         _stage(1, "research"),
         _stage(2, "sync-from-db"),
         _stage(3, "borrow-object"),
     ]
-    errors = validate_plan_invariants(plan)
-    assert errors, "sync-from-db must be position 1, not later"
+    assert validate_plan_invariants(plan) == []
 
 
-def test_lone_modifying_stage_rejected():
-    """Single modifying stage without sync."""
+def test_lone_modifying_stage_now_passes():
+    """Одиночная модифицирующая стадия без sync теперь валидна."""
     plan = [_stage(1, "borrow-object", "borrow X")]
-    errors = validate_plan_invariants(plan)
-    assert errors
-
-
-def test_error_message_names_offending_stage():
-    """Error should identify which stage triggered the invariant."""
-    plan = [
-        _stage(1, "research"),
-        _stage(2, "create-form", "build form"),
-    ]
-    errors = validate_plan_invariants(plan)
-    assert errors
-    # Helpful diagnostic for the agent
-    assert "create-form" in errors[0] or "#2" in errors[0]
+    assert validate_plan_invariants(plan) == []
 
 
 @pytest.mark.parametrize("kind", sorted(MODIFYING_STAGE_KINDS))
-def test_every_modifying_kind_demands_sync(kind: str):
-    """Coverage for the WHOLE set of modifying kinds: a single-stage
-    plan with that kind alone must be rejected.
-
-    If a new modifying kind is added later, this test catches its
-    omission from MODIFYING_STAGE_KINDS.
-    """
+def test_every_modifying_kind_passes_without_sync(kind: str):
+    """Покрытие ВСЕГО набора модифицирующих kind'ов: одиночный план с таким
+    kind БЕЗ sync-from-db теперь проходит (инвариант SYNC-FIRST снят)."""
     plan = [_stage(1, kind)]
-    errors = validate_plan_invariants(plan)
-    assert errors, (
-        f"Modifying kind `{kind}` should require sync-from-db first, "
-        f"but the invariant did not fire."
+    assert validate_plan_invariants(plan) == [], (
+        f"Modifying kind `{kind}` should no longer require sync-from-db "
+        f"(SYNC-FIRST removed in Фаза 2)."
     )
 
 
@@ -142,8 +127,8 @@ def test_every_modifying_kind_demands_sync(kind: str):
 def test_non_modifying_kinds_excluded_from_set(kind: str):
     """These kinds are NOT modifying. They must not be in MODIFYING_STAGE_KINDS.
 
-    If someone accidentally adds 'research' here, every plan would need
-    sync-from-db before research, which is wrong (research is read-only).
+    The set itself is retained (it labels which stages touch ext_src/БД for
+    other purposes), even though SYNC-FIRST no longer consumes it.
     """
     assert kind not in MODIFYING_STAGE_KINDS, (
         f"`{kind}` must NOT be in MODIFYING_STAGE_KINDS — it doesn't write."
@@ -154,19 +139,19 @@ def test_non_modifying_kinds_excluded_from_set(kind: str):
 # validate_stages — end-to-end, structural + invariants
 # ---------------------------------------------------------------------------
 
-def test_validate_stages_rejects_prod_failure_pattern():
-    """Through the full public API (raw dicts in, errors out)."""
+def test_validate_stages_accepts_plan_without_sync():
+    """Через полный публичный API: план без sync-from-db теперь валиден."""
     raw = [
         {"kind": "research", "description": "Найти подсистему Финансы"},
         {"kind": "include-in-subsystem", "description": "Добавить Посуда в Финансы"},
     ]
     stages, errors = validate_stages(raw)
-    assert errors, "Plan that failed in prod must now be rejected at plan_task time"
-    assert any("SYNC-FIRST" in e for e in errors)
+    assert not errors, errors
+    assert len(stages) == 2
 
 
-def test_validate_stages_accepts_corrected_prod_plan():
-    """Same scenario, but agent included sync-from-db as stage 1."""
+def test_validate_stages_accepts_plan_with_sync():
+    """План с явной sync-from-db первой стадией тоже валиден."""
     raw = [
         {"kind": "sync-from-db", "description": "Sync ext_src from DB"},
         {"kind": "research", "description": "Verify Финансы exists"},
@@ -180,14 +165,14 @@ def test_validate_stages_accepts_corrected_prod_plan():
     assert stages[0].kind == "sync-from-db"
 
 
-def test_validate_stages_structural_errors_short_circuit_invariants():
-    """If structural validation fails, invariant errors are not added too —
-    avoids confusing the agent with overlapping problems."""
+def test_validate_stages_structural_errors_still_enforced():
+    """Структурная валидация НЕ затронута снятием SYNC-FIRST: неизвестный
+    kind по-прежнему отвергается."""
     raw = [
         {"kind": "unknown-kind", "description": "broken"},
     ]
     stages, errors = validate_stages(raw)
     assert errors
-    # Should report the structural problem, not the SYNC-FIRST issue
     assert any("неизвестный kind" in e or "unknown" in e.lower() for e in errors)
+    # И никакого SYNC-FIRST-шума (инварианта больше нет в принципе)
     assert not any("SYNC-FIRST" in e for e in errors)

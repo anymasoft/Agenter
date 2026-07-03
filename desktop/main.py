@@ -74,10 +74,37 @@ DEFAULT_CONFIG = {
     # (там только legacy db-dump-xml.ps1 / db-load-xml.ps1).
     "skills_dir":  str(_DEFAULT_SKILLS_DIR),
     # Максимум итераций LLM-цикла на одну задачу.
-    # Защита: при зацикливании 3 одинаковых tool calls подряд → автостоп
-    # независимо от этого лимита. Лимит — верхняя граница для совсем
-    # длинных задач (сложные ТЗ типа складского учёта).
+    # Фаза 4 разворота: это БОЛЬШЕ НЕ бизнес-потолок (turn-cap снят). Значение
+    # max_iterations всё ещё задаёт верхнюю границу для расчёта аварийного
+    # SDK-cap (sdk_hard_cap) — структурной страховки от бесконечного цикла на
+    # уровне SDK. Остановка «по делу» идёт через деньги (money-cap ниже) и
+    # детектор циклов, а не через число шагов.
     "max_iterations": 50,
+    # ── Денежный потолок (Фаза 1, включён штатно в Фазе 4 как замена turn-cap) ─
+    # money_ceiling_enabled=True → живой потолок по витку (Рубеж 1): копим
+    # стоимость витков и при достижении лимита аккуратно обрываем задачу
+    # (client.interrupt()), не превышая остаток баланса. Лимит =
+    # min(task_cap_usd, остаток_баланса − резерв_витка); при пустом ledger
+    # (баланс 0) потолок неактивен — там страхует SDK-cap + детектор циклов.
+    # Это «штатный путь остановки по тратам» вместо грубого лимита по шагам.
+    "money_ceiling_enabled": True,
+    # billing_enforced=True дополнительно включает pre-start gate (Рубеж 0):
+    # не стартовать задачу, если остаток < резерва (трат ноль). Оставлен
+    # opt-in: при незаполненном балансе он бы отклонял ЛЮБОЙ старт. Включайте,
+    # когда ledger реально пополняется (биллинг). По умолчанию — выкл.
+    "billing_enforced": False,
+    # Необязательные тонкие настройки потолка (если не заданы — берутся оценки
+    # money_guard): task_cap_usd — жёсткий потолок на одну задачу ($);
+    # task_reserve_usd — резерв для pre-start gate; one_turn_reserve_usd —
+    # буфер одного витка под mid-turn перерасход. Не задаём по умолчанию,
+    # чтобы не обрывать большие легальные задачи преждевременно.
+    #
+    # Фаза 5 разворота: нативные скиллы. native_skills_enabled=True → движок
+    # видит безопасные скиллы каталога .claude/skills нативно (через Skill tool),
+    # db-мутаторы остаются только за MCP. По умолчанию OFF: включать ТОЛЬКО после
+    # чистой runtime-раскладки workspace (Фаза 7) и живого теста discovery —
+    # сейчас рантайм-.claude содержит dev-конфиг (см. orchestrator_sdk.py).
+    "native_skills_enabled": False,
 }
 
 
@@ -1030,7 +1057,37 @@ class ToolExecutor:
             "-UpdateDB",
             "-StrictLog",
         )
-        return f"db_load OK\n{out[-800:]}"
+        # ── Apply-time шлюз ─────────────────────────────────────────────────
+        # db_load загрузил ИСХОДНИКИ, но для расширения это НЕ значит «применено»:
+        # apply-time ошибки (&ИзменениеИКонтроль «текст модуля изменился» и пр.)
+        # всплывают при ПРИМЕНЕНИИ модуля, а не при загрузке. Проверяем явно —
+        # иначе агент ложно рапортует «Применено в БД». run_powershell бросит
+        # RuntimeError при exit!=0 → db_load станет is_error → фаза НЕ закоммитится.
+        apply_msg = ""
+        ext = (cfg.get("extension") or "").strip()
+        if ext:
+            check_script = str(_SCRIPTS_DIR / "cfe-check-apply.ps1")
+            if Path(check_script).exists():
+                try:
+                    await run_powershell(
+                        check_script,
+                        "-V8Path",       cfg["v8_path"],
+                        "-InfoBasePath", cfg["base_path"],
+                        "-UserName",     cfg["username"],
+                        "-Password",     cfg["password"],
+                        "-Extension",    ext,
+                    )
+                    apply_msg = f" · apply-check OK ({ext})"
+                except RuntimeError as e:
+                    raise RuntimeError(
+                        "db_load: исходники загружены, но расширение НЕ ПРИМЕНЯЕТСЯ "
+                        "платформой (apply-time проверка). Это НЕ «Применено в БД» — "
+                        "исправь модуль (напр. перехват через &Вместо вместо "
+                        "&ИзменениеИКонтроль) и повтори.\n" + str(e)
+                    ) from e
+            else:
+                apply_msg = " · apply-check ПРОПУЩЕН (cfe-check-apply.ps1 не найден)"
+        return f"db_load OK{apply_msg}\n{out[-800:]}"
 
     # ── Sprint 1 Step 2: Hot tools — обёртки над skill'ами ────────────────
     #
@@ -1224,87 +1281,11 @@ class ToolExecutor:
     # подсистему Финансы»). Hot tool делает добавление содержимого однострочной
     # операцией.
 
-    async def _plan_task(
-        self,
-        task_id: str,
-        stages: list[dict],
-    ) -> str:
-        """Sprint 4 S4.3: принимает план задачи от агента, валидирует,
-        сохраняет в БД, возвращает форматированный план обратно.
-
-        stages — список объектов с полями:
-          • kind         — один из 22 STAGE_KIND (детерминированный enum)
-          • description  — человекочитаемое описание стадии
-          • args_hint    — опц. подсказка args для будущего вызова tool
-
-        После plan_task на каждой стадии разрешён только expected_tool
-        (см. is_tool_allowed_for_stage). Это и есть суть детерминированной
-        диспетчеризации.
-        """
-        # Импорт лениво — task_planner живёт в agenter/app/
-        try:
-            from task_planner import (
-                validate_stages, render_plan_for_agent, normalize_tool_name,
-            )
-        except ImportError:
-            try:
-                import sys as _sys
-                from pathlib import Path as _P
-                _sys.path.insert(0, str(_P(__file__).parent.parent / "app"))
-                from task_planner import (
-                    validate_stages, render_plan_for_agent, normalize_tool_name,
-                )
-            except Exception as e:
-                return f"plan_task: модуль task_planner недоступен ({e})"
-
-        parsed, errors = validate_stages(stages)
-        if errors:
-            return (
-                "plan_task: план НЕ принят, ошибки валидации:\n  • "
-                + "\n  • ".join(errors)
-                + "\n\nИсправь и повтори plan_task."
-            )
-
-        # Сохраняем план в БД через прямой SQL — _save_task_stages живёт
-        # в main.py, импорт оттуда создаёт циклическую зависимость.
-        # Делаем то же самое локально.
-        import sqlite3 as _sql, json as _json
-        from datetime import datetime as _dt
-        from pathlib import Path as _P
-        db_path = _P(__file__).parent.parent / "app" / "agenter.db"
-        now = _dt.utcnow().isoformat()
-        conn = _sql.connect(str(db_path))
-        try:
-            conn.execute("DELETE FROM task_stages WHERE task_id=?", (task_id,))
-            for s in parsed:
-                args_json = _json.dumps(s.args_hint or {}, ensure_ascii=False)
-                # Sprint 4 hotfix-6: первая стадия = 'in_progress' (а не 'pending').
-                # Это даёт консистентную семантику для auto-advance:
-                # current = in_progress → completed → next pending становится in_progress.
-                init_status = "in_progress" if s.index == 1 else "pending"
-                conn.execute(
-                    "INSERT INTO task_stages "
-                    "(task_id, stage_index, kind, description, expected_tool, "
-                    " args_hint, status, started_at) "
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                    (
-                        task_id, s.index, s.kind, s.description,
-                        normalize_tool_name(s.expected_tool),
-                        args_json, init_status,
-                        now if s.index == 1 else None,
-                    ),
-                )
-            conn.commit()
-        finally:
-            conn.close()
-
-        # Возвращаем форматированный план обратно агенту — он увидит свой
-        # же план как подтверждение и подсказку tool'ов для каждой стадии.
-        text = render_plan_for_agent(parsed)
-        return (
-            f"План задачи принят ({len(parsed)} стадий). Дальше выполняй стадии "
-            f"по порядку, на каждой вызывая ИМЕННО expected tool.\n\n{text}"
-        )
+    # Фаза 5 разворота: _plan_task (совещательный планировщик) СНЯТ целиком.
+    # Планирование задачи — теперь нативный TodoWrite движка. plan_task-tool
+    # удалён из sdk_tools/AGENTER_TOOL_NAMES и из системного промпта. Хелперы
+    # validate_stages/render_plan_for_agent в task_planner.py оставлены (их
+    # держат юнит-тесты планировщика), но в рантайме больше не вызываются.
 
     async def _subsystem_edit(
         self,
@@ -1699,7 +1680,25 @@ class ToolExecutor:
                 "-ObjectPath",     str(p),
                 timeout=120,
             )
-            return f"meta_edit OK\n{out[-1500:]}"
+            # Самоописательный итог: эхо применённых операций, чтобы агент
+            # видел ЧТО изменено (а не только «OK»). Без этого пустой/краткий
+            # вывод PS заставлял агента сомневаться и повторять (петля).
+            ops: list[str] = []
+            for _op in ("add", "modify", "remove", "set"):
+                _sec = definition.get(_op)
+                if not _sec:
+                    continue
+                if isinstance(_sec, dict) and isinstance(_sec.get("properties"), dict):
+                    props = ", ".join(f"{k}={v!r}" for k, v in _sec["properties"].items())
+                    ops.append(f"{_op}.properties: {props}")
+                else:
+                    ops.append(f"{_op}: {_json.dumps(_sec, ensure_ascii=False)[:120]}")
+            applied = "; ".join(ops) or "(определение пусто)"
+            body = (out or "").strip()
+            return (
+                f"meta_edit OK · {p.name} · применено: {applied}"
+                + (f"\n{out[-1200:]}" if body else "")
+            )
         finally:
             try:
                 Path(tmp_path).unlink()
@@ -1746,12 +1745,13 @@ class ToolExecutor:
         """Создание перехватчика метода для заимствованного объекта.
         module_path: 'Catalog.X.ObjectModule' / 'Document.X.Form.Y' / 'CommonModule.X' / и т.д.
         method_name: имя оригинального метода
-        interceptor_type: 'Before' / 'After' / 'ModificationAndControl'
+        interceptor_type: 'Before' / 'After' / 'Instead' (&Вместо, канонический) /
+            'ModificationAndControl' (вручную не использовать — хрупкая байт-копия)
         context: '&НаСервере' (по умолчанию) или '&НаКлиенте'
         is_function: True если перехватываемый метод — функция (нужен Возврат)"""
-        if interceptor_type not in ("Before", "After", "ModificationAndControl"):
+        if interceptor_type not in ("Before", "After", "Instead", "ModificationAndControl"):
             raise ValueError(
-                f"cfe_patch_method: interceptor_type должен быть Before/After/ModificationAndControl, получено '{interceptor_type}'"
+                f"cfe_patch_method: interceptor_type должен быть Before/After/Instead/ModificationAndControl, получено '{interceptor_type}'"
             )
 
         ext_src = self._require_ext_src()
@@ -1958,7 +1958,7 @@ class AgentWSClient:
             open_timeout=30,
         ) as ws:
             self._ws = ws
-            log.info("✓ Подключён к backend")
+            log.info("Подключён к backend")
             # Отправляем конфиг клиента — бэкенд вставит его в system prompt
             _cfg_safe = {k: v for k, v in self.cfg.items() if k != "password"}
             await ws.send(json.dumps({
@@ -2025,9 +2025,9 @@ async def main():
     # Проверим BSL Atlas при старте
     try:
         await bsl.ensure_session()
-        log.info("✓ BSL Atlas доступен")
+        log.info("BSL Atlas доступен")
     except Exception as e:
-        log.warning("⚠ BSL Atlas недоступен: %s", e)
+        log.warning("BSL Atlas недоступен: %s", e)
 
     client = AgentWSClient(cfg["backend_ws_url"], executor)
     await client.run()

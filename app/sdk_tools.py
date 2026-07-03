@@ -55,7 +55,6 @@ def make_agenter_tools(
     executor,
     *,
     ask_user_ctx: dict | None = None,
-    task_id: str | None = None,
 ):
     """Создаёт набор SDK custom tools, забинженных в переданный ToolExecutor.
 
@@ -356,17 +355,25 @@ def make_agenter_tools(
     @tool(
         "cfe_patch_method",
         "Создать каркас перехватчика метода в заимствованном объекте 1С. "
-        "Генерирует BSL-функцию с правильной директивой (&Перед / &После / "
+        "Генерирует BSL-каркас с директивой (&Перед / &После / &Вместо / "
         "&ИзменениеИКонтроль) и именем процедуры с префиксом расширения. "
         "Объект должен быть заимствован через cfe_borrow ЗАРАНЕЕ. "
-        "ВАЖНО: создаёт только КАРКАС — тело перехватчика дописывается через "
-        "Read + Edit (или Write для нового файла).",
+        "ПРАВИЛО ВЫБОРА МЕХАНИЗМА: по умолчанию 'Instead' (&Вместо) + "
+        "ПродолжитьВызов — он общий (код до ПродолжитьВызов = «перед», после = "
+        "«после», без вызова = полная замена) и НЕ требует копии оригинала. "
+        "'ModificationAndControl' (&ИзменениеИКонтроль) ВРУЧНУЮ ЗАПРЕЩЁН: требует "
+        "байт-точной копии тела оригинала, которую правкой не воспроизвести — "
+        "платформа выдаст «Текст модуля для метода … изменился» при ПРИМЕНЕНИИ "
+        "(db_load это НЕ ловит — ловит apply-проверка). "
+        "ВАЖНО: создаёт только КАРКАС — тело дописывается через Read + Edit; для "
+        "&Вместо сигнатура повторяет параметры оригинала и передаёт их в "
+        "ПродолжитьВызов.",
         {
             "type": "object",
             "properties": {
                 "module_path":      {"type": "string", "description": "'Catalog.X.ObjectModule' / 'CommonModule.Y' / 'Document.X.ObjectModule' / 'Catalog.X.Form.Y'"},
                 "method_name":      {"type": "string", "description": "'ПриЗаписи', 'ОбработкаПроведения', ..."},
-                "interceptor_type": {"type": "string", "enum": ["Before", "After", "ModificationAndControl"]},
+                "interceptor_type": {"type": "string", "enum": ["Before", "After", "Instead", "ModificationAndControl"], "description": "Instead (&Вместо)+ПродолжитьВызов — КАНОНИЧЕСКИЙ выбор, без копии оригинала. Before/After — точечно. ModificationAndControl — НЕ использовать вручную (хрупкая байт-копия)."},
                 "context":          {"type": "string", "description": "'НаСервере' (по умолч.) / 'НаКлиенте' / 'НаКлиентеНаСервереБезКонтекста'"},
                 "is_function":      {"type": "boolean", "description": "true если оригинал — функция"},
             },
@@ -607,84 +614,6 @@ def make_agenter_tools(
             bool(args.get("detailed", False)),
             int(args.get("max_errors") or 30),
         )
-
-    @tool(
-        "plan_task",
-        "Sprint 4 S4.3: ОБЯЗАТЕЛЬНЫЙ ПЕРВЫЙ ШАГ для L2+ задач — раскладка ТЗ "
-        "на стадии. На каждой стадии указываешь её kind (тип) из фиксированного "
-        "набора, и диспетчер сам определит какой tool ты должен вызывать на этой "
-        "стадии. Без plan_task все модифицирующие tools заблокированы (R21).\n\n"
-        "Доступные kind'ы (полный список):\n"
-        "  • sync-from-db — db_dump для синхронизации\n"
-        "  • create-metadata-object — новый Catalog/Document/Register/Enum/...\n"
-        "  • edit-metadata-object — правка существующего (реквизит, ТЧ)\n"
-        "  • remove-metadata-object — удалить объект\n"
-        "  • borrow-object — заимствовать типовой объект\n"
-        "  • include-in-subsystem / remove-from-subsystem — Содержимое подсистемы\n"
-        "  • create-subsystem / edit-subsystem-property — подсистемы\n"
-        "  • create-form / edit-form / remove-form — управляемые формы\n"
-        "  • write-bsl-module — написать .bsl (единственная стадия где Edit на .bsl)\n"
-        "  • method-interceptor — перехватчик метода (cfe_patch_method)\n"
-        "  • create-role / create-template / create-skd / create-command-interface\n"
-        "  • research — read-only исследование (bsl_*, meta_info, platform_doc_*)\n"
-        "  • validate-and-load — финальный cfe_validate + db_load\n"
-        "  • ask-user — стадия с обращением к юзеру (неоднозначность)\n"
-        "  • other — fallback (требует skill_search)\n\n"
-        "ПРИНЦИПЫ ХОРОШЕГО ПЛАНА:\n"
-        "  1. Первая стадия для модифицирующих задач — обычно sync-from-db.\n"
-        "  2. Топологический порядок: A создаётся ДО B, если B ссылается на A.\n"
-        "  3. Финальная стадия — validate-and-load.\n"
-        "  4. Если ТЗ читать-обзорное — план может состоять из одной 'research'.\n"
-        "  5. План можно перевызвать (например уточнил план после research).",
-        {
-            "type": "object",
-            "properties": {
-                "stages": {
-                    "type": "array",
-                    "minItems": 1,
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "kind": {
-                                "type": "string",
-                                "description": "Один из перечисленных STAGE_KIND",
-                            },
-                            "description": {
-                                "type": "string",
-                                "minLength": 3,
-                                "description": "Что именно делать на этой стадии (человекочитаемо)",
-                            },
-                            "args_hint": {
-                                "type": "object",
-                                "description": (
-                                    "Опц. подсказка args для будущего вызова "
-                                    "expected_tool. Например {name:'X', type:'Catalog'} "
-                                    "для create-metadata-object."
-                                ),
-                            },
-                        },
-                        "required": ["kind", "description"],
-                    },
-                },
-            },
-            "required": ["stages"],
-        },
-    )
-    async def plan_task(args: dict) -> dict:
-        # task_id передан в make_agenter_tools при создании MCP-сервера.
-        # Fallback на ask_user_ctx для обратной совместимости.
-        tid = task_id
-        if not tid and ask_user_ctx:
-            tid = ask_user_ctx.get("task_id")
-        if not tid:
-            return _err(
-                "plan_task: task_id недоступен (внутренняя ошибка контекста). "
-                "Это баг Agenter, сообщи разработчику."
-            )
-        stages = args.get("stages") or []
-        if not isinstance(stages, list) or not stages:
-            return _err("plan_task: stages должно быть непустым массивом")
-        return await _safe_call(executor._plan_task, tid, stages)
 
     @tool(
         "subsystem_edit",
@@ -935,7 +864,6 @@ def make_agenter_tools(
         form_info, form_validate, form_edit, form_compile,
         meta_info, meta_validate,
         subsystem_edit,  # Sprint 2 hotfix-5
-        plan_task,       # Sprint 4 S4.3 — детерминированная диспетчеризация
         db_update, db_run,
         # Sprint 2 S2.1 — native BSL Language Server (без Docker)
         syntax_check,
@@ -1036,7 +964,6 @@ AGENTER_TOOL_NAMES = [
     "mcp__agenter__meta_info",
     "mcp__agenter__meta_validate",
     "mcp__agenter__subsystem_edit",  # Sprint 2 hotfix-5
-    "mcp__agenter__plan_task",       # Sprint 4 S4.3 — mandatory first step for L2+
     "mcp__agenter__db_update",
     "mcp__agenter__db_run",
     # Sprint 2 S2.1 — native BSL Language Server check

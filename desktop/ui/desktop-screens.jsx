@@ -672,8 +672,8 @@ const MainAppWindow = ({ onOpenSettings = ()=>{} }) => {
           <button className="dsk-btn primary" onClick={() => window.pywebview?.api?.open_web_ui()}>
             <Icon name="external" size={11}/> Веб-кабинет
           </button>
-          <button className="dsk-btn" onClick={() => window.pywebview?.api?.reindex()}>
-            <Icon name="refresh" size={11}/> Переиндексировать
+          <button className="dsk-btn" onClick={() => (window.pywebview?.api?.sync_base ?? window.pywebview?.api?.reindex)?.()}>
+            <Icon name="refresh" size={11}/> Синхронизировать с базой
           </button>
           <button className="dsk-btn" onClick={onOpenSettings}>
             <Icon name="settings" size={11}/>
@@ -885,7 +885,7 @@ const TrayContextMenu = () => (
       <div className="tray-menu-item"><Icon name="open" size={12}/> Открыть главное окно</div>
       <div className="tray-menu-item"><Icon name="external" size={12}/> Открыть веб-кабинет <span className="tray-menu-shortcut">Ctrl+Shift+A</span></div>
       <div className="tray-menu-sep"></div>
-      <div className="tray-menu-item"><Icon name="refresh" size={12}/> Переиндексировать</div>
+      <div className="tray-menu-item"><Icon name="refresh" size={12}/> Синхронизировать с базой</div>
       <div className="tray-menu-item"><Icon name="pause" size={12}/> Приостановить агента</div>
       <div className="tray-menu-sep"></div>
       <div className="tray-menu-item"><Icon name="settings" size={12}/> Настройки</div>

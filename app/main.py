@@ -31,6 +31,7 @@ import uuid
 from contextlib import asynccontextmanager
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 from urllib.parse import urlparse
 
 import aiohttp
@@ -206,8 +207,10 @@ if AGENT_PROVIDER == "deepseek":
     os.environ["ANTHROPIC_BASE_URL"] = os.environ.get(
         "DEEPSEEK_ANTHROPIC_BASE_URL", "https://api.deepseek.com/anthropic")
     ANTHROPIC_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
-    # дефолтная модель для этого провайдера (если в запросе/конфиге не указана иная)
-    os.environ.setdefault("AGENT_DEFAULT_MODEL", os.environ.get("DEEPSEEK_MODEL", "deepseek-v4-flash"))
+    # Модель deepseek берётся НАПРЯМУЮ из DEEPSEEK_MODEL в _resolve_model.
+    # Раньше здесь setdefault писал AGENT_DEFAULT_MODEL — убрано: оно
+    # перекрёстно заражало выбор (оставшийся AGENT_DEFAULT_MODEL=claude-*
+    # уходил в deepseek-эндпоинт). Источник истины — .env, см. _resolve_model.
 else:
     ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 
@@ -361,28 +364,10 @@ def _init_db():
         "CREATE INDEX IF NOT EXISTS idx_task_phases_task ON task_phases(task_id)"
     )
 
-    # Sprint 4 S4.2: таблица task_stages — план задачи в детерминированном
-    # формате. Один задача → N стадий с kind/expected_tool. Используется
-    # диспетчером для жёсткого whitelisting'а tools на каждой стадии.
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS task_stages (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            task_id TEXT NOT NULL,
-            stage_index INTEGER NOT NULL,
-            kind TEXT NOT NULL,
-            description TEXT NOT NULL,
-            expected_tool TEXT NOT NULL,
-            args_hint TEXT NOT NULL DEFAULT '{}',
-            status TEXT NOT NULL DEFAULT 'pending',
-            started_at TEXT,
-            completed_at TEXT,
-            error_msg TEXT,
-            UNIQUE(task_id, stage_index)
-        )
-    """)
-    conn.execute(
-        "CREATE INDEX IF NOT EXISTS idx_task_stages_task ON task_stages(task_id)"
-    )
+    # Фаза 4 разворота: таблица task_stages СНЯТА вместе со стадийной машиной.
+    # Стадии больше не персистятся и не гейтят вызовы — движок планирует
+    # свободно (нативный TodoWrite / совещательный plan_task). Существующие БД
+    # с пустой/наполненной task_stages не трогаем: код её больше не читает.
     conn.commit()
     conn.close()
 
@@ -560,116 +545,12 @@ def _list_phases(task_id: str) -> list[dict]:
     ]
 
 
-# ── Sprint 4 S4.2: помощники для task_stages ────────────────────────────────
-
-def _save_task_stages(task_id: str, stages: list[dict]) -> None:
-    """Перезаписывает план задачи. Сначала удаляет старые записи, потом
-    INSERT новых. Используется при первом и повторных plan_task вызовах.
-
-    stages — список словарей с полями kind, description, expected_tool,
-    args_hint (может быть {}), status (обычно 'pending').
-    """
-    import json as _json
-    now = datetime.utcnow().isoformat()
-    conn = sqlite3.connect(DB_PATH)
-    try:
-        # Полный re-plan: чистим старый план и пишем новый
-        conn.execute("DELETE FROM task_stages WHERE task_id=?", (task_id,))
-        for i, s in enumerate(stages, start=1):
-            args_json = _json.dumps(s.get("args_hint") or {}, ensure_ascii=False)
-            conn.execute(
-                "INSERT INTO task_stages "
-                "(task_id, stage_index, kind, description, expected_tool, "
-                " args_hint, status, started_at) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                (
-                    task_id, i,
-                    s["kind"], s["description"], s["expected_tool"],
-                    args_json, s.get("status", "pending"),
-                    now if i == 1 else None,
-                ),
-            )
-        conn.commit()
-    finally:
-        conn.close()
-
-
-def _get_task_stages(task_id: str) -> list[dict]:
-    """Все стадии задачи в порядке stage_index."""
-    import json as _json
-    conn = sqlite3.connect(DB_PATH)
-    rows = conn.execute(
-        "SELECT stage_index, kind, description, expected_tool, args_hint, "
-        "status, started_at, completed_at, error_msg "
-        "FROM task_stages WHERE task_id=? ORDER BY stage_index",
-        (task_id,),
-    ).fetchall()
-    conn.close()
-    out = []
-    for r in rows:
-        try:
-            args_hint = _json.loads(r[4] or "{}")
-        except Exception:
-            args_hint = {}
-        out.append({
-            "index":         r[0],
-            "kind":          r[1],
-            "description":   r[2],
-            "expected_tool": r[3],
-            "args_hint":     args_hint,
-            "status":        r[5],
-            "started_at":    r[6],
-            "completed_at":  r[7],
-            "error_msg":     r[8],
-        })
-    return out
-
-
-def _get_current_stage(task_id: str) -> dict | None:
-    """Возвращает текущую активную стадию задачи (status='in_progress'),
-    или первую pending если активной нет. None если план пуст или все
-    стадии закрыты."""
-    stages = _get_task_stages(task_id)
-    for s in stages:
-        if s["status"] == "in_progress":
-            return s
-    for s in stages:
-        if s["status"] == "pending":
-            return s
-    return None
-
-
-def _update_stage_status(
-    task_id: str,
-    stage_index: int,
-    status: str,
-    error_msg: str | None = None,
-) -> None:
-    """Обновляет статус одной стадии. status ∈ pending|in_progress|completed|failed|skipped."""
-    now = datetime.utcnow().isoformat()
-    conn = sqlite3.connect(DB_PATH)
-    try:
-        if status == "in_progress":
-            conn.execute(
-                "UPDATE task_stages SET status=?, started_at=COALESCE(started_at,?) "
-                "WHERE task_id=? AND stage_index=?",
-                (status, now, task_id, stage_index),
-            )
-        elif status in ("completed", "failed", "skipped"):
-            conn.execute(
-                "UPDATE task_stages SET status=?, completed_at=?, error_msg=? "
-                "WHERE task_id=? AND stage_index=?",
-                (status, now, error_msg, task_id, stage_index),
-            )
-        else:
-            conn.execute(
-                "UPDATE task_stages SET status=? "
-                "WHERE task_id=? AND stage_index=?",
-                (status, task_id, stage_index),
-            )
-        conn.commit()
-    finally:
-        conn.close()
+# ── Sprint 4 S4.2: помощники task_stages — СНЯТЫ (Фаза 4 разворота) ──────────
+# Здесь жили _save_task_stages / _get_task_stages / _get_current_stage /
+# _update_stage_status (включая Fix-1A перенос завершённых стадий при replan).
+# Удалены вместе со стадийной машиной: стадии больше не персистятся, у этих
+# хелперов не осталось вызывателей. Защиту от повторного деструктивного
+# db_dump несёт single-shot guard 2A/2B в tool_guards (не стадии).
 
 
 def _update_task_counters(
@@ -923,7 +804,7 @@ async def _ask_user_async(
     # Лог в exec-row: видно что задача ждёт юзера
     await _on_log(
         task_id,
-        "⏸ Жду ответ юзера",
+        "Жду ответ юзера",
         question[:120] + ("…" if len(question) > 120 else ""),
         kind="step",
     )
@@ -941,7 +822,7 @@ async def _ask_user_async(
         # Лог в чат — markdown-блок с Q+A для истории
         await _on_log(
             task_id,
-            f"**❓ Вопрос агенту:** {question}\n\n**🗣 Ответ:** {answer}",
+            f"**Вопрос агенту:** {question}\n\n**Ответ:** {answer}",
             "",
             kind="text",
         )
@@ -1064,11 +945,77 @@ async def _on_todos_update(task_id: str, incomplete: int, total: int):
     )
 
 
+async def _pre_task_autosync(task_id: str, project_id: str, task_cfg: dict) -> None:
+    """Фаза 2 / Шаг 2.2 — Уровень 2: авто-сверка базы перед задачей.
+
+    Заменяет снятый sync-first-инвариант: вместо «всегда db_dump первой
+    стадией» дёшево сверяем ConfigDumpInfo базы с baseline-снимком.
+      • не менялось  → ничего не делаем, задача стартует мгновенно;
+      • менялось     → инкрементальный reindex (force=False), не полная выгрузка;
+      • нет baseline → принимаем текущую выгрузку как точку отсчёта.
+
+    Best-effort: любая ошибка здесь НЕ должна срывать задачу (sync-first снят,
+    клетка и так backstop). Живой `-Mode UpdateInfo` (обновить штамп) — это
+    кнопка «Синхронизировать» (Шаг 2.3) или ручная операция; здесь сверяем
+    текущий ConfigDumpInfo как есть."""
+    import auto_sync
+
+    scheme = (task_cfg.get("scheme_path") or "").strip()
+    if not scheme:
+        await _on_log(task_id, "Авто-сверка базы пропущена",
+                      "scheme_path не задан — сверять нечего")
+        return
+
+    current = auto_sync.current_config_dump_info(scheme)
+    baseline = auto_sync.baseline_path(_APP_DIR, project_id)
+    decision = await asyncio.to_thread(
+        auto_sync.decide_pre_task_sync, baseline, current,
+    )
+    await _on_log(task_id, "Авто-сверка базы", decision["reason"])
+
+    if decision["action"] == auto_sync.ACTION_SKIP:
+        return
+
+    if decision["action"] == auto_sync.ACTION_FULL:
+        # Первый запуск: фиксируем текущую выгрузку как baseline (без форса
+        # полной выгрузки — она уже есть на диске, либо её сделают вручную).
+        saved = await asyncio.to_thread(
+            auto_sync.update_baseline, current, _APP_DIR, project_id,
+        )
+        if saved:
+            await _on_log(task_id, "Baseline установлен",
+                          "точка отсчёта зафиксирована из текущей выгрузки")
+        return
+
+    # ACTION_REINDEX — база менялась: инкрементальная переиндексация.
+    objs = decision.get("changed_objects") or []
+    preview = ", ".join(objs[:8]) + (" …" if len(objs) > 8 else "")
+    await _on_log(task_id, "База изменилась — переиндексация",
+                  f"объекты: {preview}" if preview else "инкрементально")
+    try:
+        async def _op_log(text: str, detail: str = ""):
+            await _on_log(task_id, text, detail)
+        from ops_runner import reindex_bsl_atlas
+        await reindex_bsl_atlas(state.client_cfg, _op_log)
+        # Успех — фиксируем новый baseline.
+        await asyncio.to_thread(
+            auto_sync.update_baseline, current, _APP_DIR, project_id,
+        )
+        await _on_log(task_id, "Переиндексация завершена",
+                      "baseline обновлён — индекс отражает текущую базу")
+    except Exception as e:
+        # reindex недоступен (BSL Atlas выключен и т.п.) — не срываем задачу.
+        log.warning("auto_sync reindex failed (best-effort): %s", e)
+        await _on_log(task_id, "Переиндексация пропущена",
+                      f"не критично, агент работает с текущим индексом: {e}")
+
+
 async def _run_task_wrapper(
     task_id: str,
     prompt: str,
     model_alias: str | None = None,
     project_id: str = "erp",
+    selected_model: str | None = None,
 ):
     if state.executor is None:
         await _on_error(task_id, "ToolExecutor не инициализирован")
@@ -1089,6 +1036,19 @@ async def _run_task_wrapper(
     ext_src = state.client_cfg.get("ext_src_path") or ""
     if ext_src:
         await asyncio.to_thread(_ensure_claude_memory_file, ext_src)
+
+    # ── Фаза 2 / Шаг 2.2: Уровень 2 — авто-сверка базы перед задачей ──────
+    # Заменяет снятый sync-first (Шаг 2.1): не «всегда выгружай», а «выгружай
+    # когда база реально менялась». Gated флагом auto_sync_enabled — по
+    # умолчанию ВЫКЛ, чтобы не навязывать логин/reindex на каждую задачу
+    # (как и денежный потолок Фазы 1). Best-effort: ошибка не срывает задачу.
+    if state.client_cfg.get("auto_sync_enabled"):
+        try:
+            await _pre_task_autosync(task_id, project_id, state.client_cfg)
+        except Exception as e:
+            log.warning("auto_sync pre-task failed (best-effort): %s", e)
+            await _on_log(task_id, "Авто-сверка базы пропущена",
+                          f"ошибка (не критично): {e}")
 
     # ── Sprint 1 Step 1: адаптивный бюджет turns ──────────────────────────
     # Большие 9-шаговые ТЗ не помещаются в 50 turns по умолчанию. Считаем
@@ -1116,7 +1076,7 @@ async def _run_task_wrapper(
     )
     await _on_log(
         task_id,
-        "📊 Бюджет turns",
+        "Бюджет turns",
         f"{final_budget}"
         + (f" (auto={auto_budget}, config floor={config_floor})"
            if config_floor and config_floor != final_budget
@@ -1125,7 +1085,7 @@ async def _run_task_wrapper(
     )
     if task_cfg.get("spec_first_required"):
         await _on_log(
-            task_id, "📋 Spec-first",
+            task_id, "Spec-first",
             "Большая задача — первым шагом TodoWrite + proposal.md в agenter/data/.../proposals/",
         )
 
@@ -1137,21 +1097,15 @@ async def _run_task_wrapper(
     task_cfg["interactive_mode"] = _detect_interactive_intent(prompt)
     if task_cfg["interactive_mode"]:
         await _on_log(
-            task_id, "💬 Интерактивный режим",
+            task_id, "Интерактивный режим",
             "в промпте есть просьба спрашивать — порог ask_user понижен на эту задачу",
         )
 
-    # ── Sprint 4 S4.7: stage-dispatch обязателен для L2+ ──────────────────
-    # L1 — простые задачи (1-2 шага), план не нужен (overhead больше пользы).
-    # L2+ — должны идти через plan_task → стадии → expected_tool на каждой.
-    # До plan_task все модифицирующие tools заблокированы guard'ом
-    # (см. check_tool_call с stage_dispatch_required=True).
-    task_cfg["_stage_dispatch_required"] = (task_cfg["task_level"] != "L1")
-    if task_cfg["_stage_dispatch_required"]:
-        await _on_log(
-            task_id, "🎯 Stage-dispatch активен",
-            "первым шагом должен быть plan_task — диспетчер выбирает tool по kind стадии",
-        )
+    # ── Sprint 4 S4.7: stage-dispatch — СНЯТО (Фаза 4 разворота) ──────────
+    # Раньше здесь для L2+ задач выставлялся флаг _stage_dispatch_required,
+    # который форсил plan_task-первым и блокировал модифицирующие tools до
+    # плана. Клетка снята: движок планирует свободно (нативный TodoWrite /
+    # совещательный plan_task), task_level больше не включает диспетчеризацию.
 
     # Wrapper над on_session_captured, чтобы прокинуть project_id (orchestrator
     # его не знает — там cwd-based).
@@ -1183,6 +1137,9 @@ async def _run_task_wrapper(
             on_phase_commit=_on_phase_commit,
             on_todos_update=_on_todos_update,  # Sprint 2 S2.7
             memory_md=memory_md,
+            # Трассировка: сырой выбор модели из UI-дропдауна (для фиксации
+            # расхождения selected vs effective в run_start). None = «дефолт».
+            selected_model=selected_model,
         )
     finally:
         # Удаляем handle из реестра. asyncio.CancelledError проходит через
@@ -1249,11 +1206,11 @@ async def lifespan(_app: FastAPI):
             async with _aiohttp.ClientSession() as _s:
                 async with _s.get(f"{url}/health", timeout=_aiohttp.ClientTimeout(total=3)) as r:
                     if r.status == 200:
-                        log.info("✓ BSL Atlas /health: 200 OK")
+                        log.info("BSL Atlas /health: 200 OK")
                     else:
-                        log.warning("⚠ BSL Atlas /health: HTTP %d", r.status)
+                        log.warning("BSL Atlas /health: HTTP %d", r.status)
     except Exception as e:
-        log.warning("⚠ BSL Atlas не отвечает на /health: %s (агент сам ретрайт при первом вызове)", e)
+        log.warning("BSL Atlas не отвечает на /health: %s (агент сам ретрайт при первом вызове)", e)
 
     yield
 
@@ -1314,24 +1271,38 @@ MODEL_PRICING = {
     "claude-sonnet-4-6": {"in": 3.00,  "out": 15.00, "cache_read": 0.30, "cache_write": 3.75},
     "claude-opus-4-6":   {"in": 15.00, "out": 75.00, "cache_read": 1.50, "cache_write": 18.75},
     "claude-haiku-4-5":  {"in": 1.00,  "out": 5.00,  "cache_read": 0.10, "cache_write": 1.25},
+    # DeepSeek (родной Anthropic-эндпоинт). cache_write — оценочно.
+    "deepseek-v4-flash": {"in": 0.14,  "out": 0.28,  "cache_read": 0.014,  "cache_write": 0.14},
+    "deepseek-v4-pro":   {"in": 0.435, "out": 0.87,  "cache_read": 0.0435, "cache_write": 0.435},
 }
 
 
-def _resolve_model(req_model: str | None, cfg: dict) -> str:
-    """API-имя модели для SDK. Принимает короткий ключ из UI (sonnet-4-6)
-    или полный alias (claude-sonnet-4-6). None → дефолт из cfg или DEFAULT_MODEL_KEY."""
-    raw = (req_model or cfg.get("model")
-           or os.environ.get("AGENT_DEFAULT_MODEL") or DEFAULT_MODEL_KEY).strip()
-    # Короткий ключ из UI
+def _resolve_model(req_model: str | None = None, cfg: dict | None = None) -> str:
+    """EFFECTIVE-модель для SDK. ЕДИНСТВЕННЫЙ источник истины — .env.
+
+    req_model (UI-дропдаун) и cfg['model'] (config.json) НАМЕРЕННО игнорируются
+    для выбора рабочей модели — они сохраняются лишь как selected_model в трейсе
+    (диагностика расхождения selected vs effective). Так в лог и в эндпоинт
+    уходит ровно то, что задано в .env, без вранья дропдауна.
+
+    Провайдер — AGENT_PROVIDER (.env):
+      • deepseek → DEEPSEEK_MODEL (родной DeepSeek-эндпоинт);
+      • claude   → AGENT_DEFAULT_MODEL (или дефолт DEFAULT_MODEL_KEY).
+    """
+    if AGENT_PROVIDER == "deepseek":
+        return (os.environ.get("DEEPSEEK_MODEL") or "deepseek-v4-flash").strip()
+    raw = (os.environ.get("AGENT_DEFAULT_MODEL") or DEFAULT_MODEL_KEY).strip()
     if raw in ALLOWED_MODELS:
         return ALLOWED_MODELS[raw]
-    # Полный alias — оставляем как есть если он в нашем списке-значений
     if raw in ALLOWED_MODELS.values():
         return raw
-    # Не-Claude провайдер (напр. DeepSeek через ANTHROPIC_BASE_URL) — pass-through.
-    if AGENT_PROVIDER != "claude" or raw.startswith(("deepseek", "deepseek-")):
+    # Сторонний провайдер (не claude/deepseek) — pass-through.
+    if AGENT_PROVIDER != "claude" or raw.startswith("deepseek"):
         return raw
-    raise ValueError(f"Неизвестная модель: '{raw}'. Допустимые: {list(ALLOWED_MODELS.keys())}")
+    raise ValueError(
+        f"Неизвестная модель в .env (AGENT_DEFAULT_MODEL='{raw}'). "
+        f"Допустимые: {list(ALLOWED_MODELS.keys())} либо полный claude-*-алиас."
+    )
 
 
 @app.post("/tasks")
@@ -1364,7 +1335,8 @@ async def create_task(req: TaskRequest):
     # Запускаем как asyncio.Task — это даёт handle для отмены.
     # BackgroundTasks использовать нельзя — оттуда нельзя отменить.
     handle = asyncio.create_task(
-        _run_task_wrapper(task_id, req.prompt, model_alias, project_id)
+        _run_task_wrapper(task_id, req.prompt, model_alias, project_id,
+                          selected_model=req.model)
     )
     state.running_tasks[task_id] = handle
     return {
@@ -1379,21 +1351,34 @@ async def create_task(req: TaskRequest):
 async def list_models():
     """Возвращает список моделей для UI dropdown.
     Имена — короткие ключи (sonnet-4-6); alias — полное API-имя; pricing — за 1M токенов."""
+    _LABELS = {
+        "claude-sonnet-4-6": "Sonnet 4.6",
+        "claude-opus-4-6":   "Opus 4.6",
+        "claude-haiku-4-5":  "Haiku 4.5",
+        "deepseek-v4-flash": "DeepSeek V4 Flash",
+        "deepseek-v4-pro":   "DeepSeek V4 Pro",
+    }
     items = []
     for key, alias in ALLOWED_MODELS.items():
         price = MODEL_PRICING.get(alias, {})
         items.append({
             "key": key,
             "alias": alias,
-            "label": {
-                "sonnet-4-6": "Sonnet 4.6",
-                "opus-4-6":   "Opus 4.6",
-                "haiku-4-5":  "Haiku 4.5",
-            }.get(key, key),
+            "label": _LABELS.get(alias, key),
             "in_per_mtok":  price.get("in"),
             "out_per_mtok": price.get("out"),
         })
-    return {"default": DEFAULT_MODEL_KEY, "models": items}
+    # EFFECTIVE — реальная рабочая модель из .env (источник истины). UI показывает
+    # именно её и блокирует выбор: дропдаун больше не управляет моделью.
+    eff_alias = _resolve_model()
+    effective = {
+        "provider": AGENT_PROVIDER,
+        "alias": eff_alias,
+        "label": _LABELS.get(eff_alias, eff_alias),
+        "locked": True,
+        "source": ".env",
+    }
+    return {"default": DEFAULT_MODEL_KEY, "models": items, "effective": effective}
 
 
 # ── Sessions / Phases / Rollback endpoints ─────────────────────────────────
@@ -1401,7 +1386,7 @@ async def list_models():
 @app.get("/sessions/{project_id}")
 async def get_session_endpoint(project_id: str):
     """Текущая Claude SDK сессия проекта. UI использует для отображения
-    бейджа «🔗 Контекст активен (N задач)» над composer."""
+    бейджа «Контекст активен (N задач)» над composer."""
     sess = await asyncio.to_thread(_get_session, project_id)
     if sess is None:
         return {"active": False, "project_id": project_id}
@@ -1706,6 +1691,9 @@ SUPPORTED_OPS = {
     "rebuild-platform-docs",
     "rebuild-platform-docs-semantic",
     "validate-xdto",
+    # Фаза 2 / Шаг 2.3 — кнопка «Синхронизировать с базой» (Уровень 1):
+    # принудительная ручная страховка = db_dump + reindex + обновить baseline.
+    "sync-base",
 }
 
 
@@ -1969,13 +1957,47 @@ async def _run_operation(op_name: str):
             validate_xdto,
         )
 
+        async def sync_base(cfg: dict, log_fn) -> dict[str, Any]:
+            """Фаза 2 / Шаг 2.3 — «Синхронизировать с базой» (Уровень 1).
+
+            Принудительная ручная страховка: db_dump (выгрузка расширения) →
+            reindex (инкрементальная пересборка индекса) → обновить baseline
+            авто-сверки. После этого индекс/SCHEME отражают РЕАЛЬНОЕ состояние
+            базы — именно из них guard читает имена объектов (не из записанной
+            памяти). Используется, если авто-сверка (Шаг 2.2) выключена/не
+            сработала или юзер правил базу вручную."""
+            import auto_sync
+            await log_fn("Синхронизация с базой: выгрузка расширения…", "db_dump")
+            dump_res = await dump_extension(cfg, log_fn)
+            await log_fn("Переиндексация…", "reindex (force=False)")
+            try:
+                await reindex_bsl_atlas(cfg, log_fn)
+            except Exception as e:
+                await log_fn("Reindex пропущен (не критично)", str(e))
+            # Обновляем baseline авто-сверки — следующая задача стартует мгновенно,
+            # если база больше не менялась.
+            scheme = (cfg.get("scheme_path") or "").strip()
+            if scheme:
+                cur = auto_sync.current_config_dump_info(scheme)
+                saved = await asyncio.to_thread(
+                    auto_sync.update_baseline, cur, _APP_DIR, "erp",
+                )
+                if saved:
+                    await log_fn("Baseline авто-сверки обновлён", str(saved))
+            return {"info": "база синхронизирована (db_dump + reindex)",
+                    "stats": dump_res.get("stats", {})}
+
         OP_HANDLERS = {
             "dump-extension":                  dump_extension,
             "dump-config":                     dump_config,
-            "reindex":                         reindex_bsl_atlas,
+            # Ручная кнопка «Переиндексировать» → ПОЛНАЯ пересборка (force=True):
+            # при смене базы инкрементальная сверка не подхватывает оптом
+            # подменённую конфигурацию, и индекс остаётся от старой базы.
+            "reindex":                         lambda c, l: reindex_bsl_atlas(c, l, force=True),
             "rebuild-platform-docs":           rebuild_platform_docs,
             "rebuild-platform-docs-semantic":  rebuild_platform_docs_semantic,
             "validate-xdto":                   validate_xdto,
+            "sync-base":                       sync_base,
         }
         handler = OP_HANDLERS.get(op_name)
         if handler is None:
@@ -2567,7 +2589,7 @@ def start_bsl_atlas():
             _bsl_proc = None
             return
         if _is_port_open(host, port, timeout=0.3):
-            log.info("✓ BSL Atlas стартовал (PID %s)", _bsl_proc.pid)
+            log.info("BSL Atlas стартовал (PID %s)", _bsl_proc.pid)
             return
         time.sleep(0.5)
 

@@ -1,23 +1,20 @@
 """
-agenter/app/task_planner.py — детерминированная диспетчеризация стадий.
+agenter/app/task_planner.py — библиотека валидации стадий (ИСТОРИЧЕСКОЕ).
 
-Sprint 4 архитектуры: уходим от модели «LLM сам выбирает tool» к модели
-«LLM КЛАССИФИЦИРУЕТ стадию задачи, ДИСПЕТЧЕР детерминистически выбирает tool».
+ВНИМАНИЕ (Фаза 5 разворота): стадийная машина и tool `plan_task` СНЯТЫ.
+Планирование задачи — нативный TodoWrite движка; этот модуль больше НЕ
+участвует в рантайме. Описание ниже — историческое (Sprint 4), оставлено
+для контекста.
 
-Принцип:
-  1. На L2+ задачах агент ОБЯЗАН первым вызовом сделать `plan_task(stages=[...])`
-  2. Каждая стадия имеет `kind` из фиксированного enum'а STAGE_KIND
-  3. STAGE_KIND_TO_TOOL — однозначная таблица соответствий «kind → tool»
-  4. Orchestrator идёт по стадиям, на каждой разрешает ТОЛЬКО соответствующий
-     tool (+ read-only/validation tools всегда разрешены)
-  5. Агент НЕ ВЫБИРАЕТ — он либо вызывает expected_tool, либо ask_user
+Из модуля в рантайме НИЧЕГО не вызывается. Сохранены лишь чистые функции
+`validate_stages` / `render_plan_for_agent` / `validate_plan_invariants` и
+типы `Stage` / `STAGE_KIND` — их держат юнит-тесты планировщика
+(tests/app/test_task_planner.py). Диспетчеризация (stage_kind_to_full_tool /
+is_tool_allowed_for_stage) удалена ещё в Фазе 4.
 
-Это снимает класс ошибок «агент попытался Edit XML вручную / выдумал
-ограничение / удалил заимствованный объект» — потому что у агента просто
-нет такой возможности по архитектуре.
-
-Универсальность гарантируется тем, что mapping kind→tool единый для всех
-задач. Никаких task-specific исключений.
+Историческая модель (Sprint 4): «LLM КЛАССИФИЦИРУЕТ стадию, ДИСПЕТЧЕР
+детерминистически выбирает tool». Эта клетка снята разворотом — движок
+вызывает инструменты свободно, границы держит периметр (check_tool_call).
 """
 
 from __future__ import annotations
@@ -143,49 +140,11 @@ MODIFYING_STAGE_KINDS: frozenset[str] = frozenset({
 })
 
 
-# ── Always-allowed tools (read-only / диагностика / финал) ─────────────────
-#
-# Эти tools разрешены на ЛЮБОЙ стадии, потому что они не выполняют
-# модификацию ext_src/БД, либо обязательны на финале фазы.
-
-ALWAYS_ALLOWED_TOOLS = frozenset({
-    # built-in read tools
-    "Read", "Glob", "Grep", "TodoWrite",
-    # Claude Code deferred tools — read-only мета-инфраструктура.
-    # ToolSearch иногда вызывается агентом для подгрузки JSON Schema
-    # известных tools — безопасно, пусть проходит без блокировки.
-    "ToolSearch",
-    # BSL Atlas — поиск
-    "mcp__bsl_atlas__search_function",
-    "mcp__bsl_atlas__get_module_functions",
-    "mcp__bsl_atlas__get_function_context",
-    "mcp__bsl_atlas__metadatasearch",
-    "mcp__bsl_atlas__get_object_details",
-    "mcp__bsl_atlas__code_grep",
-    "mcp__bsl_atlas__codesearch",
-    "mcp__bsl_atlas__helpsearch",
-    "mcp__bsl_atlas__search_code_filtered",
-    "mcp__bsl_atlas__stats",
-    # 1С-документация
-    "mcp__agenter__platform_doc_lookup",
-    "mcp__agenter__platform_doc_search",
-    # Информация об объектах/формах
-    "mcp__agenter__meta_info",
-    "mcp__agenter__form_info",
-    # Валидация (всегда нужна перед db_load)
-    "mcp__agenter__cfe_validate",
-    "mcp__agenter__meta_validate",
-    "mcp__agenter__form_validate",
-    "mcp__agenter__syntax_check",
-    # Discovery
-    "mcp__agenter__skill_search",
-    # Interaction
-    "mcp__agenter__ask_user",
-    # План — основной mandatory tool
-    "mcp__agenter__plan_task",
-    # Sub-agent — должен быть всегда доступен для делегирования
-    "Agent",
-})
+# ── Always-allowed whitelist + R1 skill-suffixes — СНЯТО (Фаза 4) ──────────
+# Здесь жили ALWAYS_ALLOWED_TOOLS, _ALWAYS_ALLOWED_SKILL_SUFFIXES и
+# _is_always_allowed_skill — whitelist для stage-dispatch (что разрешено на
+# любой стадии). Использовались ТОЛЬКО внутри is_tool_allowed_for_stage,
+# которая снята вместе со стадийной машиной. Удалены как мёртвый код.
 
 
 # ── Stage ──────────────────────────────────────────────────────────────────
@@ -250,159 +209,13 @@ def normalize_tool_name(short_or_full: str) -> str:
     return f"mcp__agenter__{short_or_full}"
 
 
-def stage_kind_to_full_tool(kind: str) -> str:
-    """Полное MCP-имя ожидаемого tool'а для kind стадии."""
-    short = expected_tool_for_kind(kind)
-    return normalize_tool_name(short)
-
-
-def _stage_field(stage: Stage | dict | None, name: str, default=None):
-    """Универсальный доступ к полю стадии — поддерживает и dataclass, и dict.
-    Это нужно потому что стадии приходят из БД как dict, а в коде Stage."""
-    if stage is None:
-        return default
-    if isinstance(stage, dict):
-        return stage.get(name, default)
-    return getattr(stage, name, default)
-
-
-def is_tool_allowed_for_stage(
-    tool_name: str,
-    stage: Stage | dict | None,
-    tool_input: dict | None = None,
-) -> tuple[bool, str]:
-    """Проверяет разрешён ли tool на активной стадии.
-
-    Возвращает (allowed, reason). reason — для отображения пользователю.
-
-    Логика:
-      • Если stage = None (план ещё не построен) — разрешены только
-        plan_task, read-only/research tools и ask_user.
-      • Иначе — разрешён expected_tool текущей стадии + ALWAYS_ALLOWED_TOOLS.
-      • Tool Bash — особый случай: разрешён только на 'write-bsl-module' и
-        'research' (для diagnostic команд), запрещён везде остальном.
-      • Write/Edit на .json — разрешён на ЛЮБОЙ стадии. JSON-файлы это args
-        для cold skills (form_compile, skd_compile, role_compile, mxl_compile,
-        interface_edit, subsystem_compile), не структурные метаданные.
-        Path-guards (Configuration.xml, .xml ext, agenter/* fragment) проверят
-        опасные пути ниже по цепочке (см. check_tool_call).
-
-    Универсально: принимает Stage dataclass ИЛИ dict с теми же ключами.
-    Также принимает имя tool'а в любом формате — short ('db_dump') или
-    full ('mcp__agenter__db_dump') — нормализует внутри.
-    tool_input нужен чтобы видеть file_path при проверке Write/Edit на .json.
-    """
-    if not tool_name:
-        return False, "пустое имя tool'а"
-
-    # Нормализуем имя tool'а к полному виду для сравнения с ALWAYS_ALLOWED_TOOLS
-    # и expected_tool (которые хранятся в полном формате).
-    tool_full = normalize_tool_name(tool_name)
-
-    # Без активного плана: разрешены только меta-tools для построения плана
-    # и read-only исследование.
-    if stage is None:
-        # Read tools + ask_user + plan_task + skill_search всегда OK
-        if tool_full in ALWAYS_ALLOWED_TOOLS:
-            return True, ""
-        # bsl_atlas wildcard
-        if tool_full.startswith("mcp__bsl_atlas__"):
-            return True, ""
-        return (
-            False,
-            "План задачи не построен. Сначала вызови plan_task с описанием стадий, "
-            "потом исполняй их по порядку. До построения плана разрешены только "
-            "read-only исследование, ask_user и сам plan_task."
-        )
-
-    stage_kind = _stage_field(stage, "kind", "")
-    stage_expected = _stage_field(stage, "expected_tool", "")
-
-    # ALWAYS-allowed работает на любой стадии
-    if tool_full in ALWAYS_ALLOWED_TOOLS:
-        return True, ""
-    if tool_full.startswith("mcp__bsl_atlas__"):
-        return True, ""
-
-    # Bash — особый случай: только для 'research' и 'write-bsl-module' и
-    # 'sync-from-db' (для diagnostic команд типа dir/git status).
-    if tool_name == "Bash":
-        if stage_kind in ("research", "write-bsl-module", "sync-from-db"):
-            return True, ""
-        return (
-            False,
-            f"Bash запрещён на стадии '{stage_kind}'. Bash доступен только на "
-            f"'research', 'write-bsl-module', 'sync-from-db'. Используй "
-            f"expected_tool='{stage_expected}' для текущей стадии."
-        )
-
-    # Edit/Write — только если стадия write-bsl-module И путь — .bsl.
-    # Также разрешены на 'research' (write Note.md в proposals для заметок).
-    # Sprint 4 hotfix-7: разрешены на ЛЮБОЙ стадии для .json файлов — это
-    # args для cold skills (form_compile, skd_compile, role_compile, mxl_compile,
-    # interface_edit, subsystem_compile). Без этого create-form/create-role/
-    # create-skd стадии не могут подготовить json_path перед skill_run.
-    # Детальная проверка пути (.xml/.bsl/Configuration.xml/agenter/*) — в tool_guards.py.
-    if tool_name in ("Edit", "Write", "write_file"):
-        if stage_kind in ("write-bsl-module", "research"):
-            return True, ""
-        # .json files — это args, не структурные метаданные. Разрешены всегда.
-        path = ""
-        if tool_input:
-            path = str(
-                tool_input.get("path")
-                or tool_input.get("file_path")
-                or ""
-            )
-        if path and path.lower().endswith(".json"):
-            return True, ""
-        return (
-            False,
-            f"Edit/Write запрещены на стадии '{stage_kind}'. Для модификации "
-            f"объектов используй expected_tool='{stage_expected}'. Edit/Write "
-            f"разрешены только на стадии 'write-bsl-module' (для *.bsl) либо "
-            f"на любой стадии для *.json (args-файлы cold skills)."
-        )
-
-    # Sprint 4 hotfix-6: special-case для research kind.
-    # Research стадия — открытая, агент делает много read-only вызовов и
-    # затем переходит к делу через plan_task (replan). На research разрешены:
-    # все always-allowed (уже выше), bsl_atlas (уже выше), Bash (уже выше),
-    # Edit/Write на .bsl (уже выше). Прочие модифицирующие tools — запрещены.
-    if stage_kind == "research":
-        return (
-            False,
-            f"Стадия 'research' — только read-only исследование и заметки. "
-            f"Tool '{tool_name}' для модификации запрещён. Когда закончишь "
-            f"исследование — вызови plan_task с обновлённым набором стадий, "
-            f"чтобы перейти к действиям."
-        )
-
-    # Проверка expected_tool — оба в нормализованном виде
-    expected_full = stage_kind_to_full_tool(stage_kind)
-
-    # Точное совпадение
-    if tool_full == expected_full:
-        return True, ""
-
-    # skill_run может «упаковать» любой cold skill, поэтому если expected
-    # начинается с `skill_run:` — разрешён mcp__agenter__skill_run
-    if expected_full == "mcp__agenter__skill_run" and tool_full == "mcp__agenter__skill_run":
-        return True, ""
-
-    # Sprint 4 hotfix-6: УБРАН опасный fallback `expected_full.endswith("*")`
-    # который пропускал ВСЁ. Wildcard'ов в STAGE_KIND_TO_TOOL теперь нет —
-    # research обработан special-case'ом выше.
-
-    stage_index = _stage_field(stage, "index", "?")
-    stage_desc = _stage_field(stage, "description", "")[:60]
-    return (
-        False,
-        f"На стадии '{stage_kind}' (#{stage_index}: {stage_desc}) "
-        f"ожидался tool '{expected_full}', а ты пытаешься вызвать '{tool_name}'. "
-        f"Либо смени план (повторный plan_task), либо вызови правильный tool, "
-        f"либо ask_user если ситуация неоднозначна."
-    )
+# ── stage-dispatch decision — СНЯТО (Фаза 4 разворота) ──────────────────────
+# Здесь жили stage_kind_to_full_tool / _stage_field / is_tool_allowed_for_stage —
+# ядро диспетчеризации (что разрешено на текущей стадии). Снято вместе со
+# стадийной машиной: клетки больше нет, движок вызывает инструменты свободно,
+# границы держит периметр (check_tool_call). validate_stages/render_plan_for_agent
+# ниже сохранены только для юнит-тестов планировщика — в рантайме (Фаза 5,
+# plan_task снят) их больше никто не вызывает.
 
 
 def validate_plan_invariants(stages: list[Stage]) -> list[str]:
@@ -412,14 +225,26 @@ def validate_plan_invariants(stages: list[Stage]) -> list[str]:
     `validate_stages`. Здесь — содержательные инварианты, которые требуют
     видеть план целиком как набор стадий.
 
-    Активные инварианты:
-      SYNC-FIRST:
-        Если в плане есть хотя бы одна модифицирующая стадия
-        (из MODIFYING_STAGE_KINDS), первая стадия плана ОБЯЗАНА быть
-        'sync-from-db'. Это закрывает класс багов «orphan-файл от прошлой
-        неудачной задачи мешает новой».
-        Read-only-планы (только research/ask-user) этот инвариант не
-        затрагивает — sync им не нужен.
+    Активные инварианты: нет.
+
+    ── Фаза 2 разворота (снято): SYNC-FIRST ──────────────────────────────
+    Ранее здесь жил инвариант SYNC-FIRST: любой план с модифицирующей
+    стадией ОБЯЗАН был начинаться с 'sync-from-db'. Это «всегда
+    синхронизируй» закрывало класс багов «orphan-файл от прошлой неудачной
+    задачи», но ценой принудительной полной выгрузки в начале КАЖДОЙ
+    модифицирующей задачи (дорого и часто бессмысленно — база не менялась).
+
+    Снят в пользу умной синхронизации (Р4):
+      • истина на чтение = реальная база/индекс, не записанная память;
+      • перед задачей дёшево сверяемся ConfigDumpInfo-детектором
+        (`base_change_detector`) — выгружаем ТОЛЬКО если база реально
+        менялась (Шаг 2.2), иначе старт мгновенный;
+      • явная кнопка «Синхронизировать» как ручная страховка (Шаг 2.3);
+      • orphan-файлы теперь не проблема: db_load-gate (сохраняемое ядро) и
+        single-shot db_dump guard (tool_guards 2A/2B) остаются на месте.
+
+    Функция намеренно сохранена (а не удалена) как точка расширения для
+    будущих семантических инвариантов плана.
 
     Возвращает список текстовых ошибок. Пустой список = инварианты держатся.
     Эти ошибки `validate_stages` отправит обратно агенту, чтобы он
@@ -429,25 +254,9 @@ def validate_plan_invariants(stages: list[Stage]) -> list[str]:
     if not stages:
         return errors
 
-    has_modifying = any(s.kind in MODIFYING_STAGE_KINDS for s in stages)
-    if has_modifying and stages[0].kind != "sync-from-db":
-        offending = next(
-            (s for s in stages if s.kind in MODIFYING_STAGE_KINDS), None,
-        )
-        offending_desc = (
-            f"#{offending.index} [{offending.kind}]" if offending else "?"
-        )
-        errors.append(
-            "Инвариант SYNC-FIRST нарушен: план содержит модифицирующую "
-            f"стадию ({offending_desc}), но не начинается с 'sync-from-db'. "
-            "Это создаёт риск orphan-файлов в ext_src/ от прошлой неудачной "
-            "задачи (db_load мог не завершиться, файлы остались на диске). "
-            "Перепланируй: первой стадией добавь "
-            "{'kind': 'sync-from-db', 'description': "
-            "'Синхронизировать ext_src/ из БД перед изменениями'}, "
-            "потом остальные стадии в прежнем порядке."
-        )
-
+    # SYNC-FIRST снят (Фаза 2): план больше не обязан начинаться с
+    # 'sync-from-db'. Синхронизация теперь условная и внешняя по отношению к
+    # плану (см. docstring). Других активных инвариантов пока нет.
     return errors
 
 
@@ -525,11 +334,11 @@ def render_plan_for_agent(stages: list[Stage]) -> str:
     for s in stages:
         full_tool = normalize_tool_name(s.expected_tool)
         marker = {
-            "pending":     "○",
-            "in_progress": "▶",
-            "completed":   "✓",
-            "failed":      "✗",
-            "skipped":     "↷",
+            "pending":     "[ ]",
+            "in_progress": "[>]",
+            "completed":   "[x]",
+            "failed":      "[!]",
+            "skipped":     "[~]",
         }.get(s.status, "?")
         lines.append(
             f"  {marker} #{s.index} [{s.kind}] {s.description}\n"

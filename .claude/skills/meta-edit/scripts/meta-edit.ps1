@@ -1977,6 +1977,22 @@ function Modify-Properties($propsDef) {
 			return
 		}
 
+		# [PATCH agenter] Мультиязычное LocalStringType-свойство (Synonym/ToolTip/…):
+		# оборачиваем через готовый Build-MLTextXml, НЕ пишем плоским InnerText —
+		# иначе db_load падает с XDTO-ошибкой LocalStringType (Расш1_Посуда.xml).
+		if ($script:mlTextProperties -contains $propName) {
+			$mlIndent = Get-ChildIndent $script:propertiesEl
+			$newMlXml = Build-MLTextXml $mlIndent $propName "$propValue"
+			$newMlNodes = Import-Fragment $newMlXml
+			if ($newMlNodes.Count -gt 0) {
+				$script:propertiesEl.InsertAfter($newMlNodes[0], $propEl) | Out-Null
+				Remove-NodeWithWhitespace $propEl
+			}
+			Info "Modified ML-text property: $propName = $propValue"
+			$script:modifyCount++
+			return
+		}
+
 		# Handle boolean values
 		$valueStr = "$propValue"
 		if ($propValue -is [bool]) {
@@ -2272,6 +2288,16 @@ $script:complexPropertyMap = @{
 	"BasedOn"         = @{ tag = "xr:Item"; attr = 'xsi:type="xr:MDObjectRef"' }
 	"InputByString"   = @{ tag = "xr:Field"; attr = $null }
 }
+
+# [PATCH agenter] Мультиязычные свойства типа LocalStringType. При модификации их
+# НЕЛЬЗЯ писать плоским InnerText — db_load падает с XDTO-ошибкой LocalStringType.
+# Оборачиваются через Build-MLTextXml (как в create-путях). Расхождение upstream:
+# meta-edit.PY эту ветку делает корректно, .PS1 — нет. См. validation-provenance-part2.md.
+$script:mlTextProperties = @(
+	"Synonym", "ToolTip", "Explanation", "Presentation",
+	"ExtendedPresentation", "ListPresentation", "ExtendedListPresentation",
+	"ObjectPresentation", "ExtendedObjectPresentation", "GroupPresentation"
+)
 
 function Find-PropertyElement([string]$propName) {
 	foreach ($child in $script:propertiesEl.ChildNodes) {
