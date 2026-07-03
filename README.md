@@ -1,6 +1,6 @@
 # Agenter — локальный AI-агент для разработки расширений 1С
 
-[![Status](https://img.shields.io/badge/status-early%20development-orange)](agenter/docs/external-audit/AUDIT_PROMPT.md)
+[![Status](https://img.shields.io/badge/status-early%20development-orange)](docs/external-audit/AUDIT_PROMPT.md)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 Десктопное приложение для разработки расширений к платформе
@@ -9,7 +9,7 @@
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│  agenter/app/main.py — единый процесс                            │
+│  app/main.py — единый процесс                                    │
 │                                                                  │
 │  PyWebView окно (frontend/)                                      │
 │       <->                                                        │
@@ -65,7 +65,7 @@
 ### Установка
 
 ```powershell
-git clone https://github.com/anymasoft/ERP.git D:\CURSORIC\agenter
+git clone https://github.com/anymasoft/Agenter.git D:\CURSORIC\agenter
 cd D:\CURSORIC\agenter\backend
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
@@ -109,27 +109,25 @@ cd D:\CURSORIC\agenter
 **Early development**, sole-founder. Внутренняя разработка для собственного
 ERP-проекта на 1С, готовится к выходу в более широкое использование.
 
-Регрессионная защита: см. `agenter/tests/audit/COVERAGE.md` (генерируется
+Регрессионная защита: см. `tests/audit/COVERAGE.md` (генерируется
 автоматически — `python -m tests.audit.skill_audit`).
 
-Документация — `agenter/README.md` (подробная) и `agenter/docs/`
-(архитектура, ADR, прогресс, аудиты).
+Документация — `docs/` (архитектура, ADR, прогресс, аудиты).
 
 ## Структура репозитория
 
 ```
 .
-|-- agenter/                     # Само приложение
-|   |-- app/                     # Entry point (main.py) + оркестратор + планировщик
-|   |-- backend/                 # Константы, requirements.txt
-|   |-- desktop/                 # ToolExecutor (модуль)
-|   |-- frontend/                # Веб-UI
-|   |-- tests/                   # 226 тестов: skills/, app/, audit/, harness/
-|   |-- docs/                    # Архитектура, ADR, external-audit/
-|   |-- scripts/                 # Legacy PowerShell
-|   |-- config/                  # config.example.json (config.json gitignored)
-|   |-- start.bat                # Запуск
-|   `-- run-tests.bat            # Тесты + аудит покрытия
+|-- app/                         # Entry point (main.py) + оркестратор + планировщик
+|-- backend/                     # Константы, requirements.txt
+|-- desktop/                     # ToolExecutor (модуль)
+|-- frontend/                    # Веб-UI
+|-- tests/                       # 226 тестов: skills/, app/, audit/, harness/
+|-- docs/                        # Архитектура, ADR, external-audit/
+|-- scripts/                     # Legacy PowerShell
+|-- config/                      # config.example.json (config.json gitignored)
+|-- start.bat                    # Запуск
+|-- run-tests.bat                # Тесты + аудит покрытия
 |-- .claude/
 |   `-- skills/                  # 67 PowerShell-скиллов для 1С
 |-- CLAUDE.md                    # Правила проекта для Claude Code
@@ -144,14 +142,14 @@ ERP-проекта на 1С, готовится к выходу в более ш
 - `SCHEME/` — XML-выгрузка конкретной 1С-конфигурации (вендорская IP)
 - `ext_src/` — конкретное расширение разработчика (бизнес-код)
 - `mcp-servers/`, `tsd-emulator/` — отдельные подпроекты
-- `agenter/backend/.venv/`, `__pycache__/`, `agenter.db`, `op_state.json`,
+- `backend/.venv/`, `__pycache__/`, `agenter.db`, `op_state.json`,
   `logs/`, `.env` — runtime state и секреты
 
 ## Credits
 
 PowerShell-скиллы — fork от **[cc-1c-skills](https://github.com/Nikolay-Shirokov/cc-1c-skills)**
 (Николай Широков, MIT). Расширены регрессионными тестами и фиксами для
-заимствованных подсистем (см. `agenter/tests/skills/test_subsystem_edit.py`,
+заимствованных подсистем (см. `tests/skills/test_subsystem_edit.py`,
 `test_cfe_borrow.py`).
 
 BSL Atlas — структурный/семантический поисковый индекс по 1С-конфе.
