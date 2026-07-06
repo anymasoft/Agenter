@@ -113,7 +113,6 @@ tests/audit/COVERAGE.md
 op_state.json
 
 # --- Сторонние дистрибутивы / скретч-рабочие папки (не source) -----------
-/MCP-RSV-Server-*/
 /_work/
 /_skd_sample-*.sql
 *.erf
